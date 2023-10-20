@@ -1,4 +1,5 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://dev.mortystack.com/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = ''
 theme = 'hugo-whisper-theme'
+version= "0.2.7"

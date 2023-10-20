@@ -1,5 +1,5 @@
 ---
-title: 'Hugo Whisper'
+title: "Example Projects"
 date: 2019-02-11T19:27:37+10:00
 weight: 6
 ---
@@ -25,11 +25,11 @@ You can insert code snippets in any markdown file by using standard code fences 
 
 ```js
 function myFunction() {
-  var x = document.getElementById('myDIV');
-  if (x.style.display === 'none') {
-    x.style.display = 'block';
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
   } else {
-    x.style.display = 'none';
+    x.style.display = "none";
   }
 }
 ```
