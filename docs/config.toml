@@ -2,7 +2,6 @@ baseURL = "/"
 theme = "hugo-whisper-theme"
 languageCode = "en-us"
 title = "Hugo Whisper Theme"
-publishDir = "docs"
 
 pygmentsCodeFences = true
 pygmentsCodefencesGuessSyntax = true
