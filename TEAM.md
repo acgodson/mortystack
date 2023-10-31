@@ -9,7 +9,8 @@
   />
 </a> -->
 
+- [Hawraa]()
 - [Tinybird](https://github.com/acgodson)
 - [Blossom]()
 - [Chibuzor Martins](https://github.com/Buzor10)
-- [Harry]()
+
