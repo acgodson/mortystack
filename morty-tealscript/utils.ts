@@ -15,6 +15,8 @@ export function calculateKeccak256(input: string): string {
   return hash;
 }
 
+//localnet
+
 //testnet configuration
 export const algodClient = new algosdk.Algodv2(
   "a".repeat(64),
