@@ -14,7 +14,6 @@ jobs:
           node-version: '14.x'
           always-auth: true
           registry-url: https://github.com/acgodson/mortystack/tree/main/mortystack-sdk/packages
-        — name: Install dependencies using a safe clean install
       - name: Install dependencies and build 🔧
         run: npm ci && npm run build
       - name: Publish package on NPM 📦
