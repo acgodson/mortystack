@@ -4,7 +4,6 @@ import readdir from "recursive-readdir-files";
 
 const isWatching = process.argv.includes("--watch");
 
-
 const getAllEntryPoints = async (rootPath) =>
   (await readdir(rootPath))
     .map(({ path }) => path)
@@ -17,7 +16,7 @@ const getAllEntryPoints = async (rootPath) =>
 
 const baseBuildConfig = {
   banner: {
-    js: '"use client";', // Required for Next 13 App Router
+    js: '"use client";',
   },
   bundle: true,
   format: "esm",
@@ -33,23 +32,10 @@ const baseBuildConfig = {
         __buildVersion: process.env.npm_package_version,
       },
     }),
-    // vanillaExtractPlugin({
-    //   identifiers: isCssMinified ? "short" : "debug",
-    //   processCss: async (css) => {
-    //     const result = await postcss([
-    //       autoprefixer,
-    //       prefixSelector({ prefix: "[data-rk]" }),
-    //     ]).process(css, {
-    //       from: undefined, // suppress source map warning
-    //     });
-
-    //     return result.css;
-    //   },ƒ
-    // }),
     {
       name: "make-all-packages-external",
       setup(build) {
-        const filter = /^[^./]|^\.[^./]|^\.\.[^/]/; // Must not start with "/" or "./" or "../"
+        const filter = /^[^./]|^\.[^./]|^\.\.[^/]/;
         build.onResolve({ filter }, (args) => ({
           external: true,
           path: args.path,
@@ -57,7 +43,7 @@ const baseBuildConfig = {
       },
     },
   ],
-  splitting: true, // Required for tree shaking
+  splitting: true,
 };
 
 const mainBuild = esbuild.build({
@@ -67,7 +53,7 @@ const mainBuild = esbuild.build({
 
     ...(await getAllEntryPoints("src/themes")),
 
-      "./src/components/index.ts",
+    "./src/components/index.ts",
   ],
   outdir: "dist",
   watch: isWatching
