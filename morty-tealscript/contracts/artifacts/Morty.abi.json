@@ -1,0 +1,245 @@
+{
+  "name": "Morty",
+  "desc": "",
+  "methods": [
+    {
+      "name": "createApplication",
+      "args": [],
+      "desc": "Initializes the transaction ID counter when creating the application.",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "subscribe",
+      "args": [
+        {
+          "name": "account",
+          "type": "byte[32]",
+          "desc": "Public key of the account subscribing."
+        }
+      ],
+      "desc": "Allows an account to subscribe, setting a subscription period and charging money after the free 1 month period.",
+      "returns": {
+        "type": "uint64[2]",
+        "desc": "The subscription period [startDate, endDate]."
+      }
+    },
+    {
+      "name": "createRecord",
+      "args": [
+        {
+          "name": "account",
+          "type": "byte[32]",
+          "desc": "Public key of the seller's account."
+        },
+        {
+          "name": "ref",
+          "type": "string",
+          "desc": "Reference string."
+        },
+        {
+          "name": "asset",
+          "type": "asset",
+          "desc": "Asset associated with the seller's record."
+        }
+      ],
+      "desc": "Creates a unique seller record based on the account, reference, and asset information.",
+      "returns": {
+        "type": "byte[32]",
+        "desc": "The unique reference for the seller's record."
+      }
+    },
+    {
+      "name": "makePayment",
+      "args": [
+        {
+          "name": "vault",
+          "type": "asset",
+          "desc": "Asset used for the payment."
+        },
+        {
+          "name": "amount",
+          "type": "uint64",
+          "desc": "Amount of the payment."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "desc": "Description of the payment."
+        },
+        {
+          "name": "sub",
+          "type": "byte[32]",
+          "desc": "Public key of the subscriber."
+        },
+        {
+          "name": "sellerRef",
+          "type": "string",
+          "desc": "Reference string associated with the seller's record."
+        },
+        {
+          "name": "from",
+          "type": "address",
+          "desc": "Sender's address."
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "desc": "Receiver's address."
+        }
+      ],
+      "desc": "Processes a payment transaction, creating a new transaction record and associated metadata.",
+      "returns": {
+        "type": "uint64",
+        "desc": "The receipt (asset) for the payment transaction."
+      }
+    },
+    {
+      "name": "claimPayment",
+      "args": [
+        {
+          "name": "txID",
+          "type": "uint64",
+          "desc": "Transaction ID of the payment transaction."
+        },
+        {
+          "name": "payASA",
+          "type": "asset",
+          "desc": "Asset associated with the payment."
+        },
+        {
+          "name": "txn",
+          "type": "pay",
+          "desc": "Payment transaction details."
+        }
+      ],
+      "desc": "Handles the payment claim process, verifying the seller's signature and transferring assets to the seller.",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "claimReceipt",
+      "args": [
+        {
+          "name": "txID",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "receipt",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "getLastSubscription",
+      "args": [
+        {
+          "name": "acc",
+          "type": "byte[32]",
+          "desc": "Public key of the account."
+        }
+      ],
+      "desc": "Retrieves the current subscription period for a given account.",
+      "returns": {
+        "type": "uint64[2]",
+        "desc": "The subscription period [startDate, endDate]."
+      }
+    },
+    {
+      "name": "getReceipt",
+      "args": [
+        {
+          "name": "txID",
+          "type": "uint64",
+          "desc": "Transaction ID."
+        }
+      ],
+      "desc": "Retrieves the receipt (asset) associated with a given transaction ID.",
+      "returns": {
+        "type": "uint64",
+        "desc": "The receipt (asset) for the specified transaction."
+      }
+    },
+    {
+      "name": "getVault",
+      "args": [
+        {
+          "name": "txID",
+          "type": "uint64",
+          "desc": "Transaction ID."
+        }
+      ],
+      "desc": "Retrieves the vault (asset) associated with a given transaction ID.",
+      "returns": {
+        "type": "uint64",
+        "desc": "The vault (asset) for the specified transaction."
+      }
+    },
+    {
+      "name": "getRecordReference",
+      "args": [
+        {
+          "name": "start",
+          "type": "uint64",
+          "desc": "Start timestamp."
+        },
+        {
+          "name": "end",
+          "type": "uint64",
+          "desc": "End timestamp."
+        },
+        {
+          "name": "ref",
+          "type": "string",
+          "desc": "Reference string."
+        }
+      ],
+      "desc": "Generates a unique record reference based on start and end timestamps and a reference string.",
+      "returns": {
+        "type": "byte[32]",
+        "desc": "The unique reference for the seller's record."
+      }
+    },
+    {
+      "name": "getMyTxnIDs",
+      "args": [
+        {
+          "name": "reference",
+          "type": "byte[32]",
+          "desc": "Unique reference for the seller's record."
+        }
+      ],
+      "desc": "Retrieves transaction IDs associated with a specific record reference.",
+      "returns": {
+        "type": "uint64[]",
+        "desc": "An array of transaction IDs associated with the specified record reference."
+      }
+    },
+    {
+      "name": "getTxnInfo",
+      "args": [
+        {
+          "name": "txID",
+          "type": "uint64",
+          "desc": "Transaction ID."
+        }
+      ],
+      "desc": "Retrieves transaction information including description, status, and round index for a given transaction ID.",
+      "returns": {
+        "type": "(string,uint64,uint64)",
+        "desc": "Transaction information object{description, status, rIdx}."
+      }
+    }
+  ]
+}

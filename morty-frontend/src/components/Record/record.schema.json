@@ -1,0 +1,37 @@
+{
+    "type": "object",
+    "properties": {
+      "start-date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end-date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "intervalMs": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "rounds": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": ["amount", "description"]
+          }
+        }
+      }
+    },
+    "required": ["start-date", "end-date", "intervalMs", "rounds"]
+  }
+  
