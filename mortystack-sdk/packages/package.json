@@ -1,7 +1,7 @@
 {
   "name": "mortystack",
   "version": "0.0.0",
-  "description": "Add a new payment-options to your web apps - Recieve Algorand Assets",
+  "description":  "Recieve Algorand Assets from customers when you add morty as a payment option in your web apps -",
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",
