@@ -30,6 +30,7 @@ describe("Morty", () => {
   let buyerAccount: any;
   let paymentASA: bigint | number;
   let recordReference: Uint8Array;
+  let transactions: any[];
   beforeEach(fixture.beforeEach);
 
   beforeAll(async () => {
@@ -261,7 +262,7 @@ describe("Morty", () => {
 
     const returnedIDs: any = myPayments.return?.valueOf();
 
-    let transactions = [];
+    transactions = [];
 
     for (let i = 0; i < returnedIDs.length; i++) {
       const fetchTxnInfo = await appClient.getTxnInfo(
@@ -329,5 +330,55 @@ describe("Morty", () => {
     const b = await indexerClient.lookupAssetBalances(Number(paymentASA)).do();
     const list: any[] = b.balances;
     const filtered = list.filter((x) => x.address === sender.addr);
+  });
+
+  test("Make Receipt Claim", async () => {
+    await appClient.appClient.fundAppAccount(microAlgos(200_000));
+    // fetch all payments
+    console.log(transactions);
+    const suggestedParams = await algodClient.getTransactionParams().do();
+
+    const atc = new algosdk.AtomicTransactionComposer();
+
+    const OptInzTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject(
+      {
+        from: buyerAccount.addr,
+        suggestedParams: suggestedParams,
+        to: buyerAccount.addr,
+        amount: 0,
+        assetIndex: Number(transactions[0].receipt),
+      }
+    );
+
+    atc.addTransaction({
+      txn: OptInzTxn,
+      signer: algosdk.makeBasicAccountTransactionSigner(buyerAccount),
+    });
+
+    atc.addMethodCall({
+      method: appClient.appClient.getABIMethod("claimReceipt")!,
+      methodArgs: [transactions[0].id, transactions[0].receipt],
+      suggestedParams: {
+        ...suggestedParams,
+        fee: 3000,
+      },
+      sender: buyerAccount.addr,
+      boxes: [
+        {
+          appIndex: Number((await appClient.appClient.getAppReference()).appId),
+          name: algosdk.encodeUint64(transactions[0].id),
+        },
+      ],
+      appID: Number((await appClient.appClient.getAppReference()).appId),
+      signer: algosdk.makeBasicAccountTransactionSigner(buyerAccount),
+    });
+
+    atc.submit(algod);
+
+    // await algokit.waitForConfirmation(makeClaim.transaction.txID(), 3, algod);
+
+    // const b = await indexerClient.lookupAssetBalances(Number(paymentASA)).do();
+    // const list: any[] = b.balances;
+    // const filtered = list.filter((x) => x.address === sender.addr);
   });
 });

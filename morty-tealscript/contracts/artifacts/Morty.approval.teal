@@ -334,24 +334,6 @@ makePayment:
 	frame_bury -8 // txnID: uint64
 
 	// contracts/morty.algo.ts:103
-	// assert(!this.transactionDetails(txnID).exists)
-	frame_dig -8 // txnID: uint64
-	itob
-	box_len
-	swap
-	pop
-	!
-	assert
-
-	// contracts/morty.algo.ts:104
-	// assert(this.subscription(sub).exists)
-	frame_dig -4 // sub: byte[32]
-	box_len
-	swap
-	pop
-	assert
-
-	// contracts/morty.algo.ts:105
 	// assert(this.subscription(sub).value[1] > globals.latestTimestamp)
 	frame_dig -4 // sub: byte[32]
 	box_get
@@ -362,7 +344,7 @@ makePayment:
 	>
 	assert
 
-	// contracts/morty.algo.ts:106
+	// contracts/morty.algo.ts:104
 	// period: uint64 =
 	//       this.subscription(sub).value[0] + this.subscription(sub).value[1]
 	frame_dig -4 // sub: byte[32]
@@ -378,7 +360,7 @@ makePayment:
 	+
 	frame_bury -9 // period: uint64
 
-	// contracts/morty.algo.ts:108
+	// contracts/morty.algo.ts:106
 	// recordID: byte32 = keccak256(sellerRef + period.toString())
 	frame_dig -5 // sellerRef: bytes
 	frame_dig -9 // period: uint64
@@ -387,7 +369,7 @@ makePayment:
 	keccak256
 	frame_bury -10 // recordID: byte32
 
-	// contracts/morty.algo.ts:109
+	// contracts/morty.algo.ts:107
 	// assert(this.sellerRecord(recordID).exists)
 	frame_dig -10 // recordID: byte32
 	box_len
@@ -395,7 +377,7 @@ makePayment:
 	pop
 	assert
 
-	// contracts/morty.algo.ts:112
+	// contracts/morty.algo.ts:110
 	// sendAssetTransfer({
 	//       xferAsset: vault,
 	//       assetAmount: 0,
@@ -407,27 +389,27 @@ makePayment:
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/morty.algo.ts:113
+	// contracts/morty.algo.ts:111
 	// xferAsset: vault
 	frame_dig -1 // vault: asset
 	itxn_field XferAsset
 
-	// contracts/morty.algo.ts:114
+	// contracts/morty.algo.ts:112
 	// assetAmount: 0
 	int 0
 	itxn_field AssetAmount
 
-	// contracts/morty.algo.ts:115
+	// contracts/morty.algo.ts:113
 	// fee: 10000
 	int 10000
 	itxn_field Fee
 
-	// contracts/morty.algo.ts:116
+	// contracts/morty.algo.ts:114
 	// assetReceiver: this.app.address
 	global CurrentApplicationAddress
 	itxn_field AssetReceiver
 
-	// contracts/morty.algo.ts:117
+	// contracts/morty.algo.ts:115
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
@@ -435,7 +417,7 @@ makePayment:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/morty.algo.ts:120
+	// contracts/morty.algo.ts:118
 	// roundID: uint64 = this.calculateRoundIndex(
 	//       this.subscription(sub).value[0],
 	//       globals.latestTimestamp
@@ -450,7 +432,7 @@ makePayment:
 	callsub calculateRoundIndex
 	frame_bury -11 // roundID: uint64
 
-	// contracts/morty.algo.ts:125
+	// contracts/morty.algo.ts:123
 	// receipt: Asset = sendAssetCreation({
 	//       configAssetTotal: 1,
 	//       configAssetFreeze: this.app.address,
@@ -461,22 +443,22 @@ makePayment:
 	int acfg
 	itxn_field TypeEnum
 
-	// contracts/morty.algo.ts:126
+	// contracts/morty.algo.ts:124
 	// configAssetTotal: 1
 	int 1
 	itxn_field ConfigAssetTotal
 
-	// contracts/morty.algo.ts:127
+	// contracts/morty.algo.ts:125
 	// configAssetFreeze: this.app.address
 	global CurrentApplicationAddress
 	itxn_field ConfigAssetFreeze
 
-	// contracts/morty.algo.ts:128
+	// contracts/morty.algo.ts:126
 	// configAssetClawback: this.app.address
 	global CurrentApplicationAddress
 	itxn_field ConfigAssetClawback
 
-	// contracts/morty.algo.ts:129
+	// contracts/morty.algo.ts:127
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
@@ -490,7 +472,7 @@ makePayment:
 	itxn CreatedAssetID
 	frame_bury -12 // receipt: asset
 
-	// contracts/morty.algo.ts:132
+	// contracts/morty.algo.ts:130
 	// metadata: metadata = {
 	//       vault: vault,
 	//       value: amount,
@@ -534,7 +516,7 @@ makePayment:
 	concat // concat head and tail
 	frame_bury -13 // metadata: metadata
 
-	// contracts/morty.algo.ts:143
+	// contracts/morty.algo.ts:141
 	// this.transactionDetails(txnID).value = metadata
 	frame_dig -8 // txnID: uint64
 	itob
@@ -544,7 +526,7 @@ makePayment:
 	frame_dig -13 // metadata: metadata
 	box_put
 
-	// contracts/morty.algo.ts:144
+	// contracts/morty.algo.ts:142
 	// this.sellerRecord(recordID).value.push(txnID)
 	frame_dig -10 // recordID: byte32
 	box_get
@@ -568,7 +550,7 @@ makePayment:
 	concat
 	box_put
 
-	// contracts/morty.algo.ts:145
+	// contracts/morty.algo.ts:143
 	// this.TxnIDx.value = this.TxnIDx.value + 1
 	byte 0x54786e494478 // "TxnIDx"
 	byte 0x54786e494478 // "TxnIDx"
@@ -577,7 +559,7 @@ makePayment:
 	+
 	app_global_put
 
-	// contracts/morty.algo.ts:146
+	// contracts/morty.algo.ts:144
 	// return receipt;
 	frame_dig -12 // receipt: asset
 	itob
@@ -623,7 +605,7 @@ abi_route_claimPayment:
 claimPayment:
 	proto 7 0
 
-	// contracts/morty.algo.ts:157
+	// contracts/morty.algo.ts:155
 	// assert(this.transactionDetails(txID).exists)
 	frame_dig -1 // txID: uint64
 	itob
@@ -632,7 +614,7 @@ claimPayment:
 	pop
 	assert
 
-	// contracts/morty.algo.ts:158
+	// contracts/morty.algo.ts:156
 	// pubKey: Address = this.transactionDetails(txID).value.to
 	frame_dig -1 // txID: uint64
 	itob
@@ -643,14 +625,14 @@ claimPayment:
 	extract 34 32
 	frame_bury -4 // pubKey: address
 
-	// contracts/morty.algo.ts:159
+	// contracts/morty.algo.ts:157
 	// assert(this.txn.sender === pubKey)
 	txn Sender
 	frame_dig -4 // pubKey: address
 	==
 	assert
 
-	// contracts/morty.algo.ts:160
+	// contracts/morty.algo.ts:158
 	// verifyTxn(txn, { receiver: pubKey })
 	// verify receiver
 	frame_dig -3 // txn: pay
@@ -659,7 +641,7 @@ claimPayment:
 	==
 	assert
 
-	// contracts/morty.algo.ts:161
+	// contracts/morty.algo.ts:159
 	// status: uint64 = this.transactionDetails(txID).value.status
 	frame_dig -1 // txID: uint64
 	itob
@@ -671,14 +653,14 @@ claimPayment:
 	btoi
 	frame_bury -5 // status: uint64
 
-	// contracts/morty.algo.ts:162
+	// contracts/morty.algo.ts:160
 	// assert(status === 0)
 	frame_dig -5 // status: uint64
 	int 0
 	==
 	assert
 
-	// contracts/morty.algo.ts:163
+	// contracts/morty.algo.ts:161
 	// asset: Asset = this.transactionDetails(txID).value.vault
 	frame_dig -1 // txID: uint64
 	itob
@@ -690,14 +672,14 @@ claimPayment:
 	btoi
 	frame_bury -6 // asset: asset
 
-	// contracts/morty.algo.ts:164
+	// contracts/morty.algo.ts:162
 	// assert(payASA === asset)
 	frame_dig -2 // payASA: asset
 	frame_dig -6 // asset: asset
 	==
 	assert
 
-	// contracts/morty.algo.ts:165
+	// contracts/morty.algo.ts:163
 	// amount: uint64 = this.transactionDetails(txID).value.value
 	frame_dig -1 // txID: uint64
 	itob
@@ -709,14 +691,14 @@ claimPayment:
 	btoi
 	frame_bury -7 // amount: uint64
 
-	// contracts/morty.algo.ts:166
+	// contracts/morty.algo.ts:164
 	// assert(amount > 0)
 	frame_dig -7 // amount: uint64
 	int 0
 	>
 	assert
 
-	// contracts/morty.algo.ts:169
+	// contracts/morty.algo.ts:167
 	// this.pendingGroup.addAssetTransfer({
 	//       xferAsset: asset,
 	//       assetAmount: amount,
@@ -727,31 +709,31 @@ claimPayment:
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/morty.algo.ts:170
+	// contracts/morty.algo.ts:168
 	// xferAsset: asset
 	frame_dig -6 // asset: asset
 	itxn_field XferAsset
 
-	// contracts/morty.algo.ts:171
+	// contracts/morty.algo.ts:169
 	// assetAmount: amount
 	frame_dig -7 // amount: uint64
 	itxn_field AssetAmount
 
-	// contracts/morty.algo.ts:172
+	// contracts/morty.algo.ts:170
 	// assetReceiver: this.txn.sender
 	txn Sender
 	itxn_field AssetReceiver
 
-	// contracts/morty.algo.ts:173
+	// contracts/morty.algo.ts:171
 	// fee: 10000
 	int 10000
 	itxn_field Fee
 
-	// contracts/morty.algo.ts:176
+	// contracts/morty.algo.ts:174
 	// this.pendingGroup.submit()
 	itxn_submit
 
-	// contracts/morty.algo.ts:178
+	// contracts/morty.algo.ts:176
 	// this.transactionDetails(txID).value.value = 0
 	frame_dig -1 // txID: uint64
 	itob
@@ -770,7 +752,7 @@ claimPayment:
 	swap
 	box_put
 
-	// contracts/morty.algo.ts:179
+	// contracts/morty.algo.ts:177
 	// this.transactionDetails(txID).value.status = 1
 	frame_dig -1 // txID: uint64
 	itob
@@ -792,7 +774,7 @@ claimPayment:
 
 // claimReceipt(asset,uint64)void
 abi_route_claimReceipt:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x; dup // push empty bytes to fill the stack frame for this subroutine's local variables
 
 	// receipt: asset
 	txna ApplicationArgs 2
@@ -809,15 +791,33 @@ abi_route_claimReceipt:
 	return
 
 claimReceipt:
-	proto 3 0
+	proto 4 0
 
-	// contracts/morty.algo.ts:183
+	// contracts/morty.algo.ts:181
 	// assert(this.transactionDetails(txID).exists)
 	frame_dig -1 // txID: uint64
 	itob
 	box_len
 	swap
 	pop
+	assert
+
+	// contracts/morty.algo.ts:182
+	// payer: Address = this.transactionDetails(txID).value.from
+	frame_dig -1 // txID: uint64
+	itob
+	box_get
+	assert
+	store 0 // full array
+	load 0 // full array
+	extract 66 32
+	frame_bury -3 // payer: address
+
+	// contracts/morty.algo.ts:183
+	// assert(payer === this.txn.sender)
+	frame_dig -3 // payer: address
+	txn Sender
+	==
 	assert
 
 	// contracts/morty.algo.ts:184
@@ -830,54 +830,73 @@ claimReceipt:
 	load 0 // full array
 	extract 26 8
 	btoi
-	frame_bury -3 // asset: asset
+	frame_bury -4 // asset: asset
 
 	// contracts/morty.algo.ts:185
 	// assert(asset !== Asset.zeroIndex)
-	frame_dig -3 // asset: asset
+	frame_dig -4 // asset: asset
 	int 0
 	!=
 	assert
 
-	// contracts/morty.algo.ts:188
+	// contracts/morty.algo.ts:187
 	// sendAssetTransfer({
 	//       xferAsset: receipt,
-	//       assetAmount: 0,
+	//       assetAmount: 1,
 	//       fee: 10000,
 	//       assetReceiver: this.txn.sender,
-	//       sender: this.txn.sender,
+	//       sender: this.app.address,
 	//     })
 	itxn_begin
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/morty.algo.ts:189
+	// contracts/morty.algo.ts:188
 	// xferAsset: receipt
 	frame_dig -2 // receipt: asset
 	itxn_field XferAsset
 
-	// contracts/morty.algo.ts:190
-	// assetAmount: 0
-	int 0
+	// contracts/morty.algo.ts:189
+	// assetAmount: 1
+	int 1
 	itxn_field AssetAmount
 
-	// contracts/morty.algo.ts:191
+	// contracts/morty.algo.ts:190
 	// fee: 10000
 	int 10000
 	itxn_field Fee
 
-	// contracts/morty.algo.ts:192
+	// contracts/morty.algo.ts:191
 	// assetReceiver: this.txn.sender
 	txn Sender
 	itxn_field AssetReceiver
 
-	// contracts/morty.algo.ts:193
-	// sender: this.txn.sender
-	txn Sender
+	// contracts/morty.algo.ts:192
+	// sender: this.app.address
+	global CurrentApplicationAddress
 	itxn_field Sender
 
 	// Submit inner transaction
 	itxn_submit
+
+	// contracts/morty.algo.ts:195
+	// this.transactionDetails(txID).value.receipt = Asset.zeroIndex
+	frame_dig -1 // txID: uint64
+	itob
+	box_get
+	assert
+	store 0 // full array
+	load 0 // full array
+	int 26
+	byte 0x0000000000000000
+	replace3
+	frame_dig -1 // txID: uint64
+	itob
+	dup
+	box_del
+	pop
+	swap
+	box_put
 	retsub
 
 // getLastSubscription(byte[32])uint64[2]
@@ -902,7 +921,7 @@ abi_route_getLastSubscription:
 getLastSubscription:
 	proto 1 0
 
-	// contracts/morty.algo.ts:205
+	// contracts/morty.algo.ts:204
 	// return this.subscription(acc).value;
 	frame_dig -1 // acc: byte[32]
 	box_get
@@ -933,7 +952,7 @@ abi_route_getReceipt:
 getReceipt:
 	proto 2 0
 
-	// contracts/morty.algo.ts:214
+	// contracts/morty.algo.ts:213
 	// receipt: Asset = this.transactionDetails(txID).value.receipt
 	frame_dig -1 // txID: uint64
 	itob
@@ -945,7 +964,7 @@ getReceipt:
 	btoi
 	frame_bury -2 // receipt: asset
 
-	// contracts/morty.algo.ts:215
+	// contracts/morty.algo.ts:214
 	// return receipt;
 	frame_dig -2 // receipt: asset
 	itob
@@ -975,7 +994,7 @@ abi_route_getVault:
 getVault:
 	proto 2 0
 
-	// contracts/morty.algo.ts:224
+	// contracts/morty.algo.ts:223
 	// receipt: Asset = this.transactionDetails(txID).value.vault
 	frame_dig -1 // txID: uint64
 	itob
@@ -987,7 +1006,7 @@ getVault:
 	btoi
 	frame_bury -2 // receipt: asset
 
-	// contracts/morty.algo.ts:225
+	// contracts/morty.algo.ts:224
 	// return receipt;
 	frame_dig -2 // receipt: asset
 	itob
@@ -1027,14 +1046,14 @@ abi_route_getRecordReference:
 getRecordReference:
 	proto 5 0
 
-	// contracts/morty.algo.ts:236
+	// contracts/morty.algo.ts:235
 	// period: uint64 = start + end
 	frame_dig -1 // start: uint64
 	frame_dig -2 // end: uint64
 	+
 	frame_bury -4 // period: uint64
 
-	// contracts/morty.algo.ts:237
+	// contracts/morty.algo.ts:236
 	// reference: byte32 = keccak256(ref + period.toString())
 	frame_dig -3 // ref: bytes
 	frame_dig -4 // period: uint64
@@ -1043,7 +1062,7 @@ getRecordReference:
 	keccak256
 	frame_bury -5 // reference: byte32
 
-	// contracts/morty.algo.ts:238
+	// contracts/morty.algo.ts:237
 	// return reference;
 	byte 0x151f7c75
 	frame_dig -5 // reference: byte32
@@ -1073,7 +1092,7 @@ abi_route_getMyTxnIDs:
 getMyTxnIDs:
 	proto 1 0
 
-	// contracts/morty.algo.ts:247
+	// contracts/morty.algo.ts:246
 	// assert(this.sellerRecord(reference).exists)
 	frame_dig -1 // reference: byte[32]
 	box_len
@@ -1081,7 +1100,7 @@ getMyTxnIDs:
 	pop
 	assert
 
-	// contracts/morty.algo.ts:248
+	// contracts/morty.algo.ts:247
 	// return this.sellerRecord(reference).value;
 	frame_dig -1 // reference: byte[32]
 	box_get
@@ -1121,7 +1140,7 @@ abi_route_getTxnInfo:
 getTxnInfo:
 	proto 2 0
 
-	// contracts/morty.algo.ts:261
+	// contracts/morty.algo.ts:260
 	// txnInfo: {
 	//       description: string;
 	//       status: uint64;
@@ -1185,7 +1204,7 @@ getTxnInfo:
 	concat // concat head and tail
 	frame_bury -2 // txnInfo: { description: string; status: uint64; rIdx: uint64; }
 
-	// contracts/morty.algo.ts:270
+	// contracts/morty.algo.ts:269
 	// return txnInfo;
 	byte 0x151f7c75
 	frame_dig -2 // txnInfo: { description: string; status: uint64; rIdx: uint64; }

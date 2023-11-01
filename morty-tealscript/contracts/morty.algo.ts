@@ -100,8 +100,6 @@ class Morty extends Contract {
   ): Asset {
     verifyTxn(this.txn, { sender: from });
     const txnID: uint64 = this.TxnIDx.value;
-    assert(!this.transactionDetails(txnID).exists);
-    assert(this.subscription(sub).exists);
     assert(this.subscription(sub).value[1] > globals.latestTimestamp);
     const period: uint64 =
       this.subscription(sub).value[0] + this.subscription(sub).value[1];
@@ -186,16 +184,6 @@ class Morty extends Contract {
     const asset: Asset = this.transactionDetails(txID).value.receipt;
     assert(asset !== Asset.zeroIndex); //
 
-    //opt in seller into asset and transafer
-    sendAssetTransfer({
-      xferAsset: receipt,
-      assetAmount: 0,
-      fee: 10000,
-      assetReceiver: this.txn.sender,
-      sender: this.txn.sender,
-    });
-    
-
     sendAssetTransfer({
       xferAsset: receipt,
       assetAmount: 1,
@@ -204,9 +192,7 @@ class Morty extends Contract {
       sender: this.app.address,
     });
 
-
-
-
+    this.transactionDetails(txID).value.receipt = Asset.zeroIndex;
   }
 
   /**
