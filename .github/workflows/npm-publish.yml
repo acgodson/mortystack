@@ -27,6 +27,8 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+      - run: npm ci
+        working-directory: ./mortystack-sdk/packages
       - run: npm publish
         working-directory: ./mortystack-sdk/packages
         env:
