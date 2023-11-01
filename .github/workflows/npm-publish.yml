@@ -13,9 +13,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: cd mortystack-sdk/packages
-      - run: npm install  # Use `npm install` instead of `npm ci`
+      - run: npm install
+        working-directory: ./mortystack-sdk/packages
       - run: npm test
+        working-directory: ./mortystack-sdk/packages
 
   publish-npm:
     needs: build
@@ -26,7 +27,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: cd mortystack-sdk/packages
       - run: npm publish
+        working-directory: ./mortystack-sdk/packages
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
