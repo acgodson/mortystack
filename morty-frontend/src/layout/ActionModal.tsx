@@ -71,12 +71,11 @@ const AModalLayout: React.FC<AModalProps> = ({ isOpen, onClose, title, size, bod
                 <ModalBody w="100%"
                     pt={12}
                     bg="#182942"
-                    positio='relative'
+                    position='relative'
                     overflowY={"auto"}
                     minH={size}
                 >
                     <Box p={6}
-
                     >
                         <Center>
                             {body}
