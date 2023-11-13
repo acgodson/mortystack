@@ -31,23 +31,23 @@ const HowItWorks = () => {
     return (
         <Box py={10} w="100%">
 
-            <Box pl={32} maxW="30%">
+            <Box pl={[3, 3, 3, 32]} maxW={["100%", "100%", "30%"]}>
                 <Heading
                     letterSpacing={"1px"}
-                    fontSize={"5xl"}
+                    fontSize={["lg", "lg", "3xl", "5xl"]}
                     fontWeight={"semibold"}
                     textAlign="left" mb={8}>
 
-                    <span style={{
+                    <Box as="span" sx={{
                         color: "#659df6"
                     }}>
                         Beginner-friendly <br />
-                    </span>
+                    </Box>
 
                     Options to Choose from
                 </Heading>
                 <Select
-                    py={5}
+                    py={[3, 3, 3, 5]}
                     mb={4}
                     onChange={(e: any) => handleOptionChange(e.target.value)}
                     defaultValue=""
@@ -64,8 +64,7 @@ const HowItWorks = () => {
             </Box>
 
             <Box
-                // ml={32}
-                // pr={32}
+
                 w="100%"
                 ref={containerRef}
                 overflowX="auto"
@@ -74,23 +73,21 @@ const HowItWorks = () => {
             >
                 <HStack
                     w="100%"
-                    marginLeft={64}
+                    marginLeft={24}
                     paddingLeft={12}
                     spacing={8}>
                     {options.map((option, index) => (
                         <Box
-                            // marginLeft={32}
                             key={option}
-                            className="grid-item" // Assign a unique class name to your grid items
-                            // direction="column"
-                            // align="center"
-                            // justify="center"
+                            // className="grid-item"
                             bg="#152037"
-                            h="500px"
-                            w="500px"
+                            h={["250px", "250px", "500px"]}
+                            w={["100%", "100%", "500px"]}
                             borderRadius="md"
                             p={6}
                         >
+                            <Box
+                                w="250px" />
                             {/* ... */}
                         </Box>
                     ))}

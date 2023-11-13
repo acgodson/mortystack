@@ -11,28 +11,35 @@ const FeaturesComponent = ({ features }: any) => {
                 w="100%"
                 left={0}
                 mx={0}
-                px={32}
-                mt={[8, 8, 16]} py={3}>
+                px={[3, 3, 3, 32]}
+                mt={[8, 8, 8, 16]} py={3}>
 
 
                 {features.map((feature: any, index: number) => (
-                    <Flex
+                    <Stack
                         // w="100%"
                         key={index}
                         justifyContent={"space-between"}
                         alignItems={"center"}
-                        direction={{ base: 'column', md: index % 2 === 0 ? 'row' : 'row-reverse' }}
+                        direction={{ base: 'column-reverse', lg: index % 2 === 0 ? 'row' : 'row-reverse', md: 'column-reverse' }}
                         width="100%"
                         mb={8}
+                        display={"flex"}
+                        spacing={"lg"}
+
                     >
-                        <Box width={{ base: '100%', md: '50%' }} pr={{ md: index % 2 === 0 ? 4 : 0 }}>
+                        <Box width={{ base: '100%', md: "100%", lg: '50%' }}
+                            pt={[8, 8, 8, 0]}
+                            pr={{ lg: index % 2 === 0 ? 4 : 0 }}>
                             <Heading
                                 fontSize={["lg", "lg", "4xl"]}
-                                color="lightpink" letterSpacing={"1.3px"} fontWeight="semibold" mb={1}>
+                                fontFamily={"CustomFontPlainRegular"}
+                                color="#a6a6ee"
+                                letterSpacing={"1.3px"} fontWeight="semibold" mb={1}>
                                 {feature.title}
                             </Heading>
                             <Text mb={4}
-                                fontSize={["md", "md", "2xl"]}
+                                color="#a6a6bb" fontSize={["md", "md", "xl"]}
                             >{feature.subtitle.length > 1 ? feature.subtitle :
                                 "Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, nihil. Sed ut omnis consequatur ab molestiae fugit esse ratione voluptatem ex mollitia. Impedit delectus laboriosam repudiandae cupiditate quos! Accusantium, veniam?"
                                 }</Text>
@@ -41,15 +48,21 @@ const FeaturesComponent = ({ features }: any) => {
                             )}
                             {index === 1 && (
                                 <>
-                                    <Stack spacing={3} direction={["column", "column", "row"]} textAlign="left" justify={"flex-start"} w="100%" maxW="300px">
+                                    <Stack
+
+                                        spacing={3} direction={["column", "column", "row"]} textAlign="left" justify={"flex-start"} w="100%">
                                         <Box bg="#152036" px={4} py={3} borderRadius="8px">
-                                            <Text fontSize={"lg"} fontWeight={"semibold"}>Value Tokens</Text>
-                                            <Text color="whiteAlpha.800" fontSize={"xs"}>Reward customers with exclusive or redeemable tokens for successful purchase.</Text>
+                                            <Text fontSize={["lg", "lg", "lg", "xl"]}
+                                                color="#4f4fde"
+                                                fontWeight={"semibold"}>Value Tokens</Text>
+                                            <Text color="whiteAlpha.800" fontSize={["xs", "xs", "xs", "md"]}>Reward customers with exclusive or redeemable tokens for successful purchase.</Text>
                                         </Box>
 
                                         <Box bg="#152036" px={4} py={3} borderRadius="8px">
-                                            <Text fontSize={"lg"} fontWeight={"semibold"}>Receipts</Text>
-                                            <Text color="whiteAlpha.800" fontSize={"xs"}>Reward customers with exclusive or redeemable tokens for successful purchase.</Text>
+                                            <Text
+                                                color="#4f4fde"
+                                                fontSize={["lg", "lg", "lg", "xl"]} fontWeight={"semibold"}>Receipts</Text>
+                                            <Text color="whiteAlpha.800" fontSize={["xs", "xs", "xs", "md"]}>Reward customers with exclusive or redeemable tokens for successful purchase.</Text>
                                         </Box>
                                     </Stack>
                                 </>
@@ -58,29 +71,47 @@ const FeaturesComponent = ({ features }: any) => {
                         </Box>
 
                         <Box
+                            mb={[24, 24, 64, 0]}
                             border={"solid 0.9px #253350"}
-                            maxW="40%"
-                            h="500px"
+                            maxW={["100%", "100%", "100%", "40%"]}
+                            h={['250px', "250px", "250px", "fit-content"]}
                             borderRadius={["15px", "15px", "25px"]}
-                            width={{ base: '100%', md: '50%', lg: "100%" }} bg="#152036">
+                            width={{ base: '100%', md: '100%', lg: "100%" }}
+                            cursor={"pointer"}
+                            _hover={{
+                                bg: "#152036"
+                            }}
+                            bg="#152036">
                             {/* <Image src={feature.image} alt={feature.title} /> */}
+
+                            <Box h="100%"
+                                w="auto"
+
+                            >
+                                <Box
+                                    as="img"
+                                    src={feature.image}
+                                />
+
+                            </Box>
+
                         </Box>
 
 
 
-                    </Flex>
+                    </Stack>
                 ))}
 
 
                 <Box right={0}
                     py={12}
-                    borderBottom={"1px solid white"}
+                    borderBottom={"1px solid #262f3c"}
                     position={"absolute"} w="100%"
                     maxW={"60%"}
 
-                >
+                />
 
-                </Box>
+
             </Box >
 
         </>

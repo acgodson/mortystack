@@ -1,24 +1,71 @@
-import { useTabs } from "@/context/TabsContext";
-import { Box, HStack, Text, Heading, Button, TabList, Tab, Flex } from "@chakra-ui/react";
-import { FaExternalLinkAlt } from "react-icons/fa";
 
+import { useSignInModal } from "@/contexts/ModalContext/useModalContext";
+import { useTabs } from "@/contexts/TabContext/TabsContext";
+import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
+import { Box, HStack, Text, Heading, Button, TabList, Tab, Flex, Stack, IconButton } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { FaExternalLinkAlt, FaHamburger } from "react-icons/fa";
+import ProfileDropdownButton from "./ProfileDropDown";
+import { MdClose, MdMenu } from "react-icons/md";
+import { shortenAddress } from "@/Wormhole/core/tokenSelector/TokenPicker";
+import { getAuth } from "firebase/auth";
+import { useTransaction } from "@/contexts/TransactionContext";
+import { useWallet } from "@txnlab/use-wallet";
+
+function getJoinedDate(date: string) {
+    // Parse the Firebase Authentication date string
+    const dateObject = new Date(date);
+
+    // Extract month and year
+    const month = dateObject.toLocaleString('default', { month: 'long' }); // Full month name
+    const year = dateObject.getFullYear();
+
+    // Output the result
+    const formattedDate = `${month} ${year}`;
+    return formattedDate
+}
 
 
 export default function NavigationBar() {
-
+    const auth = getAuth()
+    const joined = auth.currentUser?.metadata.creationTime || " "
     const { activeTab }: any = useTabs();
+    const { isModalOpen, openModal, closeModal }: any = useSignInModal();
+    const { user, web3AuthAccount, logout, web3AuthProfile }: any = useWeb3AuthProvider()
+    const { activeAddress, providers, getAccountInfo } = useWallet()
+    const [profile, setProfile] = useState<any | null>(null)
+    const [isMenuOpen, setMenuOpen] = useState(false)
     const isHome = activeTab === 0 ? true : false
+    const [connectedProvider, setConnectedProvider] = useState<any | null>(null)
     const menuList = [
         "Home", "Dashboard", "Shops"
     ]
+    const { peraAccount }: any = useTransaction()
+
+
+    const handleLoginClick = () => {
+        openModal()
+    }
+
+    const toggleMenu = () => setMenuOpen(!isMenuOpen)
+
+    useEffect(() => {
+        if (activeAddress && !connectedProvider) {
+            setConnectedProvider(providers?.filter((x) => x.isActive === true)[0])
+        }
+    }, [providers, activeAddress])
+
+
+
     return (
         <Box>
 
-
-
             {/* overlay */}
             <Box
-                h="100px"
+                h={[
+                    isMenuOpen ? "100vh" : "100px",
+                    isMenuOpen ? "100vh" : "100px",
+                    "100px"]}
                 w="100%"
                 zIndex={"tooltip"}
                 top={0}
@@ -34,66 +81,87 @@ export default function NavigationBar() {
                 w="100%"
                 position={"fixed"}
                 zIndex={"tooltip"}
-                bg="transparent"
+                bg={["rgba(21, 34, 57, 0.8)", 'rgba(21, 34, 57, 0.8)', "transparent"]}
                 py={[0, 0, 8]}
                 pb={[1, 1, 4]}
-                px={[0, 0, 16]}>
-                <HStack
-                    border={"solid 0.9px #253350"}
-                    // border={isHome ? "none" : "solid 0.9px #253350"}
+                px={[0, 0, 0, 16]}>
+                <Stack
+                    direction={[
+                        "column",
+                        "column",
+                        "row"
+                    ]}
+                    border={["none", "none", "solid 0.9px #253350"]}
                     bg={"rgba(21, 34, 57, 0.8)"}
-                    // bg={isHome ? "rgba(64, 4, 83, 0.3)" : "rgba(21, 34, 57, 0.8)"}
+
+                    sx={{
+                        backdropFilter: "blur(15px)",
+                    }}
                     w="100%"
                     h="60px"
-                    borderRadius={"10px"}
+                    borderRadius={[0, 0, 0, "10px"]}
                     justifyContent={"space-between"}
                     alignItems={"center"}
                     py={[1, 1, 8]}
                     boxShadow={0}
                     // boxShadow={!isHome ? "0px 4px 8px rgba(0, 0, 0, 0.1)" : 0}
-                    px={[3, 3, 12]}
-                    sx={{
-                        backdropFilter: "blur(15px)",
-                    }}
-
+                    px={[0, 0, 12]}
 
                 >
-                    <Box
+                    {/* logo */}
+                    <Flex
+                        px={[6, 6, 0]}
+                        py={[0, 0, 0]}
+                        alignItems={'center'}
+                        justifyContent={"space-between"}
+                        w={['100%', '100%', 'fit-content']}
                     >
 
-
-                        <HStack>
-                            {/* <Box
-                                as="img"
-                                src="/algo.svg"
-                            /> */}
-                            <svg
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="15"
-                                height="15"
-                                fill='white'
-                                viewBox="0 0 113 113.4"
-                            >
-                                <title>algorand-algo-logo</title>
-                                <polygon
-                                    points="19.6 113.4 36 85 52.4 56.7 68.7 28.3 71.4 23.8 72.6 28.3 77.6 47 72 56.7 55.6 85 39.3 113.4 58.9 113.4 75.3 85 83.8 70.3 87.8 85 95.4 113.4 113 113.4 105.4 85 97.8 56.7 95.8 49.4 108 28.3 90.2 28.3 89.6 26.2 83.4 3 82.6 0 65.5 0 65.1 0.6 49.1 28.3 32.7 56.7 16.4 85 0 113.4 19.6 113.4"
+                        <Box>
+                            <HStack>
+                                <Box
+                                    h="35px"
+                                    w="auto"
+                                    as="img"
+                                    src="/icons/mortyIcon.png"
+                                    pr={0.6}
                                 />
-                            </svg>
+                                <Heading
+                                    fontFamily="CustomFontPlainRegular"
+                                    color="white"
+                                    fontSize={"2xl"} >
+                                    Morty
+                                </Heading>
+                            </HStack>
+                        </Box>
 
-                            <Heading
-                                // opacity={}
-                                color="white"
-                                fontSize={"2xl"} >
-                                Morty<Box as="span" sx={{
-                                    color: "whiteAlpha.600"
-                                }}>Stack</Box>
-                            </Heading>
-                        </HStack>
-                    </Box>
+                        <Box
+                            display={["block", "block", "none"]}
+                        >
+                            <IconButton aria-label={"menu"}
+                                icon={isMenuOpen ? <MdClose /> : <MdMenu />}
+                                onClick={toggleMenu}
+                            />
 
-                    <Flex alignItems={"center"} >
-                        <TabList>
+                        </Box>
+
+                    </Flex>
+
+
+                    <Flex
+                        display={[isMenuOpen ? "flex" : "none", "flex"]}
+                        justifyContent={"center"}
+                        w={["100%", "100%", 'fit-content']}
+                        bg={["rgba(21, 34, 57, 0.8)", "rgba(21, 34, 57, 0.8)", "transparent"]}
+                        sx={{
+                            backdropFilter: "blur(15px)",
+                        }}
+                        direction={['column', 'column', 'row']}
+                        alignItems={"center"} >
+                        <TabList
+                            display={"flex"}
+                            flexDirection={['column', 'column', 'row']}
+                        >
                             {menuList.map((menu: string, index: number) => (
                                 <Tab
                                     key={index}
@@ -118,11 +186,54 @@ export default function NavigationBar() {
 
                     </Flex>
 
-                    <Box>
-                        <Button>Login</Button>
-                    </Box>
-                </HStack>
+
+
+                    <Flex
+                        justifyContent={["center", "center", "flex-end"]}
+                        py={[2, 2, 0]}
+                        mt={[-2, -2, 0]}
+                        w={["100%", "100%", "fit-content"]}
+                        bg={"rgba(21, 34, 57, 0.8)"}
+                        sx={{
+                            backdropFilter: "blur(15px)",
+                        }}
+                    >
+                        {
+                            !web3AuthAccount && (
+                                <Button
+                                    isDisabled={isModalOpen}
+                                    onClick={handleLoginClick}
+                                >Login</Button>
+                            )
+                        }
+
+                        {
+                            web3AuthAccount &&
+                            <ProfileDropdownButton
+                                id={user.id}
+                                email={user.email}
+                                joined={joined != "" ? getJoinedDate(joined.toString()) : joined}
+                                address={shortenAddress(web3AuthAccount.addr) || ""}
+                                balance={0}
+                                onClick={logout}
+                                linked={{
+                                    addr: activeAddress ? activeAddress : null,
+                                    provider: "PERA",
+                                    minBal: 0 //later
+                                }} disconnect={connectedProvider && connectedProvider.disconnect}
+                                connect={connectedProvider && connectedProvider.connect}
+                            />
+                        }
+
+                    </Flex>
+
+
+                </Stack>
             </Box >
-        </Box>
+
+
+
+
+        </Box >
     );
 }

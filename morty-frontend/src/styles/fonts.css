@@ -1,0 +1,134 @@
+/* light styles */
+@font-face {
+  font-family: "CustomFontLight";
+  src: url("/fonts/light.woff") format("woff"),
+    url("/fonts/light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CustomFontLightItalic";
+  src: url("/fonts/lightItalic.woff") format("woff"),
+    url("/fonts/lightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* plainLight styles */
+@font-face {
+  font-family: "CustomFontPlainLight";
+  src: url("/fonts/plainLight.woff") format("woff"),
+    url("/fonts/plainLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CustomFontPlainLightItalic";
+  src: url("/fonts/plainLightItalic.woff") format("woff"),
+    url("/fonts/plainLightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* plainRegular styles */
+@font-face {
+  font-family: "CustomFontPlainRegular";
+  src: url("/fonts/plainRegular.woff") format("woff"),
+    url("/fonts/plainRegular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CustomFontPlainRegularItalic";
+  src: url("/fonts/plainRegularItalic.woff") format("woff"),
+    url("/fonts/plainRegularItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* plainUltraBold styles */
+@font-face {
+  font-family: "CustomFontPlainUltraBold";
+  src: url("/fonts/plainUltraBold.woff") format("woff"),
+    url("/fonts/plainUltraBold.ttf") format("truetype");
+  font-weight: 800; /* ultra bold corresponds to font-weight 800 */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CustomFontPlainUltraBoldItalic";
+  src: url("/fonts/plainUltraBoldItalic.woff") format("woff"),
+    url("/fonts/plainUltraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* regular styles */
+@font-face {
+  font-family: "CustomFontRegular";
+  src: url("/fonts/regular.woff") format("woff"),
+    url("/fonts/regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CustomFontRegularItalic";
+  src: url("/fonts/regularItalic.woff") format("woff"),
+    url("/fonts/regularItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* ultraBold styles */
+@font-face {
+  font-family: "CustomFontUltraBold";
+  src: url("/fonts/ultraBold.woff") format("woff"),
+    url("/fonts/ultraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CustomFontUltraBoldItalic";
+  src: url("/fonts/ultraBoldItalic.woff") format("woff"),
+    url("/fonts/ultraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* Reset default styles for all elements */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Apply custom font to all texts */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+a,
+button,
+input,
+textarea,
+select {
+  font-family: "CustomFontRegular", sans-serif;
+}
+
+/* Apply custom font for bold texts */
+strong,
+b {
+  font-family: "CustomFontUltraBold", sans-serif;
+  font-weight: 800;
+}

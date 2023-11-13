@@ -1,11 +1,14 @@
 import React from "react";
-import { TabPanels, TabPanel, Box, Tabs } from "@chakra-ui/react";
+import { TabPanels, TabPanel, Box, Tabs, Center, Spinner } from "@chakra-ui/react";
 
 
 import NavigationBar from "@/components/NavBar/NavigationBar";
-import { useTabs } from "@/context/TabsContext";
+import { useTabs } from "@/contexts/TabContext/TabsContext";
 import { HomeBackDrop } from "./HomeBackdrop";
 import { BackDrop } from "./BackDrop";
+import LoginModal from "@/components/Modal/LoginModal";
+import { useSignInModal } from "@/contexts/ModalContext/useModalContext";
+import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
 
 
 const Layout = ({ children }: any) => {
@@ -13,6 +16,8 @@ const Layout = ({ children }: any) => {
   const isHome = activeTab === 0 ? true : false
   // const isDashboard = activeTab === 1 ? true : false
   // const isInsurance = activeTab === 2 ? true : false
+  const { isGoogleSignIn }: any = useWeb3AuthProvider()
+  const { isModalOpen, closeModal }: any = useSignInModal();
 
   return (
     <>
@@ -42,6 +47,29 @@ const Layout = ({ children }: any) => {
           </TabPanels>
         </Box>
       </Tabs>
+
+      <LoginModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
+
+      {isGoogleSignIn && (
+        <Box
+          bg="blackAlpha.900"
+          zIndex={"tooltip"}
+          position={"fixed"}
+          top={0}
+          w="100%"
+          h="100vh"
+          display={"flex"}
+          justifyContent={"center"}
+        >
+          <Center>
+            <Spinner />
+          </Center>
+        </Box>
+
+      )}
     </>
 
   );

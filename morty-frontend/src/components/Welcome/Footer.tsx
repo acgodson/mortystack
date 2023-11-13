@@ -13,8 +13,8 @@ const Footer = () => {
 
             mt={24}
             bg="gray.800" color="white" py={8}>
-            <Flex justify="space-around" align="center" direction={{ base: "column", md: "row" }}>
-                <Box>
+            <Flex justify="space-around" align="center" direction={{ base: "column", md: "column", xl: "row" }}>
+                <Box px={3}>
                     <Text
                         textAlign={"center"}
                         fontWeight={"bold"}
@@ -22,6 +22,7 @@ const Footer = () => {
                     <Text
                         maxW="500px"
                         w="100%"
+                        textAlign={"center"}
                         fontSize="md" mt={2}>
                         Thank you for visiting our website. We invite you to explore MortyStack and share it with your business, founder or freelancer friends.
 
@@ -57,7 +58,7 @@ const Footer = () => {
                         bg: "blue.400"
                     }}
                     px={3}
-                    mt={{ base: 4, md: 0 }} align="center">
+                    mt={{ base: 4, md: 4, lg: 0 }} align="center">
 
                     <IconButton
                         as="a"
@@ -78,7 +79,7 @@ const Footer = () => {
                 </Flex>
 
 
-                <Flex mt={{ base: 4, md: 0 }} align="center">
+                <Flex mt={{ base: 4, md: 4, lg: 0 }} align="center">
                     <Link href={youtubeLink} target="_blank" _hover={{ textDecor: "none" }}>
                         <IconButton
                             aria-label="YouTube"

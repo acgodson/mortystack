@@ -8,7 +8,7 @@ export const BackDrop = () => {
         <>
 
             <Box
-                bg="#09162e"
+                bg="#101829"
                 zIndex={0}
                 minH="100vH"
                 position="fixed"

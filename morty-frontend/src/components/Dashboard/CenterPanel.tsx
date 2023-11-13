@@ -1,81 +1,303 @@
-import React, { useState } from "react";
-import { Flex, Box, Text, HStack, Button, useModal } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Flex, Box, Text, HStack, Button, useModal, Step, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Center, VStack } from "@chakra-ui/react";
 import RightPanel from "./RightPanel";
-import { useSignInModal } from "@/context/useModalContext";
+
 import { FiCircle } from 'react-icons/fi';
 import BulletTitle from "../Headers";
-import CreateButton from "../CreateButton/CreateButton";
-import { useTransaction } from "@/context/TransactionContext";
-import { Transaction } from "./DashboardContent";
+import CreateButton from "../Invoice/CreateButton";
+import { useTransaction } from "@/contexts/TransactionContext";
+import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
+import SubscribeButton from "../Subscription/SubscribeButton";
+import AddOrgButton from "../Organization/AddOrgButton";
+import useCountdown from "@/hooks/useCountdown";
 
 
 
-const CenterPanel = (transactions: Transaction[] | any) => {
-  const { selectedStrategy, setSelectedStrategy }: any = useTransaction();
-  const exists = transactions && transactions.length > 0
-  const data = exists ? transactions : Array.from({ length: 3 }, (_, index) => ``);
+const CenterPanel = () => {
+  const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
+  const { user, web3AuthAccount, organizations, logout, web3AuthProfile, status, invoices }: any = useWeb3AuthProvider()
+
+  const [data, setData] = useState<any | null>(null)
+  const org = organizations ? organizations : []
+
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  useEffect(() => {
+    return setCurrentStep(
+      status ? status === 0 ? 0 :
+        status === 1 ?
+          org.length < 1 ? 1 :
+            2 : 0 : 0);
+  }, [status, org, setCurrentStep])
+  const hoursLeft = useCountdown({ startDate: "" });
+
+
+
+  useEffect(() => {
+
+    if (invoices) {
+      setData(invoices)
+      console.log(invoices)
+    }
+
+  }, [invoices])
+
+
 
 
   return (
 
     <Box
-      bg="red"
-      flex="1"
-      overflowY="auto"
+      flex={"1"}
+      overflowY="hidden"
       w="100%"
-      position={!selectedStrategy ? "fixed" : "relative"}
-      pr={
-        !selectedStrategy ?
-          14 : 0}
-
+      pr={[0, 0, !selectedTransaction ? 14 : 14]}
       bgGradient="linear-gradient(to right, #101827, #0f182a)"
-      ml="252px"
-      maxW="44%"
-    // minH="100vh"
+      ml={[0, 0, 0, "252px"]}
+      maxW={["100%", "100%", "100%", "54%"]}
+      minH="100vh"
     >
-      <Box mt={20}
-        py={1} w="100%" pr={16} pl={8}>
-        <BulletTitle title=
-          // " Active Strategies"
-          " Active Invoices"
+      <Box
+        mt={20}
 
-        />
+        py={1}
 
-        {data && (
+        w="100%"
+        pr={[0, 0, 16]} pl={[0, 0, 8]}>
+
+        {web3AuthAccount && data && (
+          <BulletTitle title=
+            " Active"
+          />
+        )}
+
+        {web3AuthAccount && data && Array.isArray(data) && (
           <>
-            <Box w="100%" pr={10} pl={3}>
-              <Box
-                bg="rgba(21, 34, 57, 0.6)"
-                border="solid 0.9px #253350"
-                borderRadius={"12px"}
-                sx={{
-                  backdropFilter: "blur(15px) saturate(120%)",
-                }}
+            <Box
+              w="100%"
+              mt={[5, 5, 0, 0]}
+              pr={[0, 0, 10]}
+              pl={[0, 0, 3]}>
 
-                py={5} px={2} w="100%" >
+
+              <Box
+                mt={5} px={2} w="100%" >
                 {data.map((item: any, index: number) => (
                   <Box
-                    bg={selectedStrategy === item ? "#253350" : "#182942"}
-                    key={index}
-                    cursor={exists ? "pointer" : "default"}
-                    // onClick={() => { }}
-                    onClick={exists ? () => setSelectedStrategy(item) : () => { }}
-                    px={4}
-                    py={6}
-                    borderRadius={"12px"}
-                    w="100%"
-                    color={selectedStrategy === item ? "white" : "whiteAlpha.500"}
                     mb={8}
+                    bg="rgba(21, 34, 57, 0.6)"
+                    border="solid 0.9px #253350"
+                    borderRadius={"12px"}
+                    sx={{
+                      backdropFilter: "blur(15px) saturate(120%)",
+                    }}
+
+                    pb={3}
+                    display={"flex"}
+                    flexDirection={"column"}
+                    justifyContent={"center"}
+                    key={index}
                   >
-                    {item}
+                    <Box
+                      bg={selectedTransaction === item ? "#253350" : "#182942"}
+
+                      cursor={data ? "pointer" : "default"}
+                      // onClick={() => { }}
+                      onClick={() => setSelectedTransaction(index + 1)}
+                      px={4}
+                      py={4}
+                      borderRadius={"12px"}
+                      w="100%"
+                      color={selectedTransaction === item ? "white" : "whiteAlpha.500"}
+
+                    >
+                      <HStack w="100%"
+
+                        justifyContent={"space-between"}>
+                        <VStack
+                          w="60%"
+                          pr={3}
+                          textAlign={"left"}
+                          justifyContent={"flex-start"}
+                          alignItems={"flex-start"}
+                        >
+                          <Text
+                            textAlign={"left"}
+                            color="whiteAlpha.700"
+                            fontWeight={"semibold"}
+                          >   {item.metadata.invoiceTitle.toUpperCase()}</Text>
+                          <Box
+                            color="whiteAlpha.800"
+                            fontSize={"xs"}
+
+                          >
+                            <Box as="span" color="#6c7686" pr={2}>
+                              Billed to:
+                            </Box>
+                            {item.metadata.customerName} ({item.metadata.customerEmail})</Box>
+                          <Box
+
+                            fontSize={"xs"}
+
+                          >org:   ({item.metadata.organization})</Box>
+
+
+
+                        </VStack>
+                        <VStack w="40%">
+                          <Text
+                            color="whiteAlpha.800"
+                            fontSize={["md", "md", "xl", "xl"]}
+                            fontWeight={"bold"}
+                          >
+
+
+                            {item.metadata.invoiceTotal}</Text>
+                          <Text
+                            color="whiteAlpha.800"
+                            fontSize={"lg"}
+                            fontWeight={"bold"}
+                          >
+                            {item.metadata.invoiceToken.split("(")[0].trim()}
+                          </Text>
+                        </VStack>
+                      </HStack>
+                    </Box>
+
+                    <Flex
+                      px={3}
+                      justifyContent={"space-between"}
+                    >
+                      <Box
+                        px={3}
+                        pt={3}
+                        fontSize={"xs"}
+                        color="#a6a6ee"
+                        opacity={0.6}
+                      >
+                        created:  {
+                          item.createdAt}
+
+                      </Box>
+                      <Box
+                        px={3}
+                        pt={3}
+
+                        fontSize={"xs"}
+                        color="whiteAlpha.800"
+                        opacity={0.6}
+
+                      >
+                        Next Action:
+                        <Box as="span"
+                          color="yellow"
+                          textDecoration={"underline"}
+                          pl={2}
+                          cursor={"pointer"}
+                        >
+                          {
+                            item.metadata.customerName}
+                        </Box>
+
+
+
+                      </Box>
+                    </Flex>
+
                   </Box>
+
                 ))}
               </Box>
             </Box>
           </>
         )}
 
-        <CreateButton />
+
+        {web3AuthAccount && !data || data && data.length < 1 && (
+
+          <Center>
+
+            {status !== 3 && (
+
+              <Stepper index={currentStep} orientation="vertical">
+                <Step >
+
+                  <StepIndicator>
+                    <StepStatus
+                      complete={<StepIcon />}
+                      incomplete={<StepNumber />}
+                      active={<StepNumber />}
+                    />
+                  </StepIndicator>
+
+                  <Box w="100%" flexShrink='0'
+                    color={currentStep < 1 ? "white" : "#90cdf4"}
+                  >
+                    Get started for free
+                    {status < 1 && (
+                      <SubscribeButton
+                        isCurrent={status === 0 ? true : false}
+                      />
+                    )}
+
+                  </Box>
+                  <StepSeparator />
+                </Step>
+
+
+                <Step>
+                  <StepIndicator>
+                    <StepStatus
+                      complete={<StepIcon />}
+                      incomplete={<StepNumber />}
+                      active={<StepNumber />}
+                    />
+                  </StepIndicator>
+
+                  <Box w="100%"
+                    color={currentStep > 1 ? "#90cdf4" : "white"}
+                  >
+                    Ready for Business
+                    {status < 1 && org < 1 && (
+                      <AddOrgButton
+                        isCurrent={currentStep === 1 ? true : false}
+
+                      />
+                    )}
+
+
+                  </Box>
+                  <StepSeparator />
+                </Step>
+
+
+                <Step>
+                  <StepIndicator>
+                    <StepStatus
+                      complete={<StepIcon />}
+                      incomplete={<StepNumber />}
+                      active={<StepNumber />}
+                    />
+                  </StepIndicator>
+
+                  <Box w="100%"
+                  >
+
+
+                    Your first Invoice
+                    <CreateButton
+                      isCurrent={org.length > 0 && currentStep === 2 ? true : false}
+                    />
+
+                  </Box>
+                  <StepSeparator />
+                </Step>
+
+              </Stepper>
+            )}
+
+          </Center>
+        )}
+
 
       </Box>
     </Box >

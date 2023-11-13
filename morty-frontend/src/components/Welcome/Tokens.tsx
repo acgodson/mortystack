@@ -48,7 +48,7 @@ const Tokens = ({ logos }: any) => {
             <Heading
 
                 mt={32}
-                px={32}
+                px={[3, 3, 32]}
                 letterSpacing={"1px"}
                 fontSize={"2xl"}
                 fontWeight={"semibold"}

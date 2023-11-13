@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
-import { Flex, Box, Text, HStack, Button } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Flex, } from '@chakra-ui/react';
 import RightPanel from './RightPanel';
 import CenterPanel from './CenterPanel';
+import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
+import { useTransaction } from '@/contexts/TransactionContext';
+import useCountdown from '@/hooks/useCountdown';
 
-
-export interface Transaction {
-    id: number | string;
-    name: string;
-    amountInvested: number;
-    currentWorth: number;
-    balance: number;
-    gmxPosition: number;
-    insurance: boolean;
-    typeOfInsurance?: string;
-}
 
 
 const DashboardContent = () => {
 
-    //this is where we'll pass the strategies from
+    const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
+
+
+    // const [data, setData] = useState<any | null>(null)
+    // const org = organizations ? organizations : []
+
+    const hoursLeft = useCountdown({ startDate: "" });
+   
+
+
+
+
+
     return (
-        <Flex w="100%"
-           
+        <Flex
+            w="100%"
+
         >
-            <CenterPanel strategies={[]} />
-            <RightPanel />
-        </Flex>
+            <CenterPanel />
+
+            <RightPanel
+
+
+            />
+
+        </Flex >
     );
 };
 

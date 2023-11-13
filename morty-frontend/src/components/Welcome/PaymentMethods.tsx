@@ -33,7 +33,10 @@ const CustomListItem = ({ title }: any) => {
 
 const PaymentMethods = () => {
     return (
-        <Grid gap={5} gridTemplateColumns={"50% 50%"} >
+        <Grid gap={5}
+
+
+            gridTemplateColumns={["100%", "100%", "50% 50%"]} >
             <CustomListItem title="Pera Wallet" />
             <CustomListItem title="Metamask" />
             <CustomListItem title="Bank Account" />

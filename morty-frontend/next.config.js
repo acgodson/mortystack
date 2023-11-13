@@ -27,7 +27,10 @@ const nextConfig = {
     ALGO_RPC_URL: process.env.ALGO_RPC_URL,
     PINATA_API_SECRET: process.env.PINATA_API_SECRET,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
-    PINATA_JWT: process.env.PINATA_JWT
+    PINATA_JWT: process.env.PINATA_JWT,
+    COVALENT_API_KEY: process.env.COVALENT_API_KEY,
+    FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY,
+    FIREBASE_PRIVATE_KEY_ID: process.env.FIREBASE_PRIVATE_KEY_ID,
   },
 };
 

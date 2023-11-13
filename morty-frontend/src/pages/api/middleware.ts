@@ -1,12 +1,14 @@
+// middleware.ts
+
 import { NextApiRequest } from "next";
 
 export async function middleware(req: NextApiRequest) {
   const origin = req.headers.origin;
   const allowedOrigins = [
     "http://localhost:3000",
+    "http://localhost:3001",
     "https://example-1.com",
     "https://example-2.com",
-    // ...
     "https://example-99.com",
   ];
 
