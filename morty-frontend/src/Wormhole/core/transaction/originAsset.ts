@@ -29,6 +29,7 @@ export async function algorandOriginAsset(mintAddress: string) {
     );
 
     const wrappedInfo = await getOriginalAssetAlgorand(
+      //@ts-ignore
       algodClient,
       ALGORAND_TOKEN_BRIDGE_ID,
       BigInt(mintAddress)

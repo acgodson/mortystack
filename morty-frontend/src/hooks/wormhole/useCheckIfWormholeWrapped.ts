@@ -78,6 +78,7 @@ function useCheckIfWormholeWrapped() {
           );
           const wrappedInfo = makeStateSafe(
             await getOriginalAssetAlgorand(
+              //@ts-ignore
               algodClient,
               ALGORAND_TOKEN_BRIDGE_ID,
               BigInt(sourceAsset)

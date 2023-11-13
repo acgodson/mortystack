@@ -18,7 +18,7 @@ const AdminAccount = {};
 
 const typedClient = new MortyClient(
   {
-    sender: AdminAccount || undefined,
+    sender: undefined,
     resolveBy: "id",
     id: 474685206,
   },

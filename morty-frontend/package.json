@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@algorandfoundation/algokit-utils": "^4.1.0",
+    "@algorandfoundation/algokit-utils": "^2.3.2",
     "@blockshake/defly-connect": "^1.1.6",
     "@certusone/wormhole-sdk": "^0.9.17",
     "@chakra-ui/next-js": "^2.1.5",
@@ -58,7 +58,6 @@
     "slick-carousel": "^1.8.1",
     "stream-to-json": "^0.0.1",
     "ts-node": "^10.9.1",
-    "utils": "link:ethers/lib/utils",
     "web3-core": "^4.3.1",
     "workbox-core": "^7.0.0",
     "workbox-expiration": "^7.0.0",
