@@ -347,8 +347,6 @@ export default function TokenPicker({
       onClose={closeDialog}
       aria-labelledby="simple-dialog-title"
       isOpen={dialogIsOpen}
-      // maxWidth="sm"
-      w="full"
     >
       <ModalHeader>
         <Box>
