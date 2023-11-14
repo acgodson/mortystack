@@ -501,7 +501,7 @@ export const Web3AuthProvider = ({ children }: any) => {
                     }
                 } else {
                     console.error("Cached invoices is not an array:", cachedInvoices);
-               
+
                 }
                 return;
             }

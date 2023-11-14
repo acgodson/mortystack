@@ -39,9 +39,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
             w="100%"
             position={"relative"}
             justifyContent={"center"}
-            alignItems={"center"}
-
-        >
+            alignItems={"center"}   >
 
             <Box p={6} maxW="xl" mx="auto">
                 <Text fontSize="2xl"

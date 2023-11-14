@@ -53,7 +53,7 @@ const Tokens = ({ logos }: any) => {
                 fontSize={"2xl"}
                 fontWeight={"semibold"}
                 textAlign="center" mb={8}>
-                Testing on &nbsp;
+                Accept on &nbsp;
                 <span style={{
                     color: "#659df6"
                 }}>

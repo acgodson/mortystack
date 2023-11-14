@@ -53,14 +53,14 @@ const LoginModal = ({ isOpen, onClose, page = 0 }: any) => {
                 description: "Password Do not match"
             })
         }
+        //remember to implement password account creation
     }
     const handleSubmitLogin = async () => {
-        setSigningIn(true)
         try {
             if (!email || !password) {
                 return
             }
-            const request = await signIn(email, password, loginWeb3, setUserCookie, mapUserData);
+            const request = await signIn(email, password, loginWeb3, setUserCookie, mapUserData, setSigningIn);
             if (request) {
                 console.log(request)
                 setSigningIn(false)
@@ -76,7 +76,7 @@ const LoginModal = ({ isOpen, onClose, page = 0 }: any) => {
     }
 
     const handleSubmitGoogle = async () => {
-        setIsGoogleSignIn(true)
+
         try {
 
             const request = await signInWithGoogle(loginWeb3, setUserCookie, mapUserData, setIsGoogleSignIn);

@@ -139,40 +139,44 @@ export default function SidePanel() {
                         )}
 
 
-                        <CreateButton 
-                        isCurrent={true}
+                        {web3AuthAccount && (
+                            <>
+                                <CreateButton
+                                    isCurrent={true}
 
-                            isTab={true}
-                        />
+                                    isTab={true}
+                                />
+                                <Box
+                                    border="solid 0.9px #253350"
+                                    bg="rgba(11 3 46, 0.9)"
+                                    sx={{
+                                        backdropFilter: "blur(15px) saturate(120%)",
+                                    }}
+                                    cursor="pointer"
+                                    px={4}
+                                    py={6}
+                                    borderRadius={"12px"}
+                                    w="100%"
+                                    color={"whiteAlpha.700"}
+                                    mb={8}
+                                >
+                                    <Button
+                                        leftIcon={<FaFlask />}
+                                        colorScheme="blue"
+                                        isDisabled={!web3AuthAccount}
+                                        w="100%"
+                                        bg={!web3AuthAccount ? "#03000f" : "linear-gradient(to right, #243c81, #3951a2)"}
+                                        _hover={{
+                                            bg: !web3AuthAccount ? "#03000f" : "linear-gradient(to right, #243c81, #3951a2)",
+                                        }}
+                                    >
+                                        Dispenser
+                                    </Button>
+                                </Box>
+                            </>
+                        )}
 
-                        <Box
 
-                            border="solid 0.9px #253350"
-                            bg="rgba(11 3 46, 0.9)"
-                            sx={{
-                                backdropFilter: "blur(15px) saturate(120%)",
-                            }}
-                            cursor="pointer"
-                            px={4}
-                            py={6}
-                            borderRadius={"12px"}
-                            w="100%"
-                            color={"whiteAlpha.700"}
-                            mb={8}
-                        >
-                            <Button
-                                leftIcon={<FaFlask />}
-                                colorScheme="blue"
-                                isDisabled={!web3AuthAccount}
-                                w="100%"
-                                bg={!web3AuthAccount ? "#03000f" : "linear-gradient(to right, #243c81, #3951a2)"}
-                                _hover={{
-                                    bg: !web3AuthAccount ? "#03000f" : "linear-gradient(to right, #243c81, #3951a2)",
-                                }}
-                            >
-                                Dispenser
-                            </Button>
-                        </Box>
                     </Box>
 
 

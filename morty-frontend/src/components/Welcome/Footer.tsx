@@ -1,5 +1,5 @@
 import { Link } from "@chakra-ui/next-js";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Divider, Flex, IconButton, Text } from "@chakra-ui/react";
 import { FaGithub, FaTwitter, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
@@ -15,29 +15,40 @@ const Footer = () => {
             bg="gray.800" color="white" py={8}>
             <Flex justify="space-around" align="center" direction={{ base: "column", md: "column", xl: "row" }}>
                 <Box px={3}>
-                    <Text
-                        textAlign={"center"}
-                        fontWeight={"bold"}
-                        fontSize="2xl">Made with ❤️ in 🇳🇬 & 🇬🇧</Text>
-                    <Text
+
+                    <br />
+
+                    <Box
                         maxW="500px"
                         w="100%"
                         textAlign={"center"}
                         fontSize="md" mt={2}>
-                        Thank you for visiting our website. We invite you to explore MortyStack and share it with your business, founder or freelancer friends.
+                        Thank you for visiting our website. We invite you to explore MortyStack and share it with your  friends.
+                        <Box as="span">
+                            [business/founder/freelancer]
+                        </Box>
 
                         <br />
                         <br />
+                        <Divider />
+
+                        <br />
+                        <br />
+
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={"bold"}
+                            fontSize="sm">Made with ❤️  🇳🇬 & 🇬🇧</Text>
 
                         <span style={{
-                            fontSize: "10px"
+                            fontSize: "12px"
                         }}>
-                            MortyStack was inspired by <a href=""
+                            MortyStack was inspired after <a href=""
                                 style={{
                                     color: "lightblue"
                                 }}
 
-                            >Morty Wallet's </a> pursuit to integrate cryptocurrency into everyday use, and finally we built and launched the mortystack MVP during the <a href=""
+                            >Morty Wallet's </a> pursuit to integrate blockchain Assets into everyday use. The mortystack MVP was kickstarted during the <a href=""
                                 style={{
                                     color: "lightblue"
                                 }}
@@ -47,7 +58,7 @@ const Footer = () => {
 
                         </span>
 
-                    </Text>
+                    </Box>
                 </Box>
 
                 <Flex
@@ -107,8 +118,8 @@ const Footer = () => {
                     </Link>
                 </Flex>
 
-            </Flex>
-        </Box>
+            </Flex >
+        </Box >
     );
 };
 

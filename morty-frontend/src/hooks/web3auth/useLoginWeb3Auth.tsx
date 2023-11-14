@@ -1,12 +1,25 @@
+import { useToast } from "@chakra-ui/react";
 import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult, OAuthCredential } from "firebase/auth";
 
 
 const useLoginWeb3Auth = () => {
+    const toast = useToast()
 
     let userID: string;
     const auth = getAuth();
-    async function signIn(email: string, password: string, loginWeb3: any, setUserCookie: any, mapUserData: any) {
+
+    async function signIn(email: string, password: string, loginWeb3: any, setUserCookie: any, mapUserData: any, setSigningIn: any) {
+
+        toast({
+            status: "error",
+            title: "Disabled",
+            description: "Please try again later"
+        })
+
+        return
+
         try {
+            setSigningIn(true)
 
             signInWithEmailAndPassword(auth, email, password)
                 .then(async (userCredential) => {
@@ -35,6 +48,14 @@ const useLoginWeb3Auth = () => {
 
     async function signInWithGoogle(loginWeb3: any, setUserCookie: any, mapUserData: any, setIsGoogleSignIn: any) {
 
+        toast({
+            status: "error",
+            title: "Disabled",
+            description: "Please try again later"
+        })
+
+        return
+        setIsGoogleSignIn(true)
         const provider = new GoogleAuthProvider();
         try {
             localStorage.setItem('isGoogleSignedIn', 'true');

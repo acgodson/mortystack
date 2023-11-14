@@ -2,7 +2,7 @@ import '@/styles/globals.css'
 import '@/styles/Home.module.css'
 import '@/styles/fonts.css';
 import type { AppProps } from 'next/app'
-import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react'
+import { ChakraProvider, ColorModeScript, type ThemeConfig, extendTheme } from '@chakra-ui/react'
 import { WormholeProvider } from '@/contexts/WormholeContext/WormholeStoreContext'
 import { AlgorandWalletProvider } from '@/contexts/WormholeContext/AlgorandWalletContext'
 import { EthereumWalletProvider } from '@/contexts/WormholeContext/EthereumWalletContext'
@@ -30,11 +30,10 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   })
 
-
-
-
-  // TODO: set custom lightmode
-  const theme = extendTheme({
+  // TODO: set custom theme
+  const theme: ThemeConfig = extendTheme({
+    initialColorMode: 'light',
+    useSystemColorMode: false,
     styles: {
       global: {
         body: {
@@ -48,12 +47,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   const isPaymentPage = router.pathname === '/pay';
-  const isKitten = router.pathname === '/kitten';
 
   return (
 
     <>
-      {isPaymentPage || isKitten ? (
+      {isPaymentPage ? (
         <ChakraProvider theme={theme}>
           <ModalProvider>
             <WalletProvider value={providers}>
