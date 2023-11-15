@@ -21,6 +21,7 @@ class Morty extends Contract {
   subscription = BoxMap<pubkey, period>();
   transactionDetails = BoxMap<uint64, metadata>();
   sellerRecord = BoxMap<bytes, uint64[]>();
+  dispenser = BoxMap<Address, Address>();
 
   /**
    * Initializes the transaction ID counter when creating the application.
@@ -60,12 +61,9 @@ class Morty extends Contract {
    * Creates a unique seller record based on the account, reference, and asset information.
    * @param account - Public key of the seller's account.
    * @param ref - Reference string.
-   * @param asset - Asset associated with the seller's record.
    * @returns The unique reference for the seller's record.
    */
-  createRecord(account: pubkey, ref: string, asset: Asset): byte32 {
-    assert(asset.creator === this.txn.sender);
-
+  createRecord(account: pubkey, ref: string): byte32 {
     // TODO: Prevent abuse by creating assets for each ref and verify that the creator is same as account.
     assert(this.subscription(account).exists); //subscription exists
     assert(this.subscription(account).value[1] > globals.latestTimestamp); //active subscription
@@ -151,7 +149,7 @@ class Morty extends Contract {
    * @param txn - Payment transaction details.
    */
   claimPayment(txID: uint64, payASA: Asset, txn: PayTxn): void {
-    // FIXME THOUGHTS: Use E25519VerifyBare Instead of addr to confirm signature?
+    // FIXME THOUGHTS: Replace with EDSAVerify Instead of addr to confirm signature?
     assert(this.transactionDetails(txID).exists);
     const pubKey: Address = this.transactionDetails(txID).value.to;
     assert(this.txn.sender === pubKey);

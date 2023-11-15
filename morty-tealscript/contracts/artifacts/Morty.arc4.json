@@ -235,6 +235,31 @@
         "type": "(string,uint64,uint64)",
         "desc": "Transaction information object{description, status, rIdx}."
       }
+    },
+    {
+      "name": "getStarted",
+      "args": [
+        {
+          "name": "msg",
+          "type": "byte[]",
+          "desc": "Message."
+        },
+        {
+          "name": "sig",
+          "type": "byte[]",
+          "desc": "Transaction ID."
+        },
+        {
+          "name": "pk",
+          "type": "byte[]",
+          "desc": "public key of seller ID."
+        }
+      ],
+      "desc": "verifys sellers signature",
+      "returns": {
+        "type": "void",
+        "desc": "Transaction information object{description, status, rIdx}."
+      }
     }
   ]
 }

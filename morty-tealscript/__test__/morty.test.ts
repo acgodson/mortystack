@@ -96,9 +96,8 @@ describe("Morty", () => {
       3,
       algodClient
     );
-    if (result) {
-      paymentASA = Number(result.assetIndex);
-    }
+
+    paymentASA = Number(result.assetIndex);
   });
 
   test("Register Seller (subscribe & create Record)", async () => {
@@ -129,7 +128,6 @@ describe("Morty", () => {
       {
         account: algosdk.decodeAddress(sender.addr).publicKey,
         ref: sellerRef,
-        asset: paymentASA,
       },
       {
         sendParams: {
