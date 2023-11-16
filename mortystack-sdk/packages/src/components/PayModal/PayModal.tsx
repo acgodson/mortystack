@@ -4,7 +4,6 @@ import { Box } from "@chakra-ui/react"
 import Spinner from '../Spinner';
 import { usePay } from '../../hooks/usePay';
 import { mortyFontStyles } from '../../utils/helpers';
-import VerifyPament from './Verifying';
 import { SentPaymentMessage } from '../Icons/sent';
 export interface PayModalProps {
     open?: boolean;
@@ -73,10 +72,8 @@ export function PayModal({ onClose, open }: PayModalProps) {
                 {verifierStatus && (
                     <Box>
                         {/* Show after successful confirmation */}
-
                     </Box>
                 )}
-
                 <Center pb={3}>
                     <Box
                         color={"#253238"}
@@ -86,11 +83,7 @@ export function PayModal({ onClose, open }: PayModalProps) {
                             <Heading
                                 color="red"
                             >{timer}</Heading>
-                            {reference}
-                            {reference && (
-                                <Text>Waiting for Payment Confirmation...</Text>
-                            )}
-
+                            <Text>Waiting for Payment Confirmation...</Text>
                             {isProcessing && <Text>Payment is still processing...</Text>}
                             {reference && !isProcessing && <Text>Payment is successful, waiting for recipient's confirmation...</Text>}
                         </Box>
