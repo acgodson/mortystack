@@ -4,6 +4,39 @@
 
 # MortyStack wants to help millions of unsatisfied and under-banked users meet their needs and grow their businesses
 
+### Resources
+
+- [Pitch Deck](/MortyStack_Pitchdeck.pdf)
+
+- [Brand Bible](/Morty_Brand_Bible.pdf)
+
+- [Whitepaper](/MortyStack_Whitepaper.pdf)
+
+### Links
+
+- [Documentation]("https://docs.mortystack.xyz)
+- [Dashboard]("https://mortystack.xyz)
+
+### Examples
+
+- [SDK Example website]()
+
+- [Invoice Sample & Checkout]()
+
+- [Sample Shop]()
+
+### Videos
+
+- [ Demo Video (Pitch)](https://www.youtube.com/watch?v=sq3tRW7CJEQ)
+- [ Demo Video (Design)](https://www.loom.com/share/96ec49ee09a945a6b10e980995722a6d?sid=0651864d-8cbd-460d-b1ac-8b7139feeefc)
+- [ Demo Video (Whitepaper)]()
+- [ Demo Video (Smart Contracts)]()
+- [ Demo Video (Client)]()
+
+### Contributors
+
+[Contributors](TEAM.md)
+
 ## Using the MortyStack SDK & Dashboard
 
 To use enable morty within your React app, you will need to install [mortystack](https://www.npmjs.com/package/mortystack) and fill in your organization's ID obtained from the [dashboard]().
@@ -71,7 +104,7 @@ const config = {
 
 ### - 2. Set up the `mortystack Button` to receive assets from your website. See example [website]()
 
-<img alt="mortystack button" height="40px" w="auto" src="/morty-frontend/public/badge.png">
+<img alt="button" height="70px" w="auto" src="/morty-frontend/public/badge.png">
 
 ```javascript
 import { PayButton } from "mortystack";
@@ -104,40 +137,6 @@ import { PayButton } from "mortystack";
 | acceptWrapped | boolean, optional        | accept wrapped tokens (wormhole bridge) |
 
 - 3. Host a shop for your organization with your choice sub-domain example `[name].mortystack.xyz`, served from `AWS`
-
-#
-
-### Resources
-
-- [Pitch Deck]()
-
-- [Brand Bible]()
-
-- [Whitepaper]()
-
-### Links
-
-- [Documentation]()
-- [Dashboard]()
-
-### Examples
-
-- [SDK Example website]()
-
-- [Invoice Sample & Checkout]()
-
-- [Sample Shop]()
-
-### Videos
-
-- [ Demo Video (Summary)]()
-- [ Demo Video (Design)]()
-- [ Demo Video (Smart Contracts)]()
-- [ Demo Video (Client)]()
-
-### Contributors
-
-[Contributors](TEAM.md)
 
 ### Appendix
 

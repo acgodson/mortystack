@@ -1,35 +1,55 @@
-import React, { useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Center, } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { Modal, ModalOverlay, Text, ModalContent, Center, Heading, } from '@chakra-ui/react';
 import { Box } from "@chakra-ui/react"
 import Spinner from '../Spinner';
 import { usePay } from '../../hooks/usePay';
+import { mortyFontStyles } from '../../utils/helpers';
+import VerifyPament from './Verifying';
+import { SentPaymentMessage } from '../Icons/sent';
 export interface PayModalProps {
-    open: boolean;
-    onClose: () => void;
+    open?: boolean;
+    onClose?: () => void;
 }
 
 export function PayModal({ onClose, open }: PayModalProps) {
-    const [titleId, setTitleId] = useState('')
-    const { sendPayment, connected } = usePay()
+    const { countdown, status, txn, connected, verifierStatus, reference }: any = usePay();
+
+    const [timer, setTimer] = useState(countdown);
+    const [isProcessing, setIsProcessing] = useState(true);
+
+    useEffect(() => {
+        if (countdown > 0) {
+            setTimer(countdown);
+        } else {
+            setIsProcessing(false);
+        }
+
+        if (verifierStatus) {
+            alert("yes")
+        } else {
+            setIsProcessing(false);
+        }
+    }, [countdown, verifierStatus, txn]);
 
 
 
     return (
-        <Modal isOpen={open} onClose={onClose}
-            size="md">
+        <Modal isOpen={open!} onClose={onClose!}
+            size="lg"
 
-            {/* overlay to block the view on the existing website */}
+            closeOnOverlayClick={false}>
+
+
             <ModalOverlay
                 opacity={1}
                 backgroundColor={"white"}
             />
 
-            {/* an overlay to creating a modal background over the block and differntiate the content from surrounding */}
             <ModalOverlay
             />
 
-
             <ModalContent
+                css={mortyFontStyles}
                 position={"absolute"}
                 bgColor={"white"}
                 top={0}
@@ -40,7 +60,7 @@ export function PayModal({ onClose, open }: PayModalProps) {
                 justifyContent={"center"}
                 alignContent={"center"}
                 flexDirection={"column"}
-                p={8}
+                p={4}
 
             >
                 <Center>
@@ -48,7 +68,35 @@ export function PayModal({ onClose, open }: PayModalProps) {
                 </Center>
 
 
+                {!verifierStatus && true && <SentPaymentMessage />}
 
+                {verifierStatus && (
+                    <Box>
+                        {/* Show after successful confirmation */}
+
+                    </Box>
+                )}
+
+                <Center pb={3}>
+                    <Box
+                        color={"#253238"}
+                        fontWeight={"bold"}
+                    >
+                        <Box css={mortyFontStyles}>
+                            <Heading
+                                color="red"
+                            >{timer}</Heading>
+                            {reference}
+                            {reference && (
+                                <Text>Waiting for Payment Confirmation...</Text>
+                            )}
+
+                            {isProcessing && <Text>Payment is still processing...</Text>}
+                            {reference && !isProcessing && <Text>Payment is successful, waiting for recipient's confirmation...</Text>}
+                        </Box>
+
+                    </Box>
+                </Center>
 
             </ModalContent>
 

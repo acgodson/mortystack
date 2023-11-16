@@ -1,22 +1,29 @@
 // src/utils/api.ts
 import axios from "axios";
-import { PaymentDetailsProp } from "../hooks/usePay";
 
-const API_BASE_URL = "http://localhost:3001/api/";
-export const PAYMENT_PAGE_URL = "http://localhost:3001/";
+const API_BASE_URL = "http://localhost:3000/api/";
+export const PAYMENT_PAGE_URL = "http://localhost:3000/";
 
-// Function to encrypt-payment
-export const generateTransactionReference = async (paymentDetails: any) => {
+export const generateTransactionReference = async (metadata: any) => {
   // Send request to your server via API to encrypt paymentDetails and get a reference
-  const response = await fetch(`${API_BASE_URL}encrypt-ref`, {
+  const response = await fetch(`${API_BASE_URL}upload-invoice`, {
     method: "POST",
-    body: JSON.stringify(paymentDetails),
+    body: JSON.stringify({ ref: metadata.record, metadata }),
     headers: {
       "Content-Type": "application/json",
     },
   });
   const data: any = await response.json();
-  return { encryptedReference: data.reference, expiry: data.expiry };
+
+  const currentDate = new Date();
+  const expiryDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+  const timestamp = expiryDate.getTime();
+
+  return {
+    success: data.success,
+    ref: data.ref,
+    expiry: timestamp,
+  };
 };
 
 // Function to fetch payment status from the server

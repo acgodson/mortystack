@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-
+// import { useVerify, useVerify as useVerifyHook } from '../../../hooks/useVerify';
 
 export const NetworkContext = createContext<{
   id?: string | undefined;
-  status?: string | null
-}>({});
+  status?: string | null,
+} | any>({});
 
 
 
@@ -15,6 +15,8 @@ export const defaultNetworkInfo = {
 
 export const NetworkProvider = ({ children }) => {
   const [status, setStatus] = useState<string | null>(null);
+  
+
 
   useEffect(() => {
     const checkNetworkStatus = () => {
@@ -40,12 +42,6 @@ export const NetworkProvider = ({ children }) => {
 
 
 
-
-
-
-
-
-// Custom hook to access network status
 export const useNetwork = () => {
   const context = useContext(NetworkContext);
   if (!context) {

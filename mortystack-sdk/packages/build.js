@@ -1,7 +1,13 @@
 import * as esbuild from "esbuild";
 import { replace } from "esbuild-plugin-replace";
 import readdir from "recursive-readdir-files";
+import { readFileSync } from "fs";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const isWatching = process.argv.includes("--watch");
 
 const getAllEntryPoints = async (rootPath) =>
@@ -23,6 +29,8 @@ const baseBuildConfig = {
   loader: {
     ".png": "dataurl",
     ".svg": "dataurl",
+    ".woff": "dataurl",
+    ".woff2": "dataurl",
   },
   platform: "browser",
   plugins: [
