@@ -17,7 +17,9 @@ import {
     FormControl,
     FormLabel,
     Heading,
-    Link
+    Link,
+    useClipboard,
+    useToast
 } from '@chakra-ui/react';
 import Description from '../Invoice/InvoiceDescription';
 import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
@@ -198,6 +200,9 @@ const Customer = ({ next, prev }: any) => {
 
 const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, onClose }) => {
     const { user, organizations }: any = useWeb3AuthProvider()
+    const [ref, setRef] = useState("");
+    const { onCopy } = useClipboard(`http://localhost:3000/${ref}`)
+    const toast = useToast()
     const {
         organization,
         invoiceTotal,
@@ -251,6 +256,13 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, onClose }) => {
         setPreview(true)
     }
 
+    const handleCopyLink = () => {
+        onCopy();
+        toast({
+            status: "success",
+            description: "Link copied to clipboard"
+        })
+    }
 
     const steps = [
         {
@@ -346,7 +358,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, onClose }) => {
                             py={4}
                             minH="50px"
                             borderRadius="25px"
-                            // onClick={handleCopyLink}
+                            onClick={handleCopyLink}
                             _hover={{ bg: '#4f4fde' }}
                         >
                             Click to Copy Link & Share

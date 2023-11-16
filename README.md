@@ -154,7 +154,10 @@ import { PayButton } from "mortystack";
 | items         | InvoiceItems[], optional |              invoice items              |
 | acceptWrapped | boolean, optional        | accept wrapped tokens (wormhole bridge) |
 
-- 3. Host a shop for your organization with your choice sub-domain example `[name].mortystack.xyz`, served from `AWS`
+
+### - 3. Host a shop for your organization with your choice sub-domain example `[name].mortystack.xyz`, served from `AWS`
+![Custome Shop](morty-frontend/public/customShop.png)
+
 
 ### Appendix
 

@@ -15,9 +15,7 @@ import {
     Textarea
 } from '@chakra-ui/react';
 import AModalLayout from '@/layout/ActionModal';
-import { useWallet } from '@txnlab/use-wallet';
 import { useTransaction } from '@/contexts/TransactionContext';
-import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
 import { MdRemove } from 'react-icons/md';
 
 interface ImageUploadFormProps {

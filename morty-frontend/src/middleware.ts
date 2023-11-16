@@ -41,11 +41,6 @@ export default async function middleware(req: NextRequest) {
     searchParams.length > 0 ? `?${searchParams}` : ""
   }`;
 
-  // case for domain without a subdomain e.g mortystack.xyz
-  if (process.env.NEXT_PUBLIC_ROOT_DOMAIN) {
-    return NextResponse.rewrite(
-      new URL(`/home${path === "/" ? "" : path}`, req.url)
-    );  }
 
   // case for domain without a subdomain e.g mortystack.xyz
   if (hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN) {

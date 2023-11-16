@@ -640,6 +640,7 @@ export const TransactionProvider = ({ children }: any) => {
             setName("")
             setCategory("")
             setOrganizations(null)
+            setStatus(null)
         } catch (error) {
             console.error('Error uploading image:', error);
             setIsCreatingOrg(false)

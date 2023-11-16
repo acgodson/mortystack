@@ -59,7 +59,7 @@ const HomePage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <ShopLayout>
-      <Box  w="100%">
+      <Box w="100%">
         {/* Top Banner */}
         <Stack
           direction={[
@@ -96,7 +96,7 @@ const HomePage = ({
 
                 <br />
                 <Text fontSize={["sm", "sm", "sm", "md"]}>
-                  This will host the description of the shop.
+                  This is the description of my shop.
                 </Text>
               </Box>
             </Box>
