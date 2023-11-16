@@ -43,16 +43,16 @@ summaryLength = 30
     meta_description = ""
     meta_og_title = "Introducing MortyStack - Documentation"
     meta_og_type = "website"
-    meta_og_url = "https://hugo-whisper.netlify.app"
-    meta_og_image = "https://raw.githubusercontent.com/JugglerX/hugo-whisper-theme/master/images/tn.png"
+    meta_og_url = ""
+    meta_og_image = ""
     meta_og_description = ""
     meta_twitter_card = "summary"
     meta_twitter_site = "@Ac_godson"
     meta_twitter_creator = "@Ac_godson"
 
   [params.logo]
-      mobile = "/images/logo-mobile.svg"
-      standard  = "/images/logo.svg"
+      mobile = "/images/morty-icon.png"
+      standard ="/images/morty-icon.png"
 
   [params.footer]
-    copyright_text = 'Free Hugo theme by <a class="zerostatic" href="https://www.zerostatic.io">Zerostatic Themes</a>'
+    # copyright_text = 'Free Hugo theme by <a class="zerostatic" href="https://www.zerostatic.io">Zerostatic Themes</a>'
