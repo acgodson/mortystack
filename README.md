@@ -14,8 +14,10 @@
 
 ### Links
 
-- [Documentation]("https://docs.mortystack.xyz)
-- [Dashboard]("https://mortystack.xyz)
+-[Contract]("/morty-tealscript)
+
+- [Documentation](https://docs.mortystack.xyz)
+- [Dashboard](https://mortystack.xyz)
 
 ### Examples
 
@@ -36,6 +38,22 @@
 ### Contributors
 
 [Contributors](TEAM.md)
+
+## Testing MortStack Contracts
+
+clone the repository
+
+```
+git clone https://github.com/acgodson/mortystack
+```
+
+open the tealscript directory and run the test
+
+```
+cd morty-tealscript
+npm install
+npm test
+```
 
 ## Using the MortyStack SDK & Dashboard
 
