@@ -130,7 +130,7 @@ export const InvoiceSummary = (
 
 
     const handleSubmit = async () => {
-        if (!IRef) {
+        if (!IRef || !activeAddress) {
             return
         }
         setRecord(IRef)
@@ -146,7 +146,7 @@ export const InvoiceSummary = (
             invoiceItems,
             acceptWrapped,
             record: IRef,
-            signer: selectedProvider === 0 ? web3AuthAccount.addr : activeAddress
+            signer: activeAddress
         }
 
         const result = await CreateInvoice(metadata)

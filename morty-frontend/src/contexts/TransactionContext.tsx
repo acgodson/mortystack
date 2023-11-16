@@ -342,7 +342,7 @@ export const TransactionProvider = ({ children }: any) => {
                 return
             }
         }
-        const x = await fetchRefs(selectedProvider === 1 ? activeAddress : web3AuthAccount.addr)
+        const x = await fetchRefs(activeAddress)
         console.log(x)
     }
 

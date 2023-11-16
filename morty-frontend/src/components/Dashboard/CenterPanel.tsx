@@ -41,9 +41,9 @@ const CenterPanel = () => {
     }
   }, [invoices])
 
-  // useEffect(() => {
-  //   console.log(status)
-  // }, [status])
+  useEffect(() => {
+    console.log("current step", status)
+  }, [status])
 
 
   return (
@@ -68,7 +68,7 @@ const CenterPanel = () => {
 
         {web3AuthAccount && data && (
           <BulletTitle title=
-            " Active"
+            " Active Invoices"
           />
         )}
 
@@ -258,7 +258,7 @@ const CenterPanel = () => {
         )}
 
 
-        {web3AuthAccount && !data && activeAddress && (
+        {web3AuthAccount && !data || data && data.length < 1 && activeAddress && (
 
           <Center>
             {status !== 3 && (
@@ -277,9 +277,9 @@ const CenterPanel = () => {
                     color={currentStep < 1 ? "white" : "#90cdf4"}
                   >
                     Get started for free
-                    {status < 1 && (
+                    {status && status < 1 && (
                       <SubscribeButton
-                        isCurrent={status === 0 ? true : false}
+                        isCurrent={status === "0" ? true : false}
                       />
                     )}
 

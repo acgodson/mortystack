@@ -62,7 +62,7 @@ const DashboardTransactions: React.FC = () => {
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
         Transactions
       </Text>
-      {/* <TransactionList /> */}
+      <TransactionList />
     </Box>
   );
 };

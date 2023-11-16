@@ -285,6 +285,7 @@ export const Web3AuthProvider = ({ children }: any) => {
             let data = await response.json(); // assuming the response is in JSON format
             // console.log(data);
             console.log("active invoices", data.active)
+            
 
             const updatedInvoices = [...(invoices || []), ...data.active];
             setInvoices(updatedInvoices);
@@ -352,7 +353,7 @@ export const Web3AuthProvider = ({ children }: any) => {
                         clientId: clientId,
                         loginConfig: {
                             jwt: {
-                                name: "mortystack",
+                                name: "morty",
                                 verifier: "mymorty",
                                 typeOfLogin: "jwt",
                                 clientId: 'mortywalletng'
@@ -508,14 +509,14 @@ export const Web3AuthProvider = ({ children }: any) => {
     }, [user, organizations])
 
 
-    // useEffect(() => {
+    useEffect(() => {
 
-    //     if (refs && refs.length > 0 && !invoices) {
-    //         alert("yooo")
-    //         fetchInvoices(refs);
-    //     }
+        if (refs && refs.length > 0 && !invoices) {
+            // alert("yooo")
+            fetchInvoices(refs);
+        }
 
-    // }, [refs, invoices])
+    }, [refs, invoices])
 
 
 
