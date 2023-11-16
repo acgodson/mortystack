@@ -1,4 +1,4 @@
-baseURL = 'https://dev.mortystack.com/'
+baseURL = 'http://docs.mortystack.xyz/'
 languageCode = 'en-us'
 title = ''
 theme = 'hugo-whisper-theme'
