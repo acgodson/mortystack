@@ -79,7 +79,6 @@ const HomePage = () => {
                             fontWeight={"bold"}
                             fontSize="3xl">+</Text>
                         <Text
-                            color={"whiteAlpha.200"}
                             fontWeight={"bold"}
                             fontSize="md">Create New Shop</Text>
                     </Box>
