@@ -65,11 +65,45 @@ const config = {
 
 5. Copy the Organization ID afterwards
 
-### With your Organization ID, you can now
+# With your Organization ID, you can now
 
-- 1. Create quick `Invoices` to forward checkout links to customers
-- 2. Set up the `mortystack SDK` to receive assets on your website
-- 3. Host a shop for your organization with your unique url example `[name].mortystack.xyz`, served from `AWS`
+### - 1. Create quick `Invoices` and forward checkout links to customers. See example [invoice]()
+
+### - 2. Set up the `mortystack Button` to receive assets from your website. See example [website]()
+
+<img alt="mortystack button" height="40px" w="auto" src="/morty-frontend/public/badge.png">
+
+```javascript
+import { PayButton } from "mortystack";
+
+// The PayButton triggers the payment modal onclick
+```
+
+- Add payload from your application states
+
+```javascript
+<PayButton
+  payload={{
+    asset: asset,
+    amount: amount,
+    email: undefined,
+    name: undefined,
+    items: undefined,
+    acceptWrapped: true,
+  }}
+/>
+```
+
+| Prop          | Type                     |               Description               |
+| :------------ | :----------------------- | :-------------------------------------: |
+| asset         | number                   |                Asset ID                 |
+| amount        | number                   |               amount in $               |
+| email         | string, optional         |            customer's email             |
+| name          | string, optional         |             customer's name             |
+| items         | InvoiceItems[], optional |              invoice items              |
+| acceptWrapped | boolean, optional        | accept wrapped tokens (wormhole bridge) |
+
+- 3. Host a shop for your organization with your choice sub-domain example `[name].mortystack.xyz`, served from `AWS`
 
 #
 
