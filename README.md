@@ -1,8 +1,10 @@
 ## Hello Morty fren 👋
 
+<img alt="logo" height="100px" w="auto" src="/morty-frontend/public/mortyIcon.png">
+
 # MortyStack wants to help millions of unsatisfied and under-banked users meet their needs and grow their businesses
 
-## Using the MortyStack SDK
+## Using the MortyStack SDK & Dashboard
 
 To use enable morty within your React app, you will need to install the [mortystack]() installed and fill in your app configuration obtained from the [dashboard]().
 
@@ -49,11 +51,11 @@ const config = {
 
 ### Retreiving your App ID
 
-1.  Login to the [Dashboard](https://mortystack.xyz)We use web3 auth and custom jwt to generate a unique account address for each social login
+1.  Login to the [MortStack Dashboard](https://mortystack.xyz). We use `Web3Auth` and `jwt` to generate a unique account address for each email login.
 
 ![login](morty-frontend/public/login.png)
 
-2. Connect to an External provider to your dashboard. We use useWallet from @txnlabs
+2. Connect an External provider to your dashboard. We use useWallet from `@txnlabs`
 
 ![Connect Wallet](morty-frontend/public/connect.png)
 
@@ -65,9 +67,9 @@ const config = {
 
 ### With your Organization ID, you can now
 
-- 1. Create quick Invoices to bill customers
-- 2. Set up the mortystack SDK to receive assets on your website
-- 3. Host a shop for your organization with your unique url `[name].mortystack.xyz`
+- 1. Create quick `Invoices` to forward checkout links to customers
+- 2. Set up the `mortystack SDK` to receive assets on your website
+- 3. Host a shop for your organization with your unique url example `[name].mortystack.xyz`, served from `AWS`
 
 #
 
