@@ -19,10 +19,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
 
   const config = {
-    id: "HIG-1699996617305-FY1K59", //Morty Organization ID from Dashboard
+    id: "HIG-1700138716687-BSAE43", //Morty Organization ID from Dashboard
     assets: selectedAssets,
     signer: {
-      addr: undefined, //address that created the record,
+      addr: "3MG2MR2CNCXPSMVYTBIU6A45HNVBILCEIPASGQDNV72SX5CUZJZVNLTROY", //address that created the record,
       secret: process.env.Secret // dispenser hash secret. Currently disabled
     }
   }

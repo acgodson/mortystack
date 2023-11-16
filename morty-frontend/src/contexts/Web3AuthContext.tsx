@@ -267,32 +267,37 @@ export const Web3AuthProvider = ({ children }: any) => {
 
 
     async function fetchInvoices(refs: any[]) {
-        try {
-            let headersList = {
-                "Content-Type": "application/json",
-            };
 
-            let bodyContent = JSON.stringify({
-                refs: refs,
-            });
+        console.log(refs.length)
 
-            let response = await fetch("/api/fetch-invoices", {
-                method: "POST",
-                body: bodyContent,
-                headers: headersList,
-            });
+        if (refs.length > 0) {
+            try {
+                let headersList = {
+                    "Content-Type": "application/json",
+                };
 
-            let data = await response.json(); // assuming the response is in JSON format
-            // console.log(data);
-            console.log("active invoices", data.active)
-            
+                let bodyContent = JSON.stringify({
+                    refs: refs,
+                });
 
-            const updatedInvoices = [...(invoices || []), ...data.active];
-            setInvoices(updatedInvoices);
-            localStorage.setItem("morty-invoices", JSON.stringify(updatedInvoices));
-        } catch (error) {
-            console.error("Error fetching invoices:", error);
+                let response = await fetch("/api/fetch-invoices", {
+                    method: "POST",
+                    body: bodyContent,
+                    headers: headersList,
+                });
 
+                let data = await response.json(); // assuming the response is in JSON format
+                // console.log(data);
+                console.log("active invoices", data.active)
+
+                console.log(data.expired)
+                const updatedInvoices = [...(invoices || []), ...data.active];
+                setInvoices(updatedInvoices);
+                localStorage.setItem("morty-invoices", JSON.stringify(updatedInvoices));
+            } catch (error) {
+                console.error("Error fetching invoices:", error);
+
+            }
         }
     }
 

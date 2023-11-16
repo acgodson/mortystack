@@ -230,8 +230,6 @@ const KittenStore = () => {
               />
 
 
-
-
             </Box>
           </Box>
         </Grid>

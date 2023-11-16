@@ -4,6 +4,8 @@ import { middleware } from "./middleware";
 
 const db = admin.firestore();
 
+
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const updatedHeaders = await middleware(req);
 
