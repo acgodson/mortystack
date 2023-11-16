@@ -5,7 +5,9 @@ draft: false
 weight: 3
 ---
 
-## Using the Morty's Branded Button
+## Using Morty's Branded Button
+
+![Button](https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/badge.png?alt=media&token=0940d98c-54d1-49b5-bc2c-c889f6bf08ed)
 
 ```javascript
 import { PayButton } from "mortystack";
