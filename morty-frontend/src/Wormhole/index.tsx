@@ -18,20 +18,162 @@ import TargetPreview from "./target/TargetPreview";
 import Send from "./send/Send";
 import SendPreview from "./send/SendPreview";
 import { useRelayContext } from "@/contexts/WormholeContext/RelayWalletContext";
+import { Invoice } from "@/utils/types";
+import AnimatedSpinner from "@/components/Animations/AnimatedSpinner";
+import { extractToken, getEquivalentAmount } from "@/utils/helpers";
+import { useAlgorandContext } from "@/contexts/WormholeContext/AlgorandWalletContext";
+
+
+const algodClient = new Algodv2(
+  ALGORAND_HOST.algodToken,
+  ALGORAND_HOST.algodServer,
+  ALGORAND_HOST.algodPort
+);
 
 
 
-function TransferBridge() {
+function TransferBridge(
+  { tokenAmount,
+    invoice }: {
+      tokenAmount: string
+      amount: string
+      invoice: Invoice
+    }
+) {
 
-  const { provider } = useEthereumProvider()
-  const { isRedeeming, sourceChain, targetAsset, setTargetAsset, sourceParsedTokenAccount, sourceAsset, isSendComplete, isSending, setSourceChain, setTargetChain, activeStep, isRedeemComplete, originAsset, setOriginAsset, setTargetParsedTokenAccount }: any = useWormholeContext()
+  const { provider, signerAddress } = useEthereumProvider()
+  const { isRedeeming,
+    balanceConfirmed, setBalanceConfirmed,
+    setIsValidating, isValidating, sourceChain,
+    targetAsset, setTargetAsset, sourceParsedTokenAccount,
+    isSendComplete, isSending, setSourceChain,
+    setTargetChain, activeStep, isRedeemComplete,
+    originAsset, setOriginAsset,
+    setTargetParsedTokenAccount }: any = useWormholeContext()
 
   const pathSourceChain = CHAIN_ID_POLYGON
   const pathTargetChain = CHAIN_ID_ALGORAND;
 
-
+  const [amount, setAmount] = useState<string | null>(null)
 
   const preventNavigation = (isSending || isSendComplete || isRedeeming) && !isRedeemComplete;
+  const [parsedToken, setParsedToken] = useState<any | null>(null)
+  const [name, setName] = useState<string | null>(null)
+
+
+
+
+  async function prepareToken() {
+    if (!tokenAmount || !signerAddress) {
+      return
+    }
+    const assetID = extractToken(invoice.metadata.invoiceToken)
+    const assetInfo = await algodClient.getAssetByID(Number(assetID)).do();
+    const metadata = {
+      tokenName: assetInfo.params.name,
+      symbol: assetInfo.params["unit-name"],
+      decimals: assetInfo.params.decimals,
+    };
+    const ParsedToken = createParsedTokenAccount(
+      signerAddress,
+      assetID!,
+      tokenAmount,
+      metadata.decimals,
+      parseFloat(formatUnits(tokenAmount, metadata.decimals)),
+      formatUnits(tokenAmount, metadata.decimals).toString(),
+      metadata.symbol,
+      metadata.tokenName,
+      undefined,
+      false
+    );
+    setParsedToken(ParsedToken)
+    return ParsedToken
+  }
+
+
+
+  async function getPrice() {
+    if (!parsedToken) {
+      return
+    }
+    let headersList = {
+      "Content-Type": "application/json"
+    }
+    let bodyContent = JSON.stringify({
+      "symbol": parsedToken.symbol === "WMATIC" ? "MATIC" : parsedToken.symbol === "WETH" ? "ETH"
+        : parsedToken.symbol === "WALGO" ? "ALGO" : parsedToken.symbol
+    });
+    let response = await fetch("api/fetch-price", {
+      method: "POST",
+      body: bodyContent,
+      headers: headersList
+    });
+    let data = await response.json();
+    if (data.usdPrice) {
+      const equiv = getEquivalentAmount(data.usdPrice, parseInt(tokenAmount), 2)
+      const sufficient = parsedToken.uiAmount >= equiv;
+
+      setAmount(equiv.toString())
+      console.log(equiv.toString())
+      console.log(sufficient)
+      setBalanceConfirmed(sufficient)
+      setIsValidating(false)
+    }
+  }
+
+  const fetchOrgmetadata = async () => {
+
+    if (!invoice.metadata.organization) {
+      return
+    }
+
+    let headersList = {
+      "Content-Type": "application/json"
+    }
+
+    let bodyContent = JSON.stringify({
+      "oid": invoice.metadata.organization,
+    });
+
+    let response = await fetch("/api/fetch-org-by-id", {
+      method: "POST",
+      body: bodyContent,
+      headers: headersList
+    });
+
+    let data: any = await response.json();
+    if (data.success) {
+      
+      setName(data.info.name.toUpperCase())
+    }
+  }
+
+  useEffect(() => {
+    if (!name && invoice) {
+      fetchOrgmetadata()
+    }
+  }, [name])
+
+
+
+
+  useEffect(() => {
+    if (tokenAmount && signerAddress && invoice && !parsedToken) {
+      prepareToken()
+    }
+  }, [tokenAmount, signerAddress, invoice, parsedToken])
+
+  useEffect(() => {
+    if (tokenAmount && parsedToken && isValidating) {
+      const { uiAmount } = parsedToken
+      console.log(uiAmount)
+      if (uiAmount) {
+        getPrice()
+      }
+    }
+  }, [tokenAmount, isValidating, parsedToken])
+
+
 
   useEffect(() => {
     try {
@@ -67,10 +209,6 @@ function TransferBridge() {
       };
     }
   }, [preventNavigation]);
-
-  // useCheckIfWormholeWrapped();
-
-  // useFetchTargetAsset();
 
   const [lastSuccessfulArgs, setLastSuccessfulArgs] = useState<{
     isSourceAssetWormholeWrapped: boolean | undefined;
@@ -171,7 +309,6 @@ function TransferBridge() {
   ])
 
   useEffect(() => {
-
     if (pathTargetChain === CHAIN_ID_ALGORAND && originAsset && !targetAsset) {
       fetchAlgorandTargetAsset(
         pathSourceChain,
@@ -180,7 +317,6 @@ function TransferBridge() {
         pathTargetChain
       )
     }
-
   }, [originAsset, targetAsset, pathTargetChain, setTargetAsset])
 
   useEffect(() => {
@@ -192,6 +328,12 @@ function TransferBridge() {
 
     }
   }, [targetAsset, originAsset])
+
+  useEffect(() => {
+
+    console.log("approved amount", amount)
+  }, [amount])
+
 
 
 
@@ -205,11 +347,13 @@ function TransferBridge() {
       return
     }
 
+    console.log(targetAsset);
+
     return fetchSingleMetadata(targetAsset, algodClient)
       .then(async (metadata) => {
 
         const accountInfo = await algodClient
-          .accountInformation('3R4TN5MX7I2CLEUJPANEQ4Y2Z2JC6L7YACZBXQRCSC6WT4UW7Z6K5QDYTE')
+          .accountInformation(invoice.metadata.signer)
           .do();
 
         let ParsedTargetAccounts = [];
@@ -234,9 +378,7 @@ function TransferBridge() {
 
           }
         }
-
         console.log("parsedd", ParsedTargetAccounts)
-
         setTargetParsedTokenAccount(ParsedTargetAccounts[0])
       })
       .catch(() => Promise.reject());
@@ -244,17 +386,11 @@ function TransferBridge() {
 
   async function checker() {
     const algoAsset = await lookupAlgoAddress();
-    console.log("algoAsstet", algoAsset)
+    console.log("Algorand Asset", algoAsset)
 
   }
 
-  useEffect(() => {
-    if (targetInfo) {
-      console.log("target Info", targetInfo)
-      checker()
-    }
 
-  }, [targetInfo])
 
 
 
@@ -262,39 +398,43 @@ function TransferBridge() {
 
 
     <Container
-      // px={3}
       maxW={"500px"}
     >
 
-
-
       <Center>
-        <VStack>
 
-          <Box w="100%" flexShrink='0'>
-            {/* <StepTitle>Sender </StepTitle> */}
-            {activeStep === 0 ? <Source /> : <SourcePreview />}
-          </Box>
+        {amount ? (
+          <VStack>
 
-          <Box w="100%" flexShrink='0'>
-            {/* <StepTitle> Receiver </StepTitle> */}
-            {activeStep === 1 ? <Target /> : <TargetPreview />}
-          </Box>
+            <Box w="100%" flexShrink='0'>
+              {activeStep === 0 ?
+                <Source
+                  name={name}
+                  tokenAmount={amount}
+                /> : <SourcePreview />}
+            </Box>
 
-          <Box
-            w="100%"
-            // flexShrink='0'
-            // px={3}
-            maxW={activeStep > 2 ? "400px" : "400px"}
-          >
-            {/* <StepTitle> Send Tokens </StepTitle> */}
-            {activeStep === 2 ? <Send /> : <SendPreview />}
-          </Box>
+            <Box w="100%" flexShrink='0'>
+              {activeStep === 1 ? <Target /> : <TargetPreview />}
+            </Box>
 
-        </VStack>
+            <Box
+              w="100%"
+              maxW={activeStep > 2 ? "400px" : "400px"}
+            >
+              {activeStep === 2 ? <Send /> : <SendPreview />}
+            </Box>
+
+          </VStack>
+        ) :
+
+          < Center>
+            <AnimatedSpinner />
+          </Center>
+
+        }
 
       </Center>
-
 
 
     </Container >

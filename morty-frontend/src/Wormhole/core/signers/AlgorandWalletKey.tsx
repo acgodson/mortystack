@@ -9,7 +9,6 @@ import { useRelayContext } from "@/contexts/WormholeContext/RelayWalletContext";
 const AlgorandWalletKey = () => {
 
   const router = useRouter()
-
   const [fetching, setFetching] = useState(true)
   const { account, setAccount } = useRelayContext();
 

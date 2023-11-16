@@ -1,7 +1,7 @@
 // import admin from "../../../firebase-admin";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { middleware } from "./middleware";
-import { MortyClient } from "@/contracts/MortyClient";
+import { MortyClient } from "@/tsContracts/MortyClient";
 import { calculateKeccak256 } from "@/utils/helpers";
 import algosdk, { Algodv2 } from "algosdk";
 import { ALGORAND_HOST } from "@/utils/wormhole/consts";

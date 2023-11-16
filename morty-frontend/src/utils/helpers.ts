@@ -68,3 +68,20 @@ export function extractToken(inputString: string) {
   }
   return result;
 }
+
+export function hexToUint8Array(hex: string): Uint8Array {
+  const uint8Array = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    uint8Array[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
+  return uint8Array;
+}
+
+export function getEquivalentAmount(
+  usdPrice: number,
+  usdAmount: number,
+  decimalPlaces: number = 2
+): number {
+  const amountInMatic = usdAmount / usdPrice;
+  return parseFloat(amountInMatic.toFixed(decimalPlaces));
+}

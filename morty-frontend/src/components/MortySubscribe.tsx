@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ReactNode, useState } from 'react'
-import { Morty, MortyClient } from '../contracts/MortyClient'
+import { Morty, MortyClient } from '../tsContracts/MortyClient'
 import { useWallet } from '@txnlab/use-wallet'
 import { Button } from '@chakra-ui/react'
 

@@ -10,13 +10,13 @@ const useLoginWeb3Auth = () => {
 
     async function signIn(email: string, password: string, loginWeb3: any, setUserCookie: any, mapUserData: any, setSigningIn: any) {
 
-        toast({
-            status: "error",
-            title: "Disabled",
-            description: "Please try again later"
-        })
+        // toast({
+        //     status: "error",
+        //     title: "Disabled",
+        //     description: "Please try again later"
+        // })
 
-        return
+        // return
 
         try {
             setSigningIn(true)
@@ -48,13 +48,14 @@ const useLoginWeb3Auth = () => {
 
     async function signInWithGoogle(loginWeb3: any, setUserCookie: any, mapUserData: any, setIsGoogleSignIn: any) {
 
-        toast({
-            status: "error",
-            title: "Disabled",
-            description: "Please try again later"
-        })
+        // toast({
+        //     status: "error",
+        //     title: "Disabled",
+        //     description: "Please try again later"
+        // })
 
-        return
+        // return
+
         setIsGoogleSignIn(true)
         const provider = new GoogleAuthProvider();
         try {

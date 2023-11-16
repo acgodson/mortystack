@@ -34,8 +34,8 @@ interface CreateOrgModalProps {
 
 const CreateOrgModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) => {
 
-    const { isCreatingOrg, name, category, setCategory, CreateRecord, setName } = useTransaction()
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const { isCreatingOrg, name, category, setCategory, CreateRecord, CreateApplication, setName } = useTransaction()
+    const [selectedImage, setSelectedImage] = useState<File | null>();
 
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,10 +46,12 @@ const CreateOrgModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) => {
     };
 
     const handleSubmit = async () => {
-        if (!selectedImage) {
-            return
-        }
-        await CreateRecord(name, category, selectedImage);
+
+        // await CreateApplication();
+
+        const img = selectedImage ? selectedImage : null;
+
+        await CreateRecord(name, category, img);
     }
     const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
@@ -183,15 +185,14 @@ const CreateOrgModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <>
-        
+            <AModalLayout
+                isOpen={isOpen}
+                onClose={onClose}
+                title={' Add New Organization'}
+                size={"fit-content"}
+                body={<ModalBody />}
+            />
         </>
-        // <AModalLayout
-        //     isOpen={isOpen}
-        //     onClose={onClose}
-        //     title={' Add New Organization'}
-        //     size={"fit-content"}
-        //     body={<ModalBody />}
-        // />
     );
 };
 

@@ -1,4 +1,4 @@
-import React , { ReactChild }from "react";
+import React, { ReactChild } from "react";
 import { Box, Button, Text, Tooltip, useClipboard } from "@chakra-ui/react";
 import { MdFileCopy, MdOpenInNew } from "react-icons/md";
 import {
@@ -131,14 +131,10 @@ export default function SmartAddress({
     );
 
     return (
-        <Tooltip
-            title={React.Children.toArray(tooltipContent).join("")}
-        >
-            <Text
-                as="div"
-            >
-                {useableSymbol || addressShort}
-            </Text>
-        </Tooltip>
+
+        <Text    >
+            {useableSymbol || addressShort}
+        </Text>
+
     );
 }

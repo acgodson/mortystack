@@ -1,23 +1,25 @@
 
-import { MortyClient } from '@/contracts/MortyClient';
+import { MortyClient } from '@/tsContracts/MortyClient';
 import { ALGORAND_HOST } from '@/utils/wormhole/consts';
 import algosdk, { Algodv2 } from 'algosdk';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useWeb3AuthProvider } from './Web3AuthContext';
 import { useWallet } from '@txnlab/use-wallet';
-import { generateUniqueReferenceID } from '@/utils/helpers';
+import { calculateKeccak256, generateUniqueReferenceID, hexToUint8Array } from '@/utils/helpers';
 import { useFirebaseStorage } from '@/hooks/useFireStorage';
 import { getDownloadURL } from 'firebase/storage';
 import { createParsedTokenAccount } from '@/utils/wormhole/parsedTokenAccount';
 import { formatUnits } from '@ethersproject/units';
 import { InvoiceItem, useInvoiceDetails } from '@/hooks/useInvoiceDetails';
+import { microAlgos } from '@algorandfoundation/algokit-utils';
+import { useToast } from '@chakra-ui/react';
 
 
 const algodToken = {
     "x-api-key": process.env.ALGO_API_KEY!,
 };
 
- 
+
 export interface SenderType {
     signer: algosdk.TransactionSigner;
     addr: string;
@@ -41,7 +43,7 @@ interface TransactionContextProps {
     setIsCreatingOrg(isCreatingOrg: boolean): void,
     setAppID(index: number): void,
     Subscribe(account: Uint8Array, boxes: any[]): void,
-    CreateRecord(name: string, category: string, selectedImage: File): void,
+    CreateRecord(name: string, category: string, selectedImage: File | null): void,
     toggleProvider(index: number): void,
     setName(namee: string): void,
     setCategory(namee: string): void,
@@ -79,6 +81,33 @@ interface TransactionContextProps {
     CreateInvoice: (metadata: any) => any;
     isSubmittingInvoice: boolean,
     setIsSubmittingInvoice: (value: boolean) => void
+    CreateApplication: () => void
+    page: number,
+    setPage: (value: number) => void
+}
+
+
+async function UploadOrgOffline(metadata: any, userid: string) {
+
+    console.log("new organization metadata", metadata)
+
+    let headers = {
+        "Content-Type": "application/json"
+    }
+
+    let body = JSON.stringify({
+        "uid": userid,
+        "metadata": metadata
+    });
+
+    let response = await fetch("/api/update-org", {
+        method: "POST",
+        body: body,
+        headers
+    });
+
+    let data = await response.json();
+    console.log(data.success);
 }
 
 
@@ -99,7 +128,7 @@ const TransactionContext = createContext<TransactionContextProps>({
     setIsCreatingOrg: (isSubscribing: boolean) => { },
     setAppID: (index: number) => { },
     Subscribe: (account: Uint8Array, boxes: any[]) => { },
-    CreateRecord: (name: string, category: string, selectedImage: File) => { },
+    CreateRecord: (name: string, category: string, selectedImage: File | null) => { },
     toggleProvider: (index: number) => { },
     setName: (name: string) => { },
     setCategory: (name: string) => { },
@@ -132,7 +161,10 @@ const TransactionContext = createContext<TransactionContextProps>({
     setRecord: () => { },
     CreateInvoice: (metadata: any) => [],
     isSubmittingInvoice: false,
-    setIsSubmittingInvoice: () => { }
+    setIsSubmittingInvoice: () => { },
+    CreateApplication: () => { },
+    page: 0,
+    setPage: () => { }
 
 });
 
@@ -143,11 +175,12 @@ const algodClient = new Algodv2(
 );
 
 export const TransactionProvider = ({ children }: any) => {
+    const [page, setPage] = useState(0)
     const { user, web3AuthAccount, status, web3AuthBalance, setSelectedProvider, refs, selectedProvider, setStatus, getUserStatus,
         organizations, setOrganizations, fetchRefs, invoices, fetchInvoices }: any = useWeb3AuthProvider()
     const { providers, activeAddress, signer } = useWallet()
     const [fetchingBal, setFetchingBal] = useState<boolean>(false)
-    const [appID, setAppID] = useState<number>(474685206)
+    const [appID, setAppID] = useState<number>(479526612)
     const [hasError, setHasError] = useState<string | null>(null)
     const [balance, setBalance] = useState<number | null>(null)
     const [selectedTransaction, setSelectedTransaction] = useState<any | null>(null);
@@ -158,6 +191,7 @@ export const TransactionProvider = ({ children }: any) => {
     const [name, setName] = useState<string>("")
     const [category, setCategory] = useState<string>("")
     const [isSubmittingInvoice, setIsSubmittingInvoice] = useState(false)
+    const toast = useToast()
     const typedClient = new MortyClient(
         {
             sender: web3AuthAccount,
@@ -177,20 +211,21 @@ export const TransactionProvider = ({ children }: any) => {
         setStatus(null)
     };
 
- 
+
 
     useEffect(() => {
 
         if (user && !status && activeAddress && selectedProvider === 1) {
             console.log("firebase user", user)
-            if (user) {
-                console.log(user.id)
-                getUserStatus(user.id, activeAddress)
 
-            }
-            console.log(status)
+            console.log(user.id)
+            getUserStatus(user.id, activeAddress)
         }
     }, [user, status, selectedProvider, activeAddress])
+
+    useEffect(() => {
+        console.log(status)
+    }, [status])
 
 
 
@@ -215,6 +250,8 @@ export const TransactionProvider = ({ children }: any) => {
             }
         }
     }, [selectedProvider, activeAddress, setFetchingBal])
+
+
 
     const getBalance = async (addr: string): Promise<any> => {
         if (!addr) {
@@ -250,7 +287,6 @@ export const TransactionProvider = ({ children }: any) => {
         if (activeAddress) {
             if (balance! < 2) {
                 const txnErr = 'Insufficent Balance, requires at least 0.21 Algos for transaction fees'
-                console.log(txnErr)
                 setHasError(txnErr)
             } else {
                 setHasError("")
@@ -258,7 +294,6 @@ export const TransactionProvider = ({ children }: any) => {
         } else {
             if (web3AuthBalance! < 2) {
                 const txnErr = 'Insufficent Balance, requires at least 0.21 Algos for transaction fees'
-                console.log(txnErr)
                 setHasError(txnErr)
             } else {
                 setHasError("")
@@ -269,19 +304,29 @@ export const TransactionProvider = ({ children }: any) => {
 
 
     async function getSub() {
+        if (appID === 0) {
+            return
+        }
         console.log(`Calling last Subscription`)
         const ref = selectedProvider === 1 ? activeAddress : web3AuthAccount.addr;
         if (!ref) {
             return
         }
-        const result = await typedClient.appClient.getBoxValue(algosdk.decodeAddress(ref).publicKey);
-        const decoder = new algosdk.ABITupleType([
-            new algosdk.ABIUintType(64),
-            new algosdk.ABIUintType(64),
-        ]);
-        const value = decoder.decode(result)
-        console.log(value);
-        setSubExpires(Number(value[1]))
+        try {
+            const result = await typedClient.appClient.getBoxValue(algosdk.decodeAddress(ref).publicKey);
+            if (result) {
+                const decoder = new algosdk.ABITupleType([
+                    new algosdk.ABIUintType(64),
+                    new algosdk.ABIUintType(64),
+                ]);
+                const value = decoder.decode(result)
+                console.log(value);
+                setSubExpires(Number(value[1]))
+            }
+        } catch (e) {
+            console.log("error trying t find subscription from box values")
+            setSubExpires([])
+        }
     }
 
     useEffect(() => {
@@ -290,21 +335,33 @@ export const TransactionProvider = ({ children }: any) => {
         }
     }, [status, subExpires, typedClient])
 
+
     const getRefs = async () => {
         if (!web3AuthAccount) {
-            return
-            alert("no web3?")
+            if (!activeAddress) {
+                return
+            }
         }
-        const x = await fetchRefs(activeAddress ? activeAddress : web3AuthAccount.addr)
+        const x = await fetchRefs(selectedProvider === 1 ? activeAddress : web3AuthAccount.addr)
         console.log(x)
     }
 
 
     useEffect(() => {
-        if (!refs) {
+        if (!refs && activeAddress && web3AuthAccount) {
             getRefs()
         }
-    },[web3AuthAccount, activeAddress, refs])
+    })
+
+    useEffect(() => {
+        console.log("new refffs", refs)
+
+        if (refs && refs.length > 0 && !invoices) {
+            // alert("yooo")
+            fetchInvoices(refs);
+        }
+
+    }, [refs, invoices])
 
 
 
@@ -357,6 +414,18 @@ export const TransactionProvider = ({ children }: any) => {
     }
 
 
+
+    //creating a new application
+    const CreateApplication = async () => {
+        console.log(`Calling createApplication`)
+        const x = await typedClient.create.createApplication(
+            {},
+            { sender },
+        );
+        console.log(x)
+        return x
+
+    }
 
 
     //function for subscribing
@@ -437,65 +506,135 @@ export const TransactionProvider = ({ children }: any) => {
 
 
     //function adding an organization
-    const CreateRecord = async (name: string, category: string, selectedImage: File) => {
+    const CreateRecord = async (name: string, category: string, selectedImage?: File | null) => {
 
         setIsCreatingOrg(true)
-        if (!user || !selectedImage) {
+        if (!user || !activeAddress) {
             return;
         }
-        let url = "";
+        let url;
+
+        //calculate organuzation ID
+        const OID = generateUniqueReferenceID(name, user.id)
+
+
         try {
-            const OID = generateUniqueReferenceID(name, user.id)
 
-            //upload photo to firestore
-            const storageRef = getRef(name);
+            //calculate subscription date
+            const subscription = await typedClient.appClient.getBoxValue(algosdk.decodeAddress(activeAddress!).publicKey);
 
-            // Upload the file to the storage reference
-            await upload(storageRef, selectedImage)
-            getDownloadURL(storageRef)
-                .then(async (_url) => {
-                    url = _url
-                    console.log(_url)
+            const decoder = new algosdk.ABITupleType([
+                new algosdk.ABIUintType(64),
+                new algosdk.ABIUintType(64),
+            ]);
+            if (!decoder) {
+                console.log("error, can't find subscription")
+                return
+            }
 
-                    const metadata = {
-                        oid: OID,
-                        name: name,
-                        category: category,
-                        url: _url
-                    }
-                    console.log("new organization", metadata)
+            const subscriptionValue: any = decoder.decode(subscription)
+            console.log(subscriptionValue);
+            const resultSum = subscriptionValue.map((x: bigint) => Number(x));
+            const period: number = resultSum.reduce(
+                (acc: number, num: number) => acc + num,
+                0
+            );
 
-                    let headers = {
-                        "Content-Type": "application/json"
-                    }
+            console.log("subscription-data: " + subscriptionValue, period);
 
-                    let body = JSON.stringify({
-                        "uid": user.id,
-                        "metadata": metadata
-                    });
+            const reference = calculateKeccak256(OID + period.toString());
 
-                    let response = await fetch("/api/update-org", {
-                        method: "POST",
-                        body: body,
-                        headers
-                    });
+            console.log("reference-for-record: " + reference);
 
-                    let data = await response.json();
-                    console.log(data.success);
-                    if (data.success) {
-                        setIsCreatingOrg(false)
-                        setName("")
-                        setCategory("")
-                        setOrganizations(null)
-                    }
-                })
-                .catch((error) => {
-                    console.error(error.message)
+
+            const atc = new algosdk.AtomicTransactionComposer();
+            const suggestedParams = await algodClient.getTransactionParams().do();
+            const encoder = new TextEncoder;
+
+
+            const depositTxn =
+                algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+                    from: activeAddress,
+                    suggestedParams: await algodClient.getTransactionParams().do(),
+                    to: (await typedClient.appClient.getAppReference()).appAddress,
+                    amount: 200_000,
+
                 });
 
+            atc.addTransaction({
+                txn: depositTxn,
+                signer,
+            });
 
 
+            atc.addMethodCall({
+                method: typedClient.appClient.getABIMethod("createRecord")!,
+                methodArgs: [algosdk.decodeAddress(activeAddress!).publicKey, encoder.encode(OID)],
+                suggestedParams: suggestedParams,
+                sender: activeAddress,
+                boxes: [
+                    {
+                        appIndex: appID,
+                        name: algosdk.decodeAddress(activeAddress).publicKey
+                    },
+                    {
+                        appIndex: appID,
+                        name: hexToUint8Array(reference)
+                    },
+                ],
+                appID,
+                signer,
+            });
 
+            const result = await atc.execute(algodClient, 4)
+
+            console.log(result)
+
+            //upload on fire storage
+            if (selectedImage) {
+                //process sending image
+                const storageRef = getRef(name);
+                await upload(storageRef, selectedImage!)
+                getDownloadURL(storageRef)
+                    .then(async (_url) => {
+                        url = _url
+                        console.log(_url)
+
+                        const metadata = {
+                            oid: OID,
+                            name: name,
+                            category: category,
+                            url: url
+                        }
+
+                        await UploadOrgOffline(metadata, user.id)
+
+                    })
+                    .catch((error) => {
+                        console.error(error.message)
+                    });
+            } else {
+
+                const metadata = {
+                    oid: OID,
+                    name: name,
+                    category: category,
+                    url: url
+                }
+
+                await UploadOrgOffline(metadata, user.id)
+            }
+
+            toast({
+                status: "success",
+                description: "Record Created Successfully",
+                position: "top-right",
+                duration: 10000
+            });
+            setIsCreatingOrg(false)
+            setName("")
+            setCategory("")
+            setOrganizations(null)
         } catch (error) {
             console.error('Error uploading image:', error);
             setIsCreatingOrg(false)
@@ -547,10 +686,6 @@ export const TransactionProvider = ({ children }: any) => {
         return refs
     }
 
-
-
-
-
     return (
         <TransactionContext.Provider value={{
             typedClient,
@@ -572,13 +707,16 @@ export const TransactionProvider = ({ children }: any) => {
             isCreatingOrg,
             setIsCreatingOrg,
             CreateRecord,
+            CreateApplication,
             setName,
             setCategory,
             getAssetHoildings,
             CreateInvoice,
             ...invoiceTxns,
             isSubmittingInvoice,
-            setIsSubmittingInvoice
+            setIsSubmittingInvoice,
+            page,
+            setPage
         }}>
             {children}
         </TransactionContext.Provider>

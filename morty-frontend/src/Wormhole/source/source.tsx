@@ -3,9 +3,8 @@ import { Box, Button, Text, Link, HStack, Center, Spinner, Alert } from "@chakra
 import { CHAIN_ID_ALGORAND } from "@certusone/wormhole-sdk";
 import { useWormholeContext } from "@/contexts/WormholeContext/WormholeStoreContext";
 import useIsWalletReady from "@/hooks/wormhole/useIsWalletReady";
-import { ALGORAND_HOST, ALGORAND_TOKEN_BRIDGE_ID, CHAINS, CLUSTER, getIsTransferDisabled, getTokenBridgeAddressForChain } from "@/utils/wormhole/consts";
-import { ChainWarningMessage, ChainSelect, SelectedTokenMessage, TokenSelector, KeyAndBalance, evmOriginAsset } from "@/Wormhole/core";
-import { errorDataWrapper, receiveDataWrapper } from "@/utils/wormhole/helpers";
+import { CHAINS, CLUSTER, getIsTransferDisabled } from "@/utils/wormhole/consts";
+import { ChainWarningMessage, ChainSelect, SelectedTokenMessage, TokenSelector, KeyAndBalance } from "@/Wormhole/core";
 import { ethers } from "ethers";
 import { ConnectType, useEthereumProvider } from "@/contexts/WormholeContext/EthereumWalletContext";
 import { Algodv2 } from "algosdk";
@@ -16,8 +15,12 @@ import { MdError } from "react-icons/md";
 
 
 
-function Source() {
-    const { amount, activeStep, setAmount, setActiveStep, setSourceChain, sourceChain, targetChain, sourceParsedTokenAccount }: any = useWormholeContext()
+function Source(
+    { tokenAmount, name }: { tokenAmount: string, name: string | null }
+) {
+    const { amount, activeStep, setAmount, setActiveStep, balanceConfirmed, setSourceChain, sourceChain, targetChain, sourceParsedTokenAccount 
+    
+    }: any = useWormholeContext()
 
     const targetChainOptions = useMemo(
         () => CHAINS.filter((c: any) => c.id === CHAIN_ID_ALGORAND),
@@ -79,6 +82,7 @@ function Source() {
     const handleAmountChange = useCallback(
         (event: any) => {
             setAmount(event.target.value / 2); //test Replace with actual bill
+
         },
         []
     );
@@ -99,7 +103,7 @@ function Source() {
     useEffect(() => {
         if (isReady && hasParsedTokenAccount) {
             const bal = Number(parsedTokenAccount.uiAmount).toFixed(4)
-            setAmount(String(0.2))
+            setAmount(tokenAmount.toString())
         }
 
     }, [isReady, hasParsedTokenAccount])
@@ -151,7 +155,7 @@ function Source() {
                 </Box>
 
                 <Box>
-                    <Text fontSize={'xs'} pb={2} variant="caption">To [Sellers Chain] </Text>
+                    <Text fontSize={'xs'} pb={2} variant="caption">To {name || "seller"} </Text>
                     <ChainSelect
                         variant="outlined"
                         select
@@ -236,11 +240,12 @@ function Source() {
                         color: "white"
                     }}
                     isDisabled={
-                        !isReady || !hasParsedTokenAccount ||
+                        !isReady || !hasParsedTokenAccount || !balanceConfirmed ||
                             isSourceTransferDisabled ||
                             isTargetTransferDisabled ? true : false
                     }
                     onClick={handleNextClick}
+
                     isLoading={false}
                 >
                     Next

@@ -125,10 +125,12 @@ const CustomDropdownButton = (
                             <Box
                                 cursor={"pointer"}
                                 px={3}
+                                as="button"
+                                onClick={address && address.length > 2 ? () => copyAddress(address!) : () => { }}
                                 py={1}
                                 fontSize={"12px"}
                                 borderRadius={"12px"}
-                                bg="blue.800">   {address}</Box>
+                                bg="blue.800">   {shortenAddress(address)}</Box>
                             <Box fontSize={'xs'} fontWeight={"bold"}>
                                 mBal:
                                 <Box as="span" color={"yellow"}> {web3AuthBalance}</Box>
@@ -166,17 +168,21 @@ const CustomDropdownButton = (
 
                         <Center>
                             <HStack alignItems={'center'} spacing={3} justifyContent={'center'}>
-                                <Button
-                                    border={'0.4px solid gray'}
-                                    mt={8}
-                                    h='30px'
-                                    colorScheme={linked.addr ? "red" : "blue"}
-                                    onClick={!linked.addr ? connect : disconnect}
-                                >
-                                    {!linked.addr ? 'Link Wallet' : 'Unlink Wallet'
-                                    }
 
-                                </Button>
+                                {linked.addr && (
+                                    <Button
+                                        border={'0.4px solid gray'}
+                                        mt={8}
+                                        h='30px'
+                                        colorScheme={linked.addr ? "red" : "blue"}
+                                        onClick={!linked.addr ? connect : disconnect}
+                                    >
+                                        {!linked.addr ? 'Link Wallet' : 'Unlink Wallet'
+                                        }
+
+                                    </Button>
+                                )}
+
                                 <Button
                                     border={'0.4px solid gray'}
                                     mt={8}

@@ -113,6 +113,7 @@ export default function SidePanel() {
                                 justifyContent={"center"}
                                 alignItems={"center"}
                                 borderRadius={"15px"}
+
                             >
 
 
@@ -139,7 +140,11 @@ export default function SidePanel() {
                         )}
 
 
-                        {web3AuthAccount && (
+
+
+
+
+                        {activeAddress && web3AuthAccount && (
                             <>
                                 <CreateButton
                                     isCurrent={true}
@@ -161,6 +166,7 @@ export default function SidePanel() {
                                     mb={8}
                                 >
                                     <Button
+                                        color={"white"}
                                         leftIcon={<FaFlask />}
                                         colorScheme="blue"
                                         isDisabled={!web3AuthAccount}
@@ -178,8 +184,6 @@ export default function SidePanel() {
 
 
                     </Box>
-
-
 
 
                 </Box>

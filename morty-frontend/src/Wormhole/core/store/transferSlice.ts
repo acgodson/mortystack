@@ -40,7 +40,6 @@ export function useTransfer() {
   const reducer = (state: State, action: Action): State => {
     switch (action.type) {
       case "INCREMENT_STEP":
-        // alert("mannnn");
         return {
           ...state,
           activeStep:
@@ -68,6 +67,9 @@ export function useTransfer() {
   const [originChain, setOriginChain] = useState<ChainId>();
   const [originAsset, setOriginAsset] = useState<string | undefined>();
   const [sourceChain, setSourceChain] = useState<ChainId>();
+  const [balanceConfirmed, setBalanceConfirmed] = useState<boolean | null>(
+    null
+  );
   const [isSourceAssetWormholeWrapped, setIsSourceAssetWormholeWrapped] =
     useState<boolean | undefined>();
   const [sourceWalletAddress, setSourceWalletAddress] = useState<
@@ -98,6 +100,7 @@ export function useTransfer() {
   const [isRecovery, setIsRecovery] = useState<boolean>(false);
   const [isApproving, setIsApproving] = useState(false);
   const [gasPrice, setGasPrice] = useState<number | undefined>();
+  const [isValidating, setIsValidating] = useState(true);
   const [sourceWormholeWrappedInfo, setSourceWormholeWrappedInfo] = useState<
     StateSafeWormholeWrappedInfo | undefined
   >();
@@ -163,6 +166,8 @@ export function useTransfer() {
     isRecovery,
     gasPrice,
     sourceWormholeWrappedInfo,
+    balanceConfirmed,
+    setIsValidating,
     setActiveStep,
     setOriginChain,
     setSourceChain,
@@ -186,5 +191,7 @@ export function useTransfer() {
     setGasPrice,
     reset,
     setSourceWormholeWrappedInfo,
+    setBalanceConfirmed,
+    isValidating,
   };
 }

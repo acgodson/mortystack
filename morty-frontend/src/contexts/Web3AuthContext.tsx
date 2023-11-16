@@ -46,12 +46,13 @@ export const Web3AuthProvider = ({ children }: any) => {
     const [web3AuthBalance, setWeb3AuthBalance] = useState<any | null>(null);
     const [web3Auth, setweb3Auth] = useState<any | null>(null)
     const [isGoogleSignIn, setIsGoogleSignIn] = useState(false)
-    const [status, setStatus] = useState<number | null>(null);
-    const [selectedProvider, setSelectedProvider] = useState<number>(0);
+    const [status, setStatus] = useState<number | string | null>(null);
+    const [selectedProvider, setSelectedProvider] = useState<number>(1); //use external provider for now
     const [organizations, setOrganizations] = useState<Organization | null>(null)
     const [invoices, setInvoices] = useState<any | null>(null)
     const [loading, setLoading] = useState(false)
-    const [refs, setRefs] = useState<any[] | null>(null)
+    const [refs, setRefs] = useState<any[] | null>(["0VwKdYdzvIRk2nlfPjm4"])
+
 
 
 
@@ -161,15 +162,22 @@ export const Web3AuthProvider = ({ children }: any) => {
             uiConsole("provider not initialized yet");
             return;
         }
-        const rpc = new RPC(provider as SafeEventEmitterProvider);
-        const userAccount = await rpc.getAccounts();
-        const algorandKeypair = await rpc.getAlgorandKeyPair();
-        if (userAccount && algorandKeypair) {
-            const account: Algoccount = {
-                addr: userAccount,
-                sk: algorandKeypair.sk
+        try {
+            const rpc = new RPC(provider as SafeEventEmitterProvider);
+            const userAccount = await rpc.getAccounts();
+            if (userAccount) {
+
             }
-            setWeb3AuthAccount(account);
+            const algorandKeypair = await rpc.getAlgorandKeyPair();
+            if (userAccount && algorandKeypair) {
+                const account: Algoccount = {
+                    addr: userAccount,
+                    sk: algorandKeypair.sk
+                }
+                setWeb3AuthAccount(account);
+            }
+        } catch (e) {
+            console.log(e)
         }
     };
 
@@ -279,9 +287,7 @@ export const Web3AuthProvider = ({ children }: any) => {
             console.log(data.active)
 
             const updatedInvoices = [...(invoices || []), ...data.active];
-
             setInvoices(updatedInvoices);
-
             localStorage.setItem("morty-invoices", JSON.stringify(updatedInvoices));
         } catch (error) {
             console.error("Error fetching invoices:", error);
@@ -306,15 +312,11 @@ export const Web3AuthProvider = ({ children }: any) => {
         });
 
         let data: any = await response.json();
+
         console.log(data);
-        // if (data.refs) {
         setRefs(data.refs);
-        // }
-        // return null
+
     }
-
-
-
 
 
 
@@ -411,19 +413,33 @@ export const Web3AuthProvider = ({ children }: any) => {
         if (flag) {
             setIsGoogleSignIn(true)
             auth.onAuthStateChanged(async (authUser: any) => {
-                if (!web3AuthAccount && provider) {
-                    console.log(authUser.providerData[0])
-                    const token = authUser.accessToken;
-                    await loginWeb3(token);
-                    const userData = await mapUserData(authUser);
-                    setUserCookie(userData);
-                    console.log(userData)
 
-                } else {
-                    if (web3AuthAccount) {
+                if (authUser) {
+                    if (!provider) {
+                        return
+                    }
+                    if (!web3AuthAccount) {
+                        if (provider) {
+                            if (!authUser.accessToken) {
+                                return
+                            }
+                            const token = authUser.accessToken;
+                            await loginWeb3(token);
+                            const userData = await mapUserData(authUser);
+                            setUserCookie(userData);
+                            console.log(userData)
+                            console.log(authUser.providerData[0])
+                        }
+                    } else {
                         const flag = localStorage.removeItem('isGoogleSignedIn');
                     }
                 }
+
+                if (!authUser) {
+                    // clear web3auth cookies
+                }
+
+
             },);
         }
     },);
@@ -453,28 +469,37 @@ export const Web3AuthProvider = ({ children }: any) => {
 
 
     async function getUserStatus(id: string, address: string) {
-        let response = await fetch(`/api/fetch-user/?userId=${id}&address=${address}`, {
-            method: "GET",
-        });
-        let data: any = await response.json();
-        console.log(data.status);
-        const value = data.status;
-        setStatus(value);
+        try {
+            let response = await fetch(`/api/fetch-user/?userId=${id}&address=${address}`, {
+                method: "GET",
+            });
+            let data: any = await response.json();
+            const value = data.status;
+            if (value === 0) {
+                setStatus(value.toString())
+                return
+            }
+            console.log(value)
+            setStatus(value)
+
+        } catch (e) {
+            console.log("error fetching user status", e)
+        }
 
     }
 
 
-    useEffect(() => {
-        if (user && !status && web3AuthAccount && selectedProvider === 0) {
-            if (!web3AuthAccount.addr) {
-                return
-            }
-            if (user) {
-                getUserStatus(user.id, web3AuthAccount.addr)
-            }
-            console.log(status)
-        }
-    }, [user, status, selectedProvider, web3AuthAccount?.addr])
+    // useEffect(() => {
+    //     if (user && !status && web3AuthAccount) {
+    //         if (!web3AuthAccount.addr) {
+    //             return
+    //         }
+    //         if (user) {
+    //             getUserStatus(user.id, web3AuthAccount.addr)
+    //         }
+
+    //     }
+    // }, [user, status, web3AuthAccount?.addr])
 
     useEffect(() => {
         if (user && !organizations) {
@@ -483,40 +508,16 @@ export const Web3AuthProvider = ({ children }: any) => {
     }, [user, organizations])
 
 
-    useEffect(() => {
-        if (refs && !invoices) {
-            console.log(refs)
-
-            const localInvoices = localStorage.getItem("morty-invoices");
-            if (localInvoices) {
-                const cachedInvoices = JSON.parse(localInvoices);
-                if (Array.isArray(cachedInvoices)) {
-                    const missingIds = refs.filter((ref: string) => !cachedInvoices.some((invoice: any) => invoice.id === ref));
-                    console.log("missing iii", missingIds)
-                    if (missingIds.length > 0) {
-                        fetchInvoices(missingIds);
-                    } else {
-                        console.log(JSON.parse(localInvoices))
-                        setInvoices(JSON.parse(localInvoices!))
-                    }
-                } else {
-                    console.error("Cached invoices is not an array:", cachedInvoices);
-
-                }
-                return;
-            }
-            fetchInvoices(refs);
-        }
-
-    }, [refs])
-
-
-
     // useEffect(() => {
-    //     if (invoices) {
-    //         console.log(invoices)
+
+    //     if (refs && refs.length > 0 && !invoices) {
+    //         alert("yooo")
+    //         fetchInvoices(refs);
     //     }
-    // }, [invoices])
+
+    // }, [refs, invoices])
+
+
 
 
     return (

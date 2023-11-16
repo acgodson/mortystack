@@ -23,7 +23,8 @@ export default function SourcePreview() {
 
             <Alert
                 borderRadius={"5px"}
-                color={"#152036"}
+                // color={"#152036"}
+                color="white"
                 px={3}
                 py={4}
             >

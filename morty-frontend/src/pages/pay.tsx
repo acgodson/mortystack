@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Box, Input, Button, Text, Center, IconButton, VStack, Spinner, Divider, HStack, Tooltip, Alert } from "@chakra-ui/react";
+import { Box, Input, Button, Text, Center, IconButton, VStack, Spinner, Divider, HStack, Tooltip, Alert, Flex } from "@chakra-ui/react";
 import { FaExclamationCircle, FaCheckCircle, FaInfo } from "react-icons/fa";
 import algosdk, { Algodv2 } from "algosdk";
 import { useWallet } from "@txnlab/use-wallet";
@@ -12,10 +12,13 @@ import { ConnectType, useEthereumProvider } from "@/contexts/WormholeContext/Eth
 import { CHAIN_ID_ALGORAND } from "@certusone/wormhole-sdk";
 import { ALGORAND_HOST, } from "@/utils/wormhole/consts";
 import { AlgoTokenPicker, KeyAndBalance, SmartAddress } from "@/Wormhole/core";
-import { extractToken } from "@/utils/helpers";
+import { extractToken, getEquivalentAmount } from "@/utils/helpers";
 import { createParsedTokenAccount } from "@/utils/wormhole/parsedTokenAccount";
 import { formatUnits } from "@ethersproject/units";
 import SendConfirmationDialog from "@/Wormhole/send/SendConfirmationDialog";
+import AnimatedSpinner from "@/components/Animations/AnimatedSpinner";
+import { truncate } from "fs/promises";
+import { Invoice } from "@/utils/types";
 
 
 
@@ -35,19 +38,20 @@ const PaymentPage: React.FC = () => {
     const [source, setSource] = useState<number>(0);
     const [pageIndex, setPageIndex] = useState(0)
     const { activeStep, originChain }: any = useWormholeContext()
-    const { availableConnections, signerAddress, provider, connect } = useEthereumProvider();
+    const { signerAddress, provider, connect } = useEthereumProvider();
+    const [tokenAmount, setTokenAmount] = useState('')
     const [amount, setAmount] = useState('')
     const [token, setToken] = useState('')
     const [parsedToken, setParsedToken] = useState<any | null>(null)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [balanceConfirmed, setBalanceConfirmed] = useState<boolean | null>(null);
+    const [isValidating, setIsValidating] = useState<boolean>(true)
+    const [invoice, setInvoice] = useState<Invoice | null>(null)
 
 
     const handleClick = () => {
 
     }
-
-
-
 
     const handleTransferClick = useCallback(() => {
         setIsConfirmOpen(true);
@@ -62,12 +66,8 @@ const PaymentPage: React.FC = () => {
     }, []);
 
 
-
-
-
     async function prepareToken() {
-        console.log("mannn")
-        if (!amount || !activeAddress || !token) {
+        if (!tokenAmount || !activeAddress || !token) {
             return
         }
         const assetID = extractToken(token)
@@ -77,27 +77,21 @@ const PaymentPage: React.FC = () => {
             symbol: assetInfo.params["unit-name"],
             decimals: assetInfo.params.decimals,
         };
-
-
-        const tk = createParsedTokenAccount(
+        const ParsedToken = createParsedTokenAccount(
             activeAddress,
             assetID!,
-            amount,
+            tokenAmount,
             metadata.decimals,
-            parseFloat(formatUnits(amount, metadata.decimals)),
-            formatUnits(amount, metadata.decimals).toString(),
+            parseFloat(formatUnits(tokenAmount, metadata.decimals)),
+            formatUnits(tokenAmount, metadata.decimals).toString(),
             metadata.symbol,
             metadata.tokenName,
             undefined,
             false
         );
-        console.log("I'm going with this now", tk)
-        setParsedToken(tk)
-        return tk
-
-
+        setParsedToken(ParsedToken)
+        return ParsedToken
     }
-
 
     async function fetchInvoice() {
         setLoading(true)
@@ -106,16 +100,13 @@ const PaymentPage: React.FC = () => {
 
             try {
                 let headersList = {
-                    "Accept": "*/*",
-                    "User-Agent": "Thunder Client (https://www.thunderclient.com)",
                     "Content-Type": "application/json"
                 }
-
                 let bodyContent = JSON.stringify({
                     "ref": ref
                 });
 
-                let response = await fetch("http://localhost:3000/api/fetch-invoice", {
+                let response = await fetch("api/fetch-invoice", {
                     method: "POST",
                     body: bodyContent,
                     headers: headersList
@@ -127,16 +118,14 @@ const PaymentPage: React.FC = () => {
                 setStatus(data.success.toString())
 
                 if (data.success) {
-                    setAmount(data.invoice.metadata.invoiceTotal)
+                    setTokenAmount(data.invoice.metadata.invoiceTotal)
                     setToken(data.invoice.metadata.invoiceToken)
+                    setInvoice(data.invoice)
                 }
                 if (!data.success) {
                     console.log("expireeeeed")
                 }
                 setLoading(false)
-
-
-
             } catch (e) {
                 console.error(e)
                 setLoading(false)
@@ -152,25 +141,52 @@ const PaymentPage: React.FC = () => {
         }
     }, [ref]);
 
-
     useEffect(() => {
-        if (amount && activeAddress && token && !parsedToken) {
+        if (tokenAmount && activeAddress && token && !parsedToken) {
             prepareToken()
-
         }
-    }, [amount, activeAddress, token, parsedToken])
+    }, [tokenAmount, activeAddress, token, parsedToken])
 
+    async function getPrice() {
+        if (!parsedToken) {
+            return
+        }
+        let headersList = {
+            "Content-Type": "application/json"
+        }
+        let bodyContent = JSON.stringify({
+            "symbol": parsedToken.symbol === "WMATIC" ? "MATIC" : parsedToken.symbol === "WETH" ? "ETH"
+                : parsedToken.symbol === "WALGO" ? "ALGO" : parsedToken.symbol
+        });
+        let response = await fetch("api/fetch-price", {
+            method: "POST",
+            body: bodyContent,
+            headers: headersList
+        });
+        let data = await response.json();
+        if (data.usdPrice) {
+            const equiv = getEquivalentAmount(data.usdPrice, parseInt(tokenAmount), 2)
+            const sufficient = parsedToken.uiAmount >= equiv;
+            setAmount(equiv.toString())
+            console.log(equiv.toString())
+            console.log(sufficient)
+            setBalanceConfirmed(sufficient)
+            setIsValidating(false)
+        }
 
-
-
+    }
 
     useEffect(() => {
-        console.log(source)
-    }, [source])
+        if (balanceConfirmed === null && pageIndex === 1 && parsedToken && tokenAmount && isValidating) {
+            const { uiAmount } = parsedToken
+            if (uiAmount) {
+                getPrice()
+            }
+        }
+    }, [source, pageIndex, tokenAmount, balanceConfirmed, parsedToken, isValidating])
 
     const copyReference = () => {
     };
-
 
     const renderStatusContent = () => {
         console.log(status)
@@ -229,7 +245,6 @@ const PaymentPage: React.FC = () => {
                             rounded="full"
                         />
                     </Box>
-
                     <Box
                         display={pageIndex === 0 ? "none" : "block"}
                         left={32}
@@ -245,7 +260,6 @@ const PaymentPage: React.FC = () => {
                         </HStack>
 
                     </Box>
-
                     <Box
                         px={24}
                         h="fit-content"
@@ -264,13 +278,20 @@ const PaymentPage: React.FC = () => {
                             backdropFilter: "blur(15px)",
                         }}
                     >
-                        {!status && <Spinner />}
+                        {!status &&
+                            <Center>
+                                {/* <Spinner /> */}
+                                <AnimatedSpinner />
+                            </Center>
+                        }
                         {status !== "true" ? (
                             renderStatusContent()
                         ) : (
                             <>
                                 {!loading && (
                                     <>
+
+                                        {/* Payment OPTION page */}
                                         {pageIndex === 0 && (
                                             <>
                                                 <Text
@@ -347,6 +368,7 @@ const PaymentPage: React.FC = () => {
                                                     }
                                                     pl={5}
                                                     fontSize={["md", "md", "xl"]}
+                                                    // isLoading={isValidating}
                                                     onClick={() => {
                                                         if (!signerAddress) {
                                                             connect(ConnectType.METAMASK)
@@ -354,18 +376,35 @@ const PaymentPage: React.FC = () => {
                                                         setSource(1);
                                                         setPageIndex(2)
                                                     }}
-
                                                 >
                                                     Metamask
                                                 </Button>
                                             </>
                                         )}
+
+
+
+
                                         {(pageIndex === 1 || pageIndex === 2) && (
                                             <>
                                                 {pageIndex === 2 ?
 
-                                                    <TransferBridge /> :
+                                                    <>
+                                                        {invoice && (
+                                                            //EvM to Algo Payment
+                                                            <TransferBridge
+                                                                tokenAmount={tokenAmount}
+                                                                amount={amount}
+                                                                invoice={invoice}
 
+                                                            />
+                                                        )}
+                                                    </>
+
+
+                                                    :
+
+                                                    // Algo to Algo Payment
                                                     <>
                                                         <Box w="100%">
                                                             {/* {parsedToken && ( */}
@@ -377,35 +416,35 @@ const PaymentPage: React.FC = () => {
                                                                 fontSize={activeStep < 2 ? "md" : "md"}
                                                                 w="100%"
                                                             >
-                                                                <HStack
-                                                                    justifyContent={"space-between"}
-                                                                    alignItems={"flex-start"}
-                                                                >
-
-                                                                    <Box
-                                                                        p={4}
-                                                                        bg="#4e4fe4"
-                                                                        rounded={"full"}
+                                                                <VStack py={4} lineHeight={"15px"} w="100%">
+                                                                    <HStack
+                                                                        justifyContent={"center"}
+                                                                        alignItems={"center"}
+                                                                        w="100%"
                                                                     >
-                                                                        <FaInfo
-                                                                            color="white" />
-                                                                    </Box>
+                                                                        <Text
+                                                                            fontSize={["xl", "xl", "xl", "3xl"]}
+                                                                            textAlign={"center"}
+                                                                            color="white"
+                                                                            fontWeight={"semibold"}
+                                                                        > {amount}
+                                                                        </Text>
+
+                                                                        <Box pl={1} color="white">
+                                                                            <SmartAddress
+                                                                                chainId={CHAIN_ID_ALGORAND}
+                                                                                parsedTokenAccount={parsedToken}
+                                                                                isAsset
+                                                                            />
+
+                                                                        </Box>
+                                                                    </HStack>
 
                                                                     <Text
-                                                                        color="#4e4fe4"
-                                                                        fontWeight={"semibold"}
-                                                                    >You're paying out  {amount}
-                                                                        <SmartAddress
-                                                                            chainId={CHAIN_ID_ALGORAND}
-                                                                            parsedTokenAccount={parsedToken}
-                                                                            isAsset
-                                                                        />   for seller to redeem
-
-                                                                    </Text>
-                                                                </HStack>
+                                                                        color={"whiteAlpha.600"}
+                                                                        fontWeight={"semibold"}>${tokenAmount}</Text>
+                                                                </VStack>
                                                             </Alert>
-                                                            {/* )} */}
-
 
                                                             {activeAddress && <AlgoTokenPicker
                                                                 value={parsedToken || null}
@@ -416,7 +455,6 @@ const PaymentPage: React.FC = () => {
                                                                 }}
                                                             />}
 
-                                                            <KeyAndBalance chainId={CHAIN_ID_ALGORAND} />
                                                             <Box py={5} w="100%">
 
                                                                 {activeAddress ?
@@ -474,15 +512,26 @@ const PaymentPage: React.FC = () => {
 
                                                                     </HStack>
                                                                 }
+                                                                {!isValidating && !balanceConfirmed && (
+                                                                    <Box py={2}>
+                                                                        <Text
+                                                                            textAlign={"center"}
+                                                                            fontSize={"xs"} color="red.200"
 
+                                                                        >
+                                                                            Insufficient Balance
+                                                                            to cover payment and transaction fees
+
+                                                                        </Text>
+                                                                    </Box>
+                                                                )}
 
                                                                 <Box w="100%" pt={8}>
                                                                     <Button
                                                                         h="45px"
                                                                         w="100%"
-                                                                        isDisabled={!activeAddress}
-                                                                    // onClick={handleTransferClick}
-
+                                                                        isDisabled={!activeAddress || !balanceConfirmed}
+                                                                        onClick={handleTransferClick}
                                                                     >
                                                                         Transfer
                                                                     </Button>
@@ -492,9 +541,6 @@ const PaymentPage: React.FC = () => {
                                                                         onClose={handleConfirmClose}
                                                                     />
                                                                 </Box>
-
-
-
 
                                                             </Box>
 
@@ -514,8 +560,6 @@ const PaymentPage: React.FC = () => {
                     </Box>
 
                     {pageIndex !== 0 && pageIndex !== 1 && <BridgeSteps active={activeStep} />}
-
-
                     <HStack
                         opacity="0.9"
                         pt={4}

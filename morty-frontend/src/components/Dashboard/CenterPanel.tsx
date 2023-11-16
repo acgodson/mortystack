@@ -1,47 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Box, Text, HStack, Button, useModal, Step, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Center, VStack } from "@chakra-ui/react";
-import RightPanel from "./RightPanel";
-
-import { FiCircle } from 'react-icons/fi';
+import { Flex, Box, Text, HStack, Step, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, Stepper, Center, VStack, Button } from "@chakra-ui/react";
 import BulletTitle from "../Headers";
 import CreateButton from "../Invoice/CreateButton";
 import { useTransaction } from "@/contexts/TransactionContext";
 import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
 import SubscribeButton from "../Subscription/SubscribeButton";
 import AddOrgButton from "../Organization/AddOrgButton";
-import useCountdown from "@/hooks/useCountdown";
+import { useWallet } from "@txnlab/use-wallet";
 
 
 
 const CenterPanel = () => {
   const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
-  const { user, web3AuthAccount, organizations, logout, web3AuthProfile, status, invoices }: any = useWeb3AuthProvider()
+  const { web3AuthAccount, organizations, status, invoices }: any = useWeb3AuthProvider()
+  const { activeAddress, providers } = useWallet()
 
   const [data, setData] = useState<any | null>(null)
   const org = organizations ? organizations : []
-
   const [currentStep, setCurrentStep] = useState<number>(0);
   useEffect(() => {
     return setCurrentStep(
-      status ? status === 0 ? 0 :
-        status === 1 ?
-          org.length < 1 ? 1 :
-            2 : 0 : 0);
-  }, [status, org, setCurrentStep])
-  const hoursLeft = useCountdown({ startDate: "" });
+      !status || status === "0" ? 0 :
+        status > 0 ?
+          organizations && organizations.length < 1 ? 1 :
+            2 : 0);
+  }, [status, organizations, setCurrentStep])
 
 
+  // useEffect(() => {
+  //   console.log("center page invoices", organizations)
+  //   if (organizations) {
+  //     console.log("center page invoices", organizations)
+  //     console.log(currentStep)
+  //   }
+  // }, [organizations])
 
   useEffect(() => {
-
     if (invoices) {
+      // console.log("center page invoices", invoices)
       setData(invoices)
-      console.log(invoices)
     }
-
   }, [invoices])
 
-
+  // useEffect(() => {
+  //   console.log(status)
+  // }, [status])
 
 
   return (
@@ -212,12 +215,54 @@ const CenterPanel = () => {
         )}
 
 
-        {web3AuthAccount && !data || data && data.length < 1 && (
+        {web3AuthAccount && organizations && !activeAddress && (
+          <>
+            <VStack mt={5}
+              maxW="400px"
+              position={"fixed"}
+              px={12}
+              w="100%" spacing={5}>
+
+              <Text>Connect Wallet</Text>
+
+              {providers?.map((provider, index) => (
+                <Button
+                  w="100%"
+                  h="50px"
+                  bg={index === 0 ? "black" : "#ffee55"}
+                  color={index === 0 ? "white" : "black"}
+                  px={5}
+                  leftIcon={
+                    <Box
+                      width={30}
+                      height={30}
+                      alt={`${provider.metadata.name} icon`}
+                      src={provider.metadata.icon}
+                      as="img"
+                    />
+                  }
+                  key={provider.metadata.id}
+                  type="button"
+                  onClick={() => {
+                    if (!activeAddress) {
+                      provider.connect();
+                    }
+                  }}
+                  disabled={provider.isConnected}
+                >
+                  Connect {provider.metadata.name}
+                </Button>
+              ))}
+            </VStack>
+          </>
+
+        )}
+
+
+        {web3AuthAccount && !data && activeAddress && (
 
           <Center>
-
             {status !== 3 && (
-
               <Stepper index={currentStep} orientation="vertical">
                 <Step >
 
@@ -257,7 +302,7 @@ const CenterPanel = () => {
                     color={currentStep > 1 ? "#90cdf4" : "white"}
                   >
                     Ready for Business
-                    {status < 1 && org < 1 && (
+                    {org < 1 && (
                       <AddOrgButton
                         isCurrent={currentStep === 1 ? true : false}
 

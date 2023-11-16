@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // TODO: set custom theme
   const theme: ThemeConfig = extendTheme({
-    initialColorMode: 'light',
+    initialColorMode: 'dark',
     useSystemColorMode: false,
     styles: {
       global: {
@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const router = useRouter()
 
-  const isPaymentPage = router.pathname === '/pay';
+  const isPaymentPage = router.pathname === '/pay' || router.pathname === '/checkout';
 
   return (
 

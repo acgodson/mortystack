@@ -25,7 +25,6 @@ import {
 } from "@/utils/wormhole/consts";
 
 function useFetchTargetAsset() {
-
   const {
     isSourceAssetWormholeWrapped,
     originChain,
@@ -33,12 +32,6 @@ function useFetchTargetAsset() {
     targetChain,
     setTargetAsset,
   }: any = useWormholeContext();
-
-  useEffect(() => {
-    if (originAsset) {
-      alert(originAsset); //origin asset is just ID
-    }
-  }, [originAsset]);
 
   const { provider, chainId: evmChainId } = useEthereumProvider();
   const correctEvmNetwork = getEvmChainId(targetChain);
@@ -129,7 +122,6 @@ function useFetchTargetAsset() {
       }
 
       if (targetChain === CHAIN_ID_ALGORAND && originChain && originAsset) {
-        alert("yellow");
         setTargetAsset(fetchDataWrapper());
         try {
           const algodClient = new algosdk.Algodv2(

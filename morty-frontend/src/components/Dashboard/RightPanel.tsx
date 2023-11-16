@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, HStack, Button, VStack, Switch } from '@chakra-ui/react';
+import { Box, Text, HStack, Button, VStack, Switch, useClipboard, useToast } from '@chakra-ui/react';
 import { useTransaction } from '@/contexts/TransactionContext';
 import TransactionContentLayout from './TransactionContent';
 import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
 import { FaLink, FaShare, FaShareAlt } from 'react-icons/fa';
+import { useWallet } from '@txnlab/use-wallet';
 
 const RightPanel = () => {
     const { selectedTransaction }: any = useTransaction();
     const { web3AuthAccount, organizations, status, invoices }: any = useWeb3AuthProvider()
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [data, setData] = useState<any | null>(null)
+    const { activeAddress } = useWallet()
+    const { onCopy } = useClipboard(invoices && selectedTransaction ? "https://mortystack.xyz/checkout?ref=" + invoices[selectedTransaction - 1].id : "null")
     const org = organizations ? organizations : []
     useEffect(() => {
         return setCurrentStep(
@@ -19,6 +22,7 @@ const RightPanel = () => {
                         2 : 0 : 0);
     }, [status, org, setCurrentStep])
     const [invoice, setInvoice] = useState<any | null>(null)
+    const toast = useToast()
 
 
     useEffect(() => {
@@ -27,10 +31,6 @@ const RightPanel = () => {
             console.log(invoices)
         }
     }, [invoices, invoice])
-
-    // const invoice = invoices ? invoices[selectedTransaction - 1] : null
-
-    console.log(invoice)
 
 
     return (
@@ -61,11 +61,11 @@ const RightPanel = () => {
                             <Text
                                 visibility={!selectedTransaction ? "hidden" : "visible"}
                                 opacity={selectedTransaction ? 1 : 0.1}
-                                fontWeight="bold">Balance: $0.00</Text>
+                                fontWeight="bold">Billed: $ {invoices[selectedTransaction - 1].metadata.invoiceTotal}</Text>
                         </Box>
                         <Box>
                             <VStack>
-                                <Text mt={2}>{selectedTransaction}</Text>
+                                {/* <Text mt={2}>{selectedTransaction - 1}</Text> */}
 
                                 <HStack
                                     bg={!selectedTransaction ? "#111e34" : "transparent"}
@@ -101,7 +101,7 @@ const RightPanel = () => {
                         borderRadius={"12px"}
                         pl={3}
                     >
-                        <Button
+                        {/* <Button
                             isDisabled={true}
                             bg={!selectedTransaction ? "#182942" : "linear-gradient(to right, #243c81, #3951a2)"}
                             _hover={{
@@ -110,7 +110,7 @@ const RightPanel = () => {
                             minW="110px"
                         >
                             {selectedTransaction ? "Withdraw" : ""}
-                        </Button>
+                        </Button> */}
                         <Button
                             bg={!selectedTransaction ? "#182942" : "linear-gradient(to right, #243c81, #3951a2)"}
                             _hover={{
@@ -118,12 +118,22 @@ const RightPanel = () => {
                             }}
                             minW="90px"
                         >
-                            {selectedTransaction ? "Delete" : ""}
+                            {selectedTransaction ? "Delete Invoice" : ""}
                         </Button>
                         <Button
                             bg='#182942'
                             color="white"
                             minW="90px"
+                            onClick={() => {
+                                onCopy();
+                                toast({
+                                    status: "info",
+                                    description: "copied to clipboard",
+                                    position: "top-right"
+                                })
+
+                            }}
+                            isDisabled={!selectedTransaction}
                             fontWeight={"light"}
                             leftIcon={<FaLink />}
                         >
@@ -142,13 +152,13 @@ const RightPanel = () => {
                         h="100%"
                         minH={"400px"}
                     >
-                        <TransactionContentLayout />
+                        <TransactionContentLayout invoice={invoices && invoices.length > 0 ? invoices[selectedTransaction - 1] : null} />
                     </Box>
 
                 </Box >
             )}
 
-            {currentStep < 3 && !selectedTransaction && (
+            {currentStep < 3 && !selectedTransaction && activeAddress && (
                 <>
                     <Box
                         opacity={0.4}
@@ -265,7 +275,7 @@ const RightPanel = () => {
                         h="100%"
                         minH={"400px"}
                     >
-                        <TransactionContentLayout />
+                        <TransactionContentLayout invoice={invoices && invoices.length > 0 ? invoices[selectedTransaction - 1] : null} />
                     </Box>
 
                 </Box >

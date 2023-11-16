@@ -352,9 +352,9 @@ export default function TokenPicker({
         <Box>
           <Text variant="h5">Select a token</Text>
           <Box />
-          <Tooltip title="Reload tokens">
-            <IconButton aria-label="refresh" icon={<MdRefresh />} onClick={resetAccountsWrapper} />
-          </Tooltip>
+          {/* <Tooltip title="Reload tokens"> */}
+            {/* <IconButton aria-label="refresh" icon={<MdRefresh />} onClick={resetAccountsWrapper} /> */}
+          {/* </Tooltip> */}
         </Box>
       </ModalHeader>
       <ModalBody bg='gray.700'>
@@ -425,7 +425,7 @@ export default function TokenPicker({
       {value ? (
         <RenderOption account={value} />
       ) : (
-        <Text color="textSecondary">Select Payment Token</Text>
+        <Text color="textSecondary"> Payment Asset</Text>
       )}
     </Button>
 

@@ -13,14 +13,9 @@ import { useTransaction } from "@/contexts/TransactionContext";
 import { useWallet } from "@txnlab/use-wallet";
 
 function getJoinedDate(date: string) {
-    // Parse the Firebase Authentication date string
     const dateObject = new Date(date);
-
-    // Extract month and year
     const month = dateObject.toLocaleString('default', { month: 'long' }); // Full month name
     const year = dateObject.getFullYear();
-
-    // Output the result
     const formattedDate = `${month} ${year}`;
     return formattedDate
 }
@@ -31,7 +26,7 @@ export default function NavigationBar() {
     const joined = auth.currentUser?.metadata.creationTime || " "
     const { activeTab }: any = useTabs();
     const { isModalOpen, openModal, closeModal }: any = useSignInModal();
-    const { user, web3AuthAccount, logout, web3AuthProfile }: any = useWeb3AuthProvider()
+    const { user, web3AuthAccount, logout, web3AuthProfile, setInvoices, setSelectedProvider, setRefs, setStatus }: any = useWeb3AuthProvider()
     const { activeAddress, providers, getAccountInfo } = useWallet()
     const [profile, setProfile] = useState<any | null>(null)
     const [isMenuOpen, setMenuOpen] = useState(false)
@@ -40,7 +35,7 @@ export default function NavigationBar() {
     const menuList = [
         "Home", "Dashboard", "Shops"
     ]
-    const { peraAccount }: any = useTransaction()
+
 
 
     const handleLoginClick = () => {
@@ -213,14 +208,23 @@ export default function NavigationBar() {
                                 id={user.id}
                                 email={user.email}
                                 joined={joined != "" ? getJoinedDate(joined.toString()) : joined}
-                                address={shortenAddress(web3AuthAccount.addr) || ""}
+                                address={web3AuthAccount.addr || ""}
                                 balance={0}
                                 onClick={logout}
                                 linked={{
                                     addr: activeAddress ? activeAddress : null,
                                     provider: "PERA",
                                     minBal: 0 //later
-                                }} disconnect={connectedProvider && connectedProvider.disconnect}
+                                }}
+                                disconnect={connectedProvider ? () => {
+                                    // setInvoices(null);
+                                    setRefs(null);
+                                    setStatus(null)
+                                    setSelectedProvider(0);
+                                    connectedProvider.disconnect();
+                                    localStorage.removeItem("morty-invoices")
+
+                                } : () => { }}
                                 connect={connectedProvider && connectedProvider.connect}
                             />
                         }

@@ -82,7 +82,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                         alignItems={"center"}
 
                     >
-                        $0.00
+                        $0.21
                     </Box>
                 </Flex>
                 <br />
@@ -108,6 +108,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                 <Stack direction="column" spacing={4}>
                     <VStack
                         as='button'
+                        opacity={0.5}
                         border="0.5px solid #a6a6ee"
                         bg={selectedProvider === 0 ? "#4e4fdf" : "blackAlpha.200"}
 
@@ -118,12 +119,12 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                         borderRadius="md"
                         spacing={2}
                         align="start"
-                        onClick={() => toggleProvider(0)}
+                        // onClick={() => toggleProvider(0)}
                         textAlign={"left"}
                     >
                         <Text
                             color={selectedProvider !== 0 ? "#a6a6ee" : "color"}
-                            fontWeight="bold">Default Provider (Limited)</Text>
+                            fontWeight="bold">Default Provider (Disabled)</Text>
                         <Text fontSize={"xs"} opacity={0.7}
                             maxW={"80%"}
                         >

@@ -1,6 +1,6 @@
 import { SenderType } from '@/contexts/TransactionContext';
 import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
-import { MortyClient } from '@/contracts/MortyClient';
+import { MortyClient } from '@/tsContracts/MortyClient';
 import { calculateKeccak256 } from '@/utils/helpers';
 import { useSteps } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
