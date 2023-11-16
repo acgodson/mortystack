@@ -6,15 +6,16 @@ import { useSignInModal } from '@/contexts/ModalContext/useModalContext';
 import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
 import { Box, VStack, Text, Button } from '@chakra-ui/react'
 import { useWallet } from '@txnlab/use-wallet';
-import { useEffect, useState } from 'react';
 import { FaChartBar, FaFlask } from 'react-icons/fa';
 import { MdFlashOn } from 'react-icons/md';
 import CreateButton from '../Invoice/CreateButton';
+import { useTransaction } from '@/contexts/TransactionContext';
 
 
 
 export default function SidePanel() {
     const { user, web3AuthAccount, logout, web3AuthProfile }: any = useWeb3AuthProvider()
+    const { setPage, page } = useTransaction()
     const { openModal }: any = useSignInModal();
     const { activeAddress } = useWallet()
 
@@ -69,26 +70,28 @@ export default function SidePanel() {
                 >
                     <Box>
                         <Button
-                            color={'white'}
+                            colorScheme='transaprent'
                             leftIcon={<FaChartBar />}
-                            colorScheme='transparent'
+                            color={page === 0 ? "#3951a1" : 'white'}
                             fontSize={"sm"}
+                            onClick={() => setPage(0)}
                         >
                             <Text pl={3}>
-                                {/* Strategies */}
                                 Invoices
                             </Text>
                         </Button>
                         <br />
                         <br />
                         <Button
-                            color={'white'}
+
+                            colorScheme='transaprent'
                             leftIcon={<MdFlashOn />}
-                            colorScheme='transparent'
+                            color={page === 1 ? "#3951a1" : 'white'}
                             fontSize={"sm"}
+                            onClick={() => setPage(1)}
                         >
                             <Text pl={3}>
-                                Integrations
+                                Transactions
 
                             </Text>
                         </Button>
@@ -169,7 +172,7 @@ export default function SidePanel() {
                                         color={"white"}
                                         leftIcon={<FaFlask />}
                                         colorScheme="blue"
-                                        isDisabled={!web3AuthAccount}
+                                        isDisabled={true}
                                         w="100%"
                                         bg={!web3AuthAccount ? "#03000f" : "linear-gradient(to right, #243c81, #3951a2)"}
                                         _hover={{
@@ -188,7 +191,7 @@ export default function SidePanel() {
 
                 </Box>
 
-            </VStack>
+            </VStack >
         </>
     )
 }

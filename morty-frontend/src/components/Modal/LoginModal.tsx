@@ -188,7 +188,7 @@ const LoginModal = ({ isOpen, onClose, page = 0 }: any) => {
                                 </Button>
 
 
-                                <HStack mt={8} fontSize={"sm"} justifyContent="center">
+                                {/* <HStack mt={8} fontSize={"sm"} justifyContent="center">
                                     <Text>           Don't have an account?</Text>
                                     <Text
                                         color={'blue.200'}
@@ -196,7 +196,7 @@ const LoginModal = ({ isOpen, onClose, page = 0 }: any) => {
                                         onClick={() => setTabIndex(1)}
                                     >
                                         Switch to Signup</Text>
-                                </HStack>
+                                </HStack> */}
 
                             </TabPanel>
 

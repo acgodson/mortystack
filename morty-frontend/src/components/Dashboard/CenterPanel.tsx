@@ -14,7 +14,6 @@ const CenterPanel = () => {
   const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
   const { web3AuthAccount, organizations, status, invoices }: any = useWeb3AuthProvider()
   const { activeAddress, providers } = useWallet()
-
   const [data, setData] = useState<any | null>(null)
   const org = organizations ? organizations : []
   const [currentStep, setCurrentStep] = useState<number>(0);

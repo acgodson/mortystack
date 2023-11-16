@@ -5,35 +5,43 @@ import CenterPanel from './CenterPanel';
 import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
 import { useTransaction } from '@/contexts/TransactionContext';
 import useCountdown from '@/hooks/useCountdown';
+import TransactionPanel from './TransactionPanel';
 
 
 
 const DashboardContent = () => {
 
-    const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
+    const { selectedTransaction, setSelectedTransaction, page }: any = useTransaction();
 
 
     // const [data, setData] = useState<any | null>(null)
     // const org = organizations ? organizations : []
 
     const hoursLeft = useCountdown({ startDate: "" });
-   
+
 
 
 
 
 
     return (
-        <Flex
-            w="100%"
-
-        >
-            <CenterPanel />
-
-            <RightPanel
+        <Flex w="100%"  >
 
 
-            />
+            {page === 0 && (
+                <>
+                    <CenterPanel />
+                    <RightPanel />
+                </>
+            )}
+
+            {page === 1 && (
+                <>
+                    <TransactionPanel />
+                </>
+            )}
+
+
 
         </Flex >
     );

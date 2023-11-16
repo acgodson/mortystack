@@ -4,7 +4,7 @@ import {
     initFirebase,
     WEB3AUTH_CLIENT_ID,
 } from "@/utils/config";
-import { getAuth, getRedirectResult, GoogleAuthProvider, OAuthCredential, onAuthStateChanged, UserCredential } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import {
     CHAIN_NAMESPACES,
@@ -102,7 +102,7 @@ export const Web3AuthProvider = ({ children }: any) => {
             console.log("web3auth not initialized yet");
             return;
         }
-        console.log("logiing into web3", idToken)
+        // console.log("logiing into web3", idToken)
         try {
 
             const _web3authProvider = await web3Auth.connectTo(
@@ -253,7 +253,7 @@ export const Web3AuthProvider = ({ children }: any) => {
             "uid": user.id
         });
 
-        let response = await fetch("http://localhost:3000/api/fetch-org", {
+        let response = await fetch("/api/fetch-org", {
             method: "POST",
             body: bodyContent,
             headers: headersList

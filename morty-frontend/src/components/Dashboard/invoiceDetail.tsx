@@ -8,7 +8,7 @@ import useCountdown from '@/hooks/useCountdown';
 
 const TransactionContentLayout = ({ invoice }: any) => {
 
-
+    const [page, setPage] = useState(0)
     const { selectedTransaction }: any = useTransaction();
     const hoursLeft = useCountdown({ startDate: invoice ? invoice.createdAt : 0 });
 

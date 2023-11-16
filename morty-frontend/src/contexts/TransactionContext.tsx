@@ -216,16 +216,16 @@ export const TransactionProvider = ({ children }: any) => {
     useEffect(() => {
 
         if (user && !status && activeAddress && selectedProvider === 1) {
-            console.log("firebase user", user)
+            console.log("firebase", user)
 
-            console.log(user.id)
+            // console.log(user.id)
             getUserStatus(user.id, activeAddress)
         }
     }, [user, status, selectedProvider, activeAddress])
 
-    useEffect(() => {
-        console.log(status)
-    }, [status])
+    // useEffect(() => {
+    //     console.log(status)
+    // }, [status])
 
 
 
