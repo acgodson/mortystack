@@ -6,26 +6,60 @@ weight: 2
 
 To use enable morty within your React app, you will need to install the [mortystack]() installed and fill in your app configuration obtained from the [dashboard]().
 
-```
-npm install mortystack #or yarn i mortystack
+```javascript
+npm i mortystack
 
 ```
 
-### App Configuration and Provider
+- Usage
 
+```javascript
+import { usePay, MortyStackProvider, PayButton } from "mortystack";
 ```
-const myConfig = {
-    id: "xxxx",
-    locale: "en_US,
-    theme: "light"
+
+### App Configuration
+
+- Initialize assets and get asset IDs:
+
+```javascript
+const selectedAssets = initAssets([
+  ASSET_IDS.WETH,
+  { id: 10458941, symbol: "USDC" }, // custom asset
+  ASSET_IDS.ALGOS,
+  ASSET_IDS.WMATIC,
+]);
+```
+
+- Configure and wrap your app/desired componet with the Mortystack provider :
+
+```javascript
+const config = {
+  id: "HIG-1699996617305-FY1K59", // Morty Organization ID from your Dashboard
+  assets: selectedAssets,
+  signer: {
+    addr: undefined, // address that owns and signs the record,
+    secret?: process.env.Secret // dispenser secret if available
+  }
 }
+    <MortyStackProvider config={config}>
+        <Component {...pageProps} />
+ </MortyStackProvider>
 
 ```
 
 ### Retreiving your App ID
 
-- Login to the [Dashboard]()
+- Login to the [Dashboard](https://mortystack.xyz)
 
-- Go to Integrations tab on the sidebar, create a new application
+{{<rawhtml >}}
+<img as src="/login.png"/ >
 
-- Open your application and copy the ID
+{{< /rawhtml >}}
+
+- Connect an External Algorand Wallet to your dashboard
+
+- Create a new Subscription
+
+- Now you create a new organization
+
+- Copy the Organization ID afterwards

@@ -6,7 +6,7 @@
 
 ## Using the MortyStack SDK & Dashboard
 
-To use enable morty within your React app, you will need to install the [mortystack]() installed and fill in your app configuration obtained from the [dashboard]().
+To use enable morty within your React app, you will need to install [mortystack](https://www.npmjs.com/package/mortystack) and fill in your organization's ID obtained from the [dashboard]().
 
 ```javascript
 npm i mortystack

@@ -57,31 +57,13 @@ date: 2018-11-28T15:14:39+10:00
             <path d="M9 18L15 12L9 6" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </div>
-    <div class="box">
-        <div>
-            <h2>Brochure</h2>
-            <p>Get our latest brochure in PDF</p>
-        </div>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 21L12 3" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15 18L12 21L9 18" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </div>
-    <div class="box">
-        <div>
-            <h2>Pitch Deck</h2>
-            <p>Download our pitch deck in PDF</p>
-        </div>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 21V3" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9 6L12 3L15 6" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </div>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const boxes = document.querySelectorAll('.box');
         
+        // TODO: use mortystack/docs instead
         boxes[0].addEventListener('click', function() {
             window.location.href = '/docs';
         });

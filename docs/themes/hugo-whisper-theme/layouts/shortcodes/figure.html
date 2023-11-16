@@ -1,0 +1,17 @@
+{{ "<!-- ENTERING shortcode figure.html -->" | safeHTML }}
+{{ $images := .Page.Resources.ByType "image" }}
+{{- $original := $images.GetMatch (.Get 0) -}}
+{{- $command := .Get 1 -}}
+{{- $options := .Get 2 -}}
+{{- $type := .Get 3 -}}
+{{- $title := .Get 4 -}}
+{{- if eq $command "Fit" -}}
+{{- .Scratch.Set "image" ($original.Fit $options) -}}
+{{- else if eq $command "Resize" -}}
+{{- .Scratch.Set "image" ($original.Resize $options) -}}
+{{- else if eq $command "Fill" -}}
+{{- .Scratch.Set "image" ($original.Fill $options) -}}
+{{- else -}}
+{{- errorf "Invalid image processing command: Must be one of Fit, Fill or Resize." -}}
+{{- end -}}
+{{- $image := .Scratch.Get "image" -}}
