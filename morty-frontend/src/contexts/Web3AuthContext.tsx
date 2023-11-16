@@ -283,8 +283,8 @@ export const Web3AuthProvider = ({ children }: any) => {
             });
 
             let data = await response.json(); // assuming the response is in JSON format
-            console.log(data);
-            console.log(data.active)
+            // console.log(data);
+            console.log("active invoices", data.active)
 
             const updatedInvoices = [...(invoices || []), ...data.active];
             setInvoices(updatedInvoices);

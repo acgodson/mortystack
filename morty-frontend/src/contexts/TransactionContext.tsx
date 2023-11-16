@@ -354,10 +354,8 @@ export const TransactionProvider = ({ children }: any) => {
     })
 
     useEffect(() => {
-        console.log("new refffs", refs)
 
         if (refs && refs.length > 0 && !invoices) {
-            // alert("yooo")
             fetchInvoices(refs);
         }
 
