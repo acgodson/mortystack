@@ -10,14 +10,26 @@ import { FaChartBar, FaFlask } from 'react-icons/fa';
 import { MdFlashOn } from 'react-icons/md';
 import CreateButton from '../Invoice/CreateButton';
 import { useTransaction } from '@/contexts/TransactionContext';
+import { useState, useEffect } from 'react';
 
 
 
 export default function SidePanel() {
-    const { user, web3AuthAccount, logout, web3AuthProfile }: any = useWeb3AuthProvider()
+    const { web3AuthAccount, organizations, status, invoices }: any = useWeb3AuthProvider()
     const { setPage, page } = useTransaction()
     const { openModal }: any = useSignInModal();
-    const { activeAddress } = useWallet()
+    const { activeAddress } = useWallet();
+
+    const [currentStep, setCurrentStep] = useState<number>(0);
+    useEffect(() => {
+        return setCurrentStep(
+            !status || status === "0" ? 0 :
+                status > 0 ?
+                    organizations && organizations.length < 1 ? 1 :
+                        2 : 0);
+    }, [status, organizations, setCurrentStep])
+
+
 
     const connectAlgoWallet = () => {
         if (!web3AuthAccount) {
@@ -144,10 +156,7 @@ export default function SidePanel() {
 
 
 
-
-
-
-                        {activeAddress && web3AuthAccount && (
+                        {activeAddress && web3AuthAccount && currentStep > 1 && (
                             <>
                                 <CreateButton
                                     isCurrent={true}
