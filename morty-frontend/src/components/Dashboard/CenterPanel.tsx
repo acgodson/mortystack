@@ -72,7 +72,7 @@ const CenterPanel = () => {
           />
         )}
 
-        {web3AuthAccount && data && Array.isArray(data) && (
+        {web3AuthAccount && data && Array.isArray(data) && data.length > 0 && (
           <>
             <Box
               w="100%"
@@ -126,7 +126,8 @@ const CenterPanel = () => {
                             textAlign={"left"}
                             color="whiteAlpha.700"
                             fontWeight={"semibold"}
-                          >   {item.metadata.invoiceTitle.toUpperCase()}</Text>
+                          >
+                            {item.metadata.invoiceTitle?.toUpperCase() || ""}</Text>
                           <Box
                             color="whiteAlpha.800"
                             fontSize={"xs"}
@@ -258,7 +259,7 @@ const CenterPanel = () => {
         )}
 
 
-        {web3AuthAccount && !data || data && data.length < 1 && activeAddress && (
+        {web3AuthAccount && !data && activeAddress && (
 
           <Center>
             {status !== 3 && (

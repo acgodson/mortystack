@@ -361,6 +361,8 @@ function TransferBridge(
         for (const asset of accountInfo.assets) {
           const assetId = asset["asset-id"];
           if (assetId.toString() === targetAsset) {
+
+            
             const amount = asset.amount;
             const parsedAccount = createParsedTokenAccount(
               account!.addr,

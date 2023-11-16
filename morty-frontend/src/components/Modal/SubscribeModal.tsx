@@ -82,7 +82,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                         alignItems={"center"}
 
                     >
-                        $0.21
+                        $0.00
                     </Box>
                 </Flex>
                 <br />

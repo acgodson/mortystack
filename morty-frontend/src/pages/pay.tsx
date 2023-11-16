@@ -1,24 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Box, Input, Button, Text, Center, IconButton, VStack, Spinner, Divider, HStack, Tooltip, Alert, Flex } from "@chakra-ui/react";
+import { Box, Input, Button, Text, Center, IconButton, VStack, Spinner, Divider, HStack, Tooltip, Alert, Flex, useToast } from "@chakra-ui/react";
 import { FaExclamationCircle, FaCheckCircle, FaInfo } from "react-icons/fa";
 import algosdk, { Algodv2 } from "algosdk";
 import { useWallet } from "@txnlab/use-wallet";
 import TransferBridge from "@/Wormhole";
 import { useWormholeContext } from "@/contexts/WormholeContext/WormholeStoreContext";
 import { BridgeSteps } from "@/components/Pay/Steps";
-import { MdArrowBack, MdLinkOff } from "react-icons/md";
+import { MdArrowBack, MdDirectionsBoatFilled, MdLinkOff } from "react-icons/md";
 import { ConnectType, useEthereumProvider } from "@/contexts/WormholeContext/EthereumWalletContext";
-import { CHAIN_ID_ALGORAND } from "@certusone/wormhole-sdk";
+import { CHAIN_ID_ALGORAND, hexToUint8Array } from "@certusone/wormhole-sdk";
 import { ALGORAND_HOST, } from "@/utils/wormhole/consts";
 import { AlgoTokenPicker, KeyAndBalance, SmartAddress } from "@/Wormhole/core";
-import { extractToken, getEquivalentAmount } from "@/utils/helpers";
+import { calculateKeccak256, extractToken, getEquivalentAmount } from "@/utils/helpers";
 import { createParsedTokenAccount } from "@/utils/wormhole/parsedTokenAccount";
 import { formatUnits } from "@ethersproject/units";
 import SendConfirmationDialog from "@/Wormhole/send/SendConfirmationDialog";
 import AnimatedSpinner from "@/components/Animations/AnimatedSpinner";
 import { truncate } from "fs/promises";
 import { Invoice } from "@/utils/types";
+import { PaymentTxnType, useTransaction } from "@/contexts/TransactionContext";
+import { MortyClient } from "@/tsContracts/MortyClient";
 
 
 
@@ -34,7 +36,7 @@ const PaymentPage: React.FC = () => {
     const { ref } = router.query;
     const [status, setStatus] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const { providers, activeAddress } = useWallet()
+    const { providers, activeAddress, signer } = useWallet()
     const [source, setSource] = useState<number>(0);
     const [pageIndex, setPageIndex] = useState(0)
     const { activeStep, originChain }: any = useWormholeContext()
@@ -47,20 +49,146 @@ const PaymentPage: React.FC = () => {
     const [balanceConfirmed, setBalanceConfirmed] = useState<boolean | null>(null);
     const [isValidating, setIsValidating] = useState<boolean>(true)
     const [invoice, setInvoice] = useState<Invoice | null>(null)
+    const [isPaying, setIsPaying] = useState<boolean>(false);
+    const [appID, setAppID] = useState<number>(479526612)
+    const sender = { signer, addr: activeAddress! }
+    const toast = useToast()
+    const typedClient = new MortyClient(
+        {
+            sender: sender,
+            resolveBy: 'id',
+            id: appID,
+        },
+        algodClient
+    );
 
 
-    const handleClick = () => {
+    //make a payment to a record
+    const SubmitPayment = async ({ token, amount, description, sellersSigner, organizationID, from, reference }: PaymentTxnType) => {
+        setIsPaying(true)
+        if (!activeAddress) {
+            return
+        }
+
+        console.log(reference);
+        console.log(organizationID);
+
+        //I think we need to get the exact reference from the smart contract
+
+        const result = await typedClient.appClient.getBoxValue(algosdk.decodeAddress(sellersSigner).publicKey);
+        if (result) {
+            const decoder = new algosdk.ABITupleType([
+                new algosdk.ABIUintType(64),
+                new algosdk.ABIUintType(64),
+            ]);
+            const value: any = decoder.decode(result)
+            console.log(value);
+            const resultSum = value.map((x: bigint) => Number(x));
+            const period: number = resultSum.reduce(
+                (acc: number, num: number) => acc + num,
+                0
+            );
+            console.log(period)
+
+            const rr = calculateKeccak256(organizationID + period.toString());
+            console.log(rr)
+
+            const atc = new algosdk.AtomicTransactionComposer();
+            const suggestedParams = await algodClient.getTransactionParams().do();
+            const encoder = new TextEncoder;
+
+            try {
+                const txIndex = (
+                    await typedClient.getGlobalState()
+                ).TxnIDx?.asNumber().valueOf();
+
+                const depositTxn =
+                    algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+                        from: activeAddress,
+                        suggestedParams: await algodClient.getTransactionParams().do(),
+                        to: (await typedClient.appClient.getAppReference()).appAddress,
+                        amount: 200_000,
+                    });
+
+                atc.addTransaction({
+                    txn: depositTxn,
+                    signer,
+                });
+
+
+                atc.addMethodCall({
+                    method: typedClient.appClient.getABIMethod("makePayment")!,
+                    methodArgs: [
+                        BigInt(token),
+                        amount,
+                        encoder.encode(description),
+                        algosdk.decodeAddress(sellersSigner).publicKey,
+                        encoder.encode(organizationID),
+                        from,
+                        sellersSigner
+                    ],
+                    suggestedParams: suggestedParams,
+                    sender: activeAddress,
+                    boxes: [
+                        {
+                            appIndex: appID,
+                            name: algosdk.encodeUint64(txIndex!),
+                        },
+                        {
+                            appIndex: appID,
+                            name: algosdk.decodeAddress(activeAddress).publicKey
+                        },
+                        {
+                            appIndex: appID,
+                            name: hexToUint8Array(reference)
+                        },
+                    ],
+                    appID,
+                    signer,
+                });
+
+                const result = await atc.execute(algodClient, 4)
+                console.log(result)
+                setIsPaying(false)
+
+
+            } catch (e: any) {
+                console.log(e)
+                toast({
+                    status: "error",
+                    description: e.toString(),
+                    position: "top"
+                })
+                setIsPaying(false)
+            }
+        }
 
     }
+
+
+
+
 
     const handleTransferClick = useCallback(() => {
         setIsConfirmOpen(true);
     }, []);
-    const handleConfirmClick = useCallback(() => {
-        handleClick();
-        setIsConfirmOpen(false);
+    const handleConfirmClick = async () => {
 
-    }, [handleClick]);
+        console.log(parsedToken.mintKey)
+
+        SubmitPayment(
+            {
+                token: parseInt(parsedToken.mintKey),
+                amount: parseInt(amount),
+                description: invoice?.id!,
+                sellersSigner: invoice?.metadata.signer!,
+                organizationID: invoice?.metadata.organization!,
+                from: activeAddress!,
+                reference: invoice?.metadata.record!
+            }
+        );
+        // setIsConfirmOpen(false);
+    };
     const handleConfirmClose = useCallback(() => {
         setIsConfirmOpen(false);
     }, []);
@@ -70,27 +198,57 @@ const PaymentPage: React.FC = () => {
         if (!tokenAmount || !activeAddress || !token) {
             return
         }
-        const assetID = extractToken(token)
-        const assetInfo = await algodClient.getAssetByID(Number(assetID)).do();
+        const asset_ID = extractToken(token)
+
+
+        const accountInfo = await algodClient
+            .accountInformation(activeAddress)
+            .do();
+
+        let ParsedOriginAccounts = [];
+
+        const assetInfo = await algodClient.getAssetByID(Number(asset_ID)).do();
         const metadata = {
             tokenName: assetInfo.params.name,
             symbol: assetInfo.params["unit-name"],
             decimals: assetInfo.params.decimals,
         };
-        const ParsedToken = createParsedTokenAccount(
-            activeAddress,
-            assetID!,
-            tokenAmount,
-            metadata.decimals,
-            parseFloat(formatUnits(tokenAmount, metadata.decimals)),
-            formatUnits(tokenAmount, metadata.decimals).toString(),
-            metadata.symbol,
-            metadata.tokenName,
-            undefined,
-            false
-        );
-        setParsedToken(ParsedToken)
-        return ParsedToken
+        for (const asset of accountInfo.assets) {
+            console.log(asset)
+            const assetId = asset["asset-id"];
+            console.log(assetId)
+            console.log(asset_ID)
+            if (assetId.toString() === asset_ID?.toString()) {
+
+                const assetId = asset["asset-id"];
+                console.log(assetId)
+                console.log(asset_ID)
+
+
+                const amount = asset.amount;
+
+                const parsedAccount = createParsedTokenAccount(
+                    activeAddress,
+                    assetId.toString(),
+                    amount,
+                    metadata.decimals,
+                    parseFloat(formatUnits(amount, metadata.decimals)),
+                    formatUnits(amount, metadata.decimals).toString(),
+                    metadata.symbol,
+                    metadata.tokenName,
+                    undefined,
+                    false
+                );
+
+
+                console.log(parsedAccount)
+                ParsedOriginAccounts.push(parsedAccount)
+
+            }
+        }
+        // console.log("parsedd", ParsedOriginAccounts)
+        setParsedToken(ParsedOriginAccounts[0])
+        // return ParsedOriginAccounts[0]
     }
 
     async function fetchInvoice() {
@@ -147,10 +305,13 @@ const PaymentPage: React.FC = () => {
         }
     }, [tokenAmount, activeAddress, token, parsedToken])
 
+
+
     async function getPrice() {
         if (!parsedToken) {
             return
         }
+        console.log("parsed Token", parsedToken)
         let headersList = {
             "Content-Type": "application/json"
         }
@@ -178,6 +339,7 @@ const PaymentPage: React.FC = () => {
 
     useEffect(() => {
         if (balanceConfirmed === null && pageIndex === 1 && parsedToken && tokenAmount && isValidating) {
+            console.log("checFh")
             const { uiAmount } = parsedToken
             if (uiAmount) {
                 getPrice()
@@ -530,8 +692,9 @@ const PaymentPage: React.FC = () => {
                                                                     <Button
                                                                         h="45px"
                                                                         w="100%"
+                                                                        isLoading={isPaying}
                                                                         isDisabled={!activeAddress || !balanceConfirmed}
-                                                                        onClick={handleTransferClick}
+                                                                        onClick={handleConfirmClick}
                                                                     >
                                                                         Transfer
                                                                     </Button>

@@ -13,6 +13,7 @@ import { formatUnits } from '@ethersproject/units';
 import { InvoiceItem, useInvoiceDetails } from '@/hooks/useInvoiceDetails';
 import { microAlgos } from '@algorandfoundation/algokit-utils';
 import { useToast } from '@chakra-ui/react';
+import { FaGalacticSenate } from 'react-icons/fa';
 
 
 const algodToken = {
@@ -23,6 +24,11 @@ const algodToken = {
 export interface SenderType {
     signer: algosdk.TransactionSigner;
     addr: string;
+}
+
+export interface PaymentTxnType {
+    token: number, amount: number, description: string, sellersSigner: string, organizationID: string, from: string
+    reference: string
 }
 
 interface TransactionContextProps {
@@ -83,7 +89,7 @@ interface TransactionContextProps {
     setIsSubmittingInvoice: (value: boolean) => void
     CreateApplication: () => void
     page: number,
-    setPage: (value: number) => void
+    setPage: (value: number) => void,
 }
 
 
@@ -164,7 +170,7 @@ const TransactionContext = createContext<TransactionContextProps>({
     setIsSubmittingInvoice: () => { },
     CreateApplication: () => { },
     page: 0,
-    setPage: () => { }
+    setPage: () => { },
 
 });
 
@@ -190,7 +196,7 @@ export const TransactionProvider = ({ children }: any) => {
     const [isCreatingOrg, setIsCreatingOrg] = useState(false)
     const [name, setName] = useState<string>("")
     const [category, setCategory] = useState<string>("")
-    const [isSubmittingInvoice, setIsSubmittingInvoice] = useState(false)
+    const [isSubmittingInvoice, setIsSubmittingInvoice] = useState(false);
     const toast = useToast()
     const typedClient = new MortyClient(
         {
@@ -715,7 +721,7 @@ export const TransactionProvider = ({ children }: any) => {
             isSubmittingInvoice,
             setIsSubmittingInvoice,
             page,
-            setPage
+            setPage,
         }}>
             {children}
         </TransactionContext.Provider>

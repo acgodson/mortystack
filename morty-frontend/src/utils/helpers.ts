@@ -83,5 +83,5 @@ export function getEquivalentAmount(
   decimalPlaces: number = 2
 ): number {
   const amountInMatic = usdAmount / usdPrice;
-  return parseFloat(amountInMatic.toFixed(decimalPlaces));
+  return parseFloat(amountInMatic.toFixed(7));
 }

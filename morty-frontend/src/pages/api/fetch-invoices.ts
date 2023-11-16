@@ -26,6 +26,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { refs } = req.body;
 
+    console.log(refs)
+
     for (let index = 0; index < refs.length; index++) {
       const ref = refs[index];
       const docRef = (await db
