@@ -1,5 +1,6 @@
 import React, { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { usePay } from "../../../hooks/usePay";
+import { SignerType } from "..";
 
 
 export const AppContext = createContext<{
@@ -8,6 +9,7 @@ export const AppContext = createContext<{
   appName?: string;
   url?: string;
   setAppInfo?(info: any): void
+  signer?: SignerType | undefined
 
 }>({});
 
@@ -18,6 +20,7 @@ export const defaultAppInfo = {
   appName: undefined,
   assets: undefined,
   url: "",
+  signer: undefined
 };
 export const AppProvider = ({ children, appInfo }: any) => {
   const { countdown, status, txn } = usePay()

@@ -10,7 +10,10 @@ import { TransactionProvider } from './contexts/TransactionContext';
 import { AssetIndex, AssetConfig } from '../../utils/helpers';
 
 
-
+export interface SignerType {
+    addr: string
+    secret: string
+}
 
 
 export interface MortyStackProviderProps {
@@ -19,6 +22,7 @@ export interface MortyStackProviderProps {
         theme?: ThemeMode | null;
         locale?: Locale;
         assets?: (AssetIndex | AssetConfig)[];
+        signer?: SignerType | null
     }
     children: ReactNode;
 }
@@ -27,7 +31,7 @@ const defaultTheme: ThemeMode = 'light';
 
 
 export function MortyStackProvider({
-    config: { id = "", theme = defaultTheme, assets, locale } = {},
+    config: { id = "", theme = defaultTheme, assets, locale, signer } = {},
     children,
 
 }: MortyStackProviderProps) {
@@ -37,6 +41,7 @@ export function MortyStackProvider({
             <AppProvider appInfo={{
                 id: id,
                 assets: assets,
+                signer: signer
             }}>
                 <TransactionProvider >
                     <ModalProvider>

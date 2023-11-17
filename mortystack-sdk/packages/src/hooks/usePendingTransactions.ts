@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { PaymentStatus } from "./usePay";
+import { PaymentStatus } from "../utils/helpers";
+
 
 interface Transaction {
   status: PaymentStatus;

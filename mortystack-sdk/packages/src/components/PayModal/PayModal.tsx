@@ -79,7 +79,9 @@ export function PayModal({ onClose, open }: PayModalProps) {
                         color={"#253238"}
                         fontWeight={"bold"}
                     >
-                        <Box css={mortyFontStyles}>
+                        <Box css={mortyFontStyles}
+                            textAlign={"center"}
+                        >
                             <Heading
                                 color="red"
                             >{timer}</Heading>

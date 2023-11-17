@@ -80,9 +80,7 @@ export const usePay = () => {
       console.error("Error verifying payment:", error);
     }
   };
-
   useEffect(() => {
-   
     const storedReference = localStorage.getItem("lastReference");
 
     if (storedReference === reference) {
@@ -109,6 +107,13 @@ export const usePay = () => {
   const sendPayment = async (paymentDetails: PayButtonProps) => {
     setConnected(true);
 
+    if (!appInfo.signer) {
+      console.error("no signer address found");
+      return;
+    }
+
+    console.log(appInfo.signer.addr);
+
     //prepare asset
     const filter = assets.find((x) => x.id === Number(paymentDetails.asset));
 
@@ -124,9 +129,11 @@ export const usePay = () => {
       "Content-Type": "application/json",
     };
 
+    console.log("this is the id", appInfo.id);
+
     let bodyContent = JSON.stringify({
       organization: appInfo.id,
-      signer: "GQFIDU622V6ZIVD6E2X2N72IIHBRD6ZACJQ6GS4F5XZFW3S3ZMYN4STEPM",
+      signer: appInfo.signer.addr,
     });
     //TODO: remember to replace with url addresses
     let response = await fetch("http://localhost:3000/api/verify-record", {
@@ -154,7 +161,7 @@ export const usePay = () => {
       invoiceItems: null,
       acceptWrapped: paymentDetails.acceptWrapped ? true : false,
       record: data.reecord,
-      signer: "GQFIDU622V6ZIVD6E2X2N72IIHBRD6ZACJQ6GS4F5XZFW3S3ZMYN4STEPM", //replace with signer in config
+      signer: appInfo.signer.addr, //replace with signer in config
     };
 
     //send a second request to create new invoice and return the reference
