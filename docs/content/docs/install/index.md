@@ -22,6 +22,8 @@ import { usePay, MortyStackProvider, PayButton } from "mortystack";
 - Initialize assets and get asset IDs:
 
 ```javascript
+const { initAssets, ASSET_IDS } = usePay();
+
 const selectedAssets = initAssets([
   ASSET_IDS.WETH,
   { id: 10458941, symbol: "USDC" }, // custom asset
@@ -35,7 +37,7 @@ const selectedAssets = initAssets([
 ```javascript
 const config = {
   id: "HIG-1699996617305-FY1K59", // Morty Organization ID from your Dashboard
-  assets: selectedAssets,
+  assets: selectedAssets, //<--- InitAsset
   signer: {
     addr: undefined, // address that owns and signs the record,
     secret?: process.env.Secret // dispenser secret if available
@@ -50,11 +52,6 @@ const config = {
 ### Retreiving your App ID
 
 - Login to the [Dashboard](https://mortystack.xyz)
-
-{{<rawhtml >}}
-<img as src="/login.png"/ >
-
-{{< /rawhtml >}}
 
 - Connect an External Algorand Wallet to your dashboard
 

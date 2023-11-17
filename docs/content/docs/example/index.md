@@ -8,5 +8,5 @@ weight: 6
 
 A simple `next-js-app` to demonstrate MortStack Button
 
-- [Website]()
-- [Repository]()
+- [Website](https://kitten-moustache.vercel.app/)
+- [Repository](https://github.com/acgodson/mortystack/tree/main/mortystack-sdk/examples/morty-next-app)

@@ -94,7 +94,7 @@ const config = {
   id: "HIG-1699996617305-FY1K59", // Morty Organization ID from your Dashboard
   assets: selectedAssets,
   signer: {
-    addr: undefined, // address that owns and signs the record,
+    addr: //HSDGESxxxxTYRJ, // address that owns and signs the record,
     secret?: process.env.Secret // dispenser secret if available
   }
 }

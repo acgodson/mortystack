@@ -15,7 +15,7 @@ We have two approaches on the frontend to complete this exchange between a buyer
 
 ##### Direct (Algo to Algo Chain)
 
-![direct approach](https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/sketch.png?alt=media&token=7ec93adf-0fff-4c5e-8b3f-925c340908d6)
+![direct approach](https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/Direct_Approach.jpg?alt=media&token=21bc89f1-edc9-4303-ae23-aaa9e1a44066)
 
 ##### Relay (EVM to Algo Chain)
 
