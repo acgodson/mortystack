@@ -201,7 +201,7 @@ const Customer = ({ next, prev }: any) => {
 const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, onClose }) => {
     const { user, organizations }: any = useWeb3AuthProvider()
     const [ref, setRef] = useState("");
-    const { onCopy } = useClipboard(`http://localhost:3000/${ref}`)
+    const { onCopy } = useClipboard(`http://localhost:3000/?checkout=${ref}`)
     const toast = useToast()
     const {
         organization,

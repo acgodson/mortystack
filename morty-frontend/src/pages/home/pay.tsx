@@ -279,6 +279,7 @@ const PaymentPage: React.FC = () => {
                     setTokenAmount(data.invoice.metadata.invoiceTotal)
                     setToken(data.invoice.metadata.invoiceToken)
                     setInvoice(data.invoice)
+                    
                 }
                 if (!data.success) {
                     console.log("expireeeeed")

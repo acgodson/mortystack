@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Divider, Flex, HStack, Text, VStack } from '@chakra-ui/react';
-import { FaDollarSign, FaChartLine, FaWallet, FaHourglass } from 'react-icons/fa';
+import { FaDollarSign, FaChartLine, FaWallet, FaHourglass, FaExternalLinkAlt } from 'react-icons/fa';
 import { useTransaction } from '@/contexts/TransactionContext';
 import useCountdown from '@/hooks/useCountdown';
+import { extractToken, getEquivalentAmount } from '@/utils/helpers';
 
 
 
@@ -11,10 +12,48 @@ const TransactionContentLayout = ({ invoice }: any) => {
     const [page, setPage] = useState(0)
     const { selectedTransaction }: any = useTransaction();
     const hoursLeft = useCountdown({ startDate: invoice ? invoice.createdAt : 0 });
-
+    const [worth, setWorth] = useState<string | null>(null)
     const amount = selectedTransaction && invoice && invoice.invoice ? "" : ""
-    const worth = selectedTransaction ? "" : "";
+
     const status = selectedTransaction ? "" : ""
+
+
+    async function getPrice() {
+        if (!invoice) {
+            return
+        }
+        const token = invoice.metadata.invoiceToken.split("(")[0].trim()
+        if (!token) {
+            return
+        }
+
+        console.log("tghe token", token)
+        let headersList = {
+            "Content-Type": "application/json"
+        }
+        let bodyContent = JSON.stringify({
+            "symbol": token === "WMATIC" ? "MATIC" : token === "WETH" ? "ETH"
+                : token === "WALGO" ? "ALGO" : token
+        });
+        let response = await fetch("api/fetch-price", {
+            method: "POST",
+            body: bodyContent,
+            headers: headersList
+        });
+        let data = await response.json();
+        if (data.usdPrice) {
+            console.log(data.usdPrice)
+            const equiv = getEquivalentAmount(data.usdPrice, parseInt(invoice.metadata.invoiceTotal), 2)
+            setWorth(equiv.toString())
+        }
+    }
+
+    useEffect(() => {
+        if (invoice && !worth) {
+            getPrice()
+        }
+    }, [invoice, worth])
+
 
 
 
@@ -58,15 +97,15 @@ const TransactionContentLayout = ({ invoice }: any) => {
                             <Box>
 
                                 <Text fontSize="xs" fontWeight="bold" mt={2}>
-                                    Value
+                                    Current  Value
                                 </Text>
 
 
                                 <Text
 
                                     fontSize={"sm"}
-                                    color="gray.600">{worth}</Text>
-                                ###         {invoice.metadata.invoiceToken}
+                                    color="gray.200">{worth}         {invoice.metadata.invoiceToken.split("(")[0].trim()}</Text>
+
 
 
                             </Box>
@@ -107,7 +146,17 @@ const TransactionContentLayout = ({ invoice }: any) => {
 
 
             <Box w="100%" py={8}>
-                <HStack fontSize={"sm"}>
+                <HStack
+                    bg="#242f49"
+                    py={2}
+                    px={3}
+                    cursor="pointer"
+                    pr={12}
+                    fontSize={"sm"}
+                    as="a"
+                    href={invoice && `        https://mortystack.xyz/checkout?ref=${invoice.id}`}
+                    target="_blank"
+                >
 
                     <Box color="gray">   Checkout url:</Box>
                     <Box
@@ -121,6 +170,9 @@ const TransactionContentLayout = ({ invoice }: any) => {
                             </a>
                         }
                     </Box>
+
+                    <FaExternalLinkAlt />
+
                 </HStack>
 
             </Box>

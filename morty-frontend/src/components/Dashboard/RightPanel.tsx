@@ -28,7 +28,7 @@ const RightPanel = () => {
     useEffect(() => {
         if (invoices && !invoice) {
             setData(invoices)
-            console.log("invoices", invoices)
+            // console.log("invoices", invoices)
         }
     }, [invoices, invoice])
 

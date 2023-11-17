@@ -37,39 +37,30 @@ const PaymentPage: React.FC = () => {
         setLoading(true)
         console.log(ref)
         if (ref && ref.length > 5) {
-
             try {
                 let headersList = {
-                    "Accept": "*/*",
-                    "User-Agent": "Thunder Client (https://www.thunderclient.com)",
                     "Content-Type": "application/json"
                 }
-
                 let bodyContent = JSON.stringify({
                     "ref": ref
                 });
 
-                let response = await fetch("http://localhost:3000/api/fetch-invoice", {
+                let response = await fetch("/api/fetch-invoice", {
                     method: "POST",
                     body: bodyContent,
                     headers: headersList
                 });
 
                 let data: any = await response.json();
-
                 console.log(data.invoice)
                 setStatus(data.success.toString())
-
                 if (data.success && data.invoice) {
-                    // const x: any = data.invoice
                     setInvoice(data.invoice)
                 }
                 if (!data.success) {
                     console.log("expireeeeed or invalid")
                 }
                 setLoading(false)
-
-
 
             } catch (e) {
                 console.error(e)
@@ -81,7 +72,7 @@ const PaymentPage: React.FC = () => {
         {
             sender: undefined,
             resolveBy: 'id',
-            id: 479526612 //          BigInt(process.env.APPID!),
+            id: 479526612 
         },
         algodClient
     );

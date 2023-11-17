@@ -1,3 +1,4 @@
+import { Box } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
 
 const useCountdown = (startDate: string) => {
@@ -7,24 +8,18 @@ const useCountdown = (startDate: string) => {
         const calculateHoursLeft = () => {
             const expirationTime = new Date(startDate);
             expirationTime.setHours(expirationTime.getHours() + 24);
-
             const currentTime = new Date().getTime();
             const timeDifference = expirationTime.getTime() - currentTime;
-
-            // Calculate hours left
             const hours = Math.max(0, Math.floor(timeDifference / (1000 * 60 * 60)));
-
             setHoursLeft(hours);
         };
 
         const countdownInterval = setInterval(() => {
             calculateHoursLeft();
-        }, 1000 * 60 * 60); // Update every hour
+        }, 1000 * 60 * 60);
 
-        // Initial calculation
         calculateHoursLeft();
 
-        // Cleanup on unmount
         return () => clearInterval(countdownInterval);
     }, [startDate]);
 
@@ -35,10 +30,9 @@ const CountdownComponent = ({ startDate }: { startDate: any }) => {
     const hoursLeft = useCountdown(startDate);
 
     return (
-        <div>
-            <p>{hoursLeft} hours left</p>
-            {/* You can render the countdown in your desired format */}
-        </div>
+        <Box>
+            <p>{hoursLeft} hours left to expire</p>
+        </Box>
     );
 };
 
