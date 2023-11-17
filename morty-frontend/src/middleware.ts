@@ -41,6 +41,9 @@ export default async function middleware(req: NextRequest) {
     searchParams.length > 0 ? `?${searchParams}` : ""
   }`;
 
+  console.log("##########################################################");
+  console.log(hostname);
+  console.log("##########################################################");
 
   // case for domain without a subdomain e.g mortystack.xyz
   if (hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN) {
