@@ -14,18 +14,18 @@
 
 ### Links
 
--[Contract]("/morty-tealscript)
 
+- [Smart Contract]("/morty-tealscript)
 - [Documentation](https://docs.mortystack.xyz)
 - [Dashboard](https://mortystack.xyz)
 
 ### Examples
 
-- [SDK Example website](https://kitten-moustache.vercel.app/)
+- [SDK PayPutton Example](https://kitten-moustache.vercel.app/)
 
-- [Invoice Sample & Checkout]()
+- [Invoice Sample & Checkout](https://mortystack.xyz/checkout?ref=6bH5iu8pyKmf0gF9e7a9)
 
-- [Sample Shop]()
+- [Sample Shop](https://kelvx.mortystack.xyz/)
 
 ### Videos
 
@@ -75,6 +75,8 @@ import { usePay, MortyStackProvider, PayButton } from "mortystack";
 - Initialize assets and get asset IDs:
 
 ```javascript
+const { initAssets, ASSET_IDS } = usePay();
+
 const selectedAssets = initAssets([
   ASSET_IDS.WETH,
   { id: 10458941, symbol: "USDC" }, // custom asset
@@ -118,9 +120,9 @@ const config = {
 
 # With your Organization ID, you can now
 
-### - 1. Create quick `Invoices` and forward checkout links to customers. See example [invoice]()
+**- 1. Create quick `Invoices` and forward checkout links to customers. See example [invoice](https://mortystack.xyz/checkout?ref=6bH5iu8pyKmf0gF9e7a9)**
 
-### - 2. Set up the `mortystack Button` to receive assets from your website. See example [website]()
+**- 2. Set up the `mortystack Button` to receive assets originating from your website. See example [website](https://kitten-moustache.vercel.app/)**
 
 <img alt="button" height="70px" w="auto" src="/morty-frontend/public/badge.png">
 
@@ -133,6 +135,8 @@ import { PayButton } from "mortystack";
 - Add payload from your application states
 
 ```javascript
+const [payload, setPayload] = useState()
+
 <PayButton
   payload={{
     asset: asset,
@@ -154,10 +158,11 @@ import { PayButton } from "mortystack";
 | items         | InvoiceItems[], optional |              invoice items              |
 | acceptWrapped | boolean, optional        | accept wrapped tokens (wormhole bridge) |
 
+**- 3. Host a shop for your organization with your choice sub-domain example `[name].mortystack.xyz`, served from `AWS Amplify`**
 
-### - 3. Host a shop for your organization with your choice sub-domain example `[name].mortystack.xyz`, served from `AWS`
 ![Custome Shop](morty-frontend/public/customShop.png)
 
+![Alt text](morty-frontend/public/amplify.png)
 
 ### Appendix
 
