@@ -12,7 +12,7 @@ import { ConnectType, useEthereumProvider } from "@/contexts/WormholeContext/Eth
 import { CHAIN_ID_ALGORAND, hexToUint8Array } from "@certusone/wormhole-sdk";
 import { ALGORAND_HOST, } from "@/utils/wormhole/consts";
 import { AlgoTokenPicker, KeyAndBalance, SmartAddress } from "@/Wormhole/core";
-import { calculateKeccak256, extractToken, getEquivalentAmount } from "@/utils/helpers";
+import { algosToMicroAlgos, calculateKeccak256, extractToken, getEquivalentAmount } from "@/utils/helpers";
 import { createParsedTokenAccount } from "@/utils/wormhole/parsedTokenAccount";
 import { formatUnits } from "@ethersproject/units";
 import SendConfirmationDialog from "@/Wormhole/send/SendConfirmationDialog";
@@ -51,6 +51,7 @@ const PaymentPage: React.FC = () => {
     const [invoice, setInvoice] = useState<Invoice | null>(null)
     const [isPaying, setIsPaying] = useState<boolean>(false);
     const [appID, setAppID] = useState<number>(479526612)
+    const [success, setSuccess] = useState(false)
     const sender = { signer, addr: activeAddress! }
     const toast = useToast()
     const typedClient = new MortyClient(
@@ -145,10 +146,28 @@ const PaymentPage: React.FC = () => {
                     signer,
                 });
 
+
+                const assetTxn =
+                    algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+                        from: activeAddress,
+                        suggestedParams: await algodClient.getTransactionParams().do(),
+                        to: (await typedClient.appClient.getAppReference()).appAddress,
+                        amount: algosToMicroAlgos(amount),
+                        assetIndex: token,
+                    });
+
+                atc.addTransaction({
+                    txn: assetTxn,
+                    signer,
+                });
+
                 const result = await atc.execute(algodClient, 4)
                 console.log(result)
-                setIsPaying(false)
 
+                setSuccess(true)
+
+                //update invoice status on firestore post hackathon so that the invoice can be reusable
+                setIsPaying(false)
 
             } catch (e: any) {
                 console.log(e)
@@ -162,8 +181,6 @@ const PaymentPage: React.FC = () => {
         }
 
     }
-
-
 
 
 
@@ -321,6 +338,7 @@ const PaymentPage: React.FC = () => {
         if (data.usdPrice) {
             const equiv = getEquivalentAmount(data.usdPrice, parseInt(tokenAmount), 2)
             const sufficient = parsedToken.uiAmount >= equiv;
+            // alert(amount)
             setAmount(equiv.toString())
             console.log(equiv.toString())
             console.log(sufficient)
@@ -368,11 +386,20 @@ const PaymentPage: React.FC = () => {
                 return (
                     <VStack align={"center"}>
                         <FaCheckCircle size={48} color="green" />
-                        <Text mt="4" fontWeight="bold">
-                            Transaction found
+                        <Text
+                            color="#81e6d9"
+                            mt="4" fontWeight="bold">
+                            Transaction Successful
                         </Text>
-                        <Button mt="4" colorScheme="teal" onClick={() => copyReference()}>
-                            Copy Reference
+                        <Text
+
+                            textAlign={"center"}
+                            fontSize={"sm"} >You an Claim Receipt After Seller has Retrieved Payment </Text>
+
+                        <Button
+                            isDisabled={true}
+                            mt="4" colorScheme="teal" onClick={() => copyReference()}>
+                            Claim Receipt
                         </Button>
                     </VStack>
                 );
@@ -390,332 +417,355 @@ const PaymentPage: React.FC = () => {
                 <VStack
                     w="100%"
                     alignItems="center">
-                    <Box>
-                        <Box
-                            position="absolute"
-                            marginTop="16px"
-                            h="50px"
-                            w="50px"
-                            bg="red"
-                            rounded="full"
-                        />
-                    </Box>
-                    <Box
-                        display={pageIndex === 0 ? "none" : "block"}
-                        left={32}
-                        top={18}
-                        position={"absolute"}>
-                        <HStack
-                            pb={"20px"}
-                            as="button"
-                            onClick={() => setPageIndex(0)}
-                        >
-                            <MdArrowBack />
-                            <Text>            Back to Payment Option</Text>
-                        </HStack>
 
-                    </Box>
-                    <Box
-                        px={24}
-                        h="fit-content"
-                        flexDirection="column"
-                        display="flex"
-                        justifyContent="space-around"
-                        bg={"rgba(21, 34, 57, 0.8)"}
-                        py={8}
-                        borderWidth="0.9px"
-                        borderColor="#253350"
-                        borderRadius="lg"
-                        shadow="md"
-                        maxW={["md", "md", "xl"]}
-                        w="100%"
-                        sx={{
-                            backdropFilter: "blur(15px)",
-                        }}
-                    >
-                        {!status &&
-                            <Center>
-                                {/* <Spinner /> */}
-                                <AnimatedSpinner />
-                            </Center>
-                        }
-                        {status !== "true" ? (
-                            renderStatusContent()
-                        ) : (
-                            <>
-                                {!loading && (
+
+                    {!success && (
+                        <>
+
+                            <Box>
+                                <Box
+                                    position="absolute"
+                                    marginTop="16px"
+                                    h="50px"
+                                    w="50px"
+                                    bg="red"
+                                    rounded="full"
+                                />
+                            </Box>
+
+                            <Box
+                                display={pageIndex === 0 ? "none" : "block"}
+                                left={32}
+                                top={18}
+                                position={"absolute"}>
+                                <HStack
+                                    pb={"20px"}
+                                    as="button"
+                                    onClick={() => setPageIndex(0)}
+                                >
+                                    <MdArrowBack />
+                                    <Text>            Back to Payment Option</Text>
+                                </HStack>
+                            </Box>
+
+                            <Box
+                                px={24}
+                                h="fit-content"
+                                flexDirection="column"
+                                display="flex"
+                                justifyContent="space-around"
+                                bg={"rgba(21, 34, 57, 0.8)"}
+                                py={8}
+                                borderWidth="0.9px"
+                                borderColor="#253350"
+                                borderRadius="lg"
+                                shadow="md"
+                                maxW={["md", "md", "xl"]}
+                                w="100%"
+                                sx={{
+                                    backdropFilter: "blur(15px)",
+                                }}
+                            >
+                                {!status &&
+                                    <Center>
+                                        <AnimatedSpinner />
+                                    </Center>
+                                }
+                                {status !== "true" ? (
+                                    renderStatusContent()
+                                ) : (
                                     <>
-
-                                        {/* Payment OPTION page */}
-                                        {pageIndex === 0 && (
+                                        {!loading && (
                                             <>
-                                                <Text
-                                                    color="whiteAlpha.800"
-                                                    textAlign="center"
-                                                    letterSpacing="2px"
-                                                    fontSize={["md", "md", "2xl"]}
-                                                    fontWeight="semibold"
-                                                    mb="4"
-                                                >
-                                                    Connect your Wallet
-                                                </Text>
-                                                <VStack mt={5} w="100%" spacing={5}>
-                                                    {providers?.map((provider, index) => (
+
+                                                {/* Payment OPTION page */}
+                                                {pageIndex === 0 && (
+                                                    <>
+                                                        <Text
+                                                            color="whiteAlpha.800"
+                                                            textAlign="center"
+                                                            letterSpacing="2px"
+                                                            fontSize={["md", "md", "2xl"]}
+                                                            fontWeight="semibold"
+                                                            mb="4"
+                                                        >
+                                                            Connect your Wallet
+                                                        </Text>
+                                                        <VStack mt={5} w="100%" spacing={5}>
+                                                            {providers?.map((provider, index) => (
+                                                                <Button
+                                                                    w="100%"
+                                                                    h="50px"
+                                                                    bg={index === 0 ? "black" : "#ffee55"}
+                                                                    color={index === 0 ? "white" : "black"}
+                                                                    px={5}
+                                                                    leftIcon={
+                                                                        <Box
+                                                                            width={30}
+                                                                            height={30}
+                                                                            alt={`${provider.metadata.name} icon`}
+                                                                            src={provider.metadata.icon}
+                                                                            as="img"
+                                                                        />
+                                                                    }
+                                                                    key={provider.metadata.id}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        if (!activeAddress) {
+                                                                            provider.connect();
+                                                                        }
+
+                                                                        setSource(0);
+                                                                        setPageIndex(1)
+                                                                    }}
+                                                                    disabled={provider.isConnected}
+                                                                >
+                                                                    Connect {provider.metadata.name}
+                                                                </Button>
+                                                            ))}
+                                                        </VStack>
+                                                        <Divider py={3} />
+                                                        <HStack
+                                                            justifyContent="center"
+                                                            alignItems="center"
+                                                        >
+                                                            <Box mx={3} w="13%" bg="#a8a9ee" h="0.3px" />
+                                                            <Text
+                                                                py={5}
+                                                                fontStyle="italic"
+                                                                textAlign="center"
+                                                                fontSize="xs"
+                                                            >
+                                                                More Options
+                                                            </Text>
+                                                            <Box mx={3} w="13%" bg="#a8a9ee" h="0.3px" />
+                                                        </HStack>
                                                         <Button
+                                                            bg="#25272a"
                                                             w="100%"
                                                             h="50px"
-                                                            bg={index === 0 ? "black" : "#ffee55"}
-                                                            color={index === 0 ? "white" : "black"}
-                                                            px={5}
+                                                            color="white"
                                                             leftIcon={
                                                                 <Box
-                                                                    width={30}
-                                                                    height={30}
-                                                                    alt={`${provider.metadata.name} icon`}
-                                                                    src={provider.metadata.icon}
+                                                                    w="100%"
                                                                     as="img"
+                                                                    src="/icons/metamask-fox.svg"
+                                                                    h="40px"
                                                                 />
                                                             }
-                                                            key={provider.metadata.id}
-                                                            type="button"
+                                                            pl={5}
+                                                            fontSize={["md", "md", "xl"]}
+                                                            // isLoading={isValidating}
                                                             onClick={() => {
-                                                                if (!activeAddress) {
-                                                                    provider.connect();
+                                                                if (!signerAddress) {
+                                                                    connect(ConnectType.METAMASK)
                                                                 }
-
-                                                                setSource(0);
-                                                                setPageIndex(1)
+                                                                setSource(1);
+                                                                setPageIndex(2)
                                                             }}
-                                                            disabled={provider.isConnected}
                                                         >
-                                                            Connect {provider.metadata.name}
+                                                            Metamask
                                                         </Button>
-                                                    ))}
-                                                </VStack>
-                                                <Divider py={3} />
-                                                <HStack
-                                                    justifyContent="center"
-                                                    alignItems="center"
-                                                >
-                                                    <Box mx={3} w="13%" bg="#a8a9ee" h="0.3px" />
-                                                    <Text
-                                                        py={5}
-                                                        fontStyle="italic"
-                                                        textAlign="center"
-                                                        fontSize="xs"
-                                                    >
-                                                        More Options
-                                                    </Text>
-                                                    <Box mx={3} w="13%" bg="#a8a9ee" h="0.3px" />
-                                                </HStack>
-                                                <Button
-                                                    bg="#25272a"
-                                                    w="100%"
-                                                    h="50px"
-                                                    color="white"
-                                                    leftIcon={
-                                                        <Box
-                                                            w="100%"
-                                                            as="img"
-                                                            src="/icons/metamask-fox.svg"
-                                                            h="40px"
-                                                        />
-                                                    }
-                                                    pl={5}
-                                                    fontSize={["md", "md", "xl"]}
-                                                    // isLoading={isValidating}
-                                                    onClick={() => {
-                                                        if (!signerAddress) {
-                                                            connect(ConnectType.METAMASK)
-                                                        }
-                                                        setSource(1);
-                                                        setPageIndex(2)
-                                                    }}
-                                                >
-                                                    Metamask
-                                                </Button>
-                                            </>
-                                        )}
-
-
-
-
-                                        {(pageIndex === 1 || pageIndex === 2) && (
-                                            <>
-                                                {pageIndex === 2 ?
-
-                                                    <>
-                                                        {invoice && (
-                                                            //EvM to Algo Payment
-                                                            <TransferBridge
-                                                                tokenAmount={tokenAmount}
-                                                                amount={amount}
-                                                                invoice={invoice}
-
-                                                            />
-                                                        )}
                                                     </>
+                                                )}
 
 
-                                                    :
 
-                                                    // Algo to Algo Payment
+                                                {(pageIndex === 1 || pageIndex === 2) && (
                                                     <>
-                                                        <Box w="100%">
-                                                            {/* {parsedToken && ( */}
-                                                            <Alert
-                                                                borderRadius={"5px"}
-                                                                color={"#152036"}
-                                                                px={3}
-                                                                py={4}
-                                                                fontSize={activeStep < 2 ? "md" : "md"}
-                                                                w="100%"
-                                                            >
-                                                                <VStack py={4} lineHeight={"15px"} w="100%">
-                                                                    <HStack
-                                                                        justifyContent={"center"}
-                                                                        alignItems={"center"}
+                                                        {pageIndex === 2 ?
+
+                                                            <>
+                                                                {invoice && (
+                                                                    //EvM to Algo Payment
+                                                                    <TransferBridge
+                                                                        tokenAmount={tokenAmount}
+                                                                        amount={amount}
+                                                                        invoice={invoice}
+
+                                                                    />
+                                                                )}
+                                                            </>
+
+
+                                                            :
+
+                                                            // Algo to Algo Payment
+                                                            <>
+                                                                <Box w="100%">
+                                                                    {/* {parsedToken && ( */}
+                                                                    <Alert
+                                                                        borderRadius={"5px"}
+                                                                        color={"#152036"}
+                                                                        px={3}
+                                                                        py={4}
+                                                                        fontSize={activeStep < 2 ? "md" : "md"}
                                                                         w="100%"
                                                                     >
-                                                                        <Text
-                                                                            fontSize={["xl", "xl", "xl", "3xl"]}
-                                                                            textAlign={"center"}
-                                                                            color="white"
-                                                                            fontWeight={"semibold"}
-                                                                        > {amount}
-                                                                        </Text>
+                                                                        <VStack py={4} lineHeight={"15px"} w="100%">
+                                                                            <HStack
+                                                                                justifyContent={"center"}
+                                                                                alignItems={"center"}
+                                                                                w="100%"
+                                                                            >
+                                                                                <Text
+                                                                                    fontSize={["xl", "xl", "xl", "3xl"]}
+                                                                                    textAlign={"center"}
+                                                                                    color="white"
+                                                                                    fontWeight={"semibold"}
+                                                                                > {amount}
+                                                                                </Text>
 
-                                                                        <Box pl={1} color="white">
-                                                                            <SmartAddress
-                                                                                chainId={CHAIN_ID_ALGORAND}
-                                                                                parsedTokenAccount={parsedToken}
-                                                                                isAsset
-                                                                            />
+                                                                                <Box pl={1} color="white">
+                                                                                    <SmartAddress
+                                                                                        chainId={CHAIN_ID_ALGORAND}
+                                                                                        parsedTokenAccount={parsedToken}
+                                                                                        isAsset
+                                                                                    />
 
-                                                                        </Box>
-                                                                    </HStack>
+                                                                                </Box>
+                                                                            </HStack>
 
-                                                                    <Text
-                                                                        color={"whiteAlpha.600"}
-                                                                        fontWeight={"semibold"}>${tokenAmount}</Text>
-                                                                </VStack>
-                                                            </Alert>
+                                                                            <Text
+                                                                                color={"whiteAlpha.600"}
+                                                                                fontWeight={"semibold"}>${tokenAmount}</Text>
+                                                                        </VStack>
+                                                                    </Alert>
 
-                                                            {activeAddress && <AlgoTokenPicker
-                                                                value={parsedToken || null}
-                                                                disabled={true}
-                                                                wallet={activeAddress}
-                                                                onChange={() => {
+                                                                    {activeAddress && <AlgoTokenPicker
+                                                                        value={parsedToken || null}
+                                                                        disabled={true}
+                                                                        wallet={activeAddress}
+                                                                        onChange={() => {
 
-                                                                }}
-                                                            />}
+                                                                        }}
+                                                                    />}
 
-                                                            <Box py={5} w="100%">
+                                                                    <Box py={5} w="100%">
 
-                                                                {activeAddress ?
-                                                                    <Tooltip w="100%" title={activeAddress}>
-                                                                        <Button
-                                                                            w="100%"
-                                                                            h="50px"
-                                                                            color="gray"
-                                                                            bg="blackAlpha.700"
-                                                                            _hover={{
-                                                                                bg: "blackAlpha.700",
-                                                                                color: "gray"
-                                                                            }}
-                                                                            _active={{
-                                                                                bg: "blackAlpha.700",
-                                                                                color: "gray"
-                                                                            }}
-                                                                            _focus={{
-                                                                                bg: "blackAlpha.700",
-                                                                                color: "gray"
-                                                                            }}
-                                                                            // variant="outlined"
-                                                                            size="small"
-                                                                            onClick={
-                                                                                () => providers![1].disconnect()
-                                                                            }
-                                                                            leftIcon={<MdLinkOff />}
-                                                                        >
-                                                                            Disconnect {activeAddress.substring(0, is0x ? 6 : 3)}...
-                                                                            {activeAddress.substr(activeAddress.length - (is0x ? 4 : 3))}
-                                                                        </Button>
-                                                                    </Tooltip>
-                                                                    :
-                                                                    <HStack w="100%" spacing={10}>
-                                                                        {providers?.map((provider, index) => (
+                                                                        {activeAddress ?
+                                                                            <Tooltip w="100%" title={activeAddress}>
+                                                                                <Button
+                                                                                    w="100%"
+                                                                                    h="50px"
+                                                                                    color="gray"
+                                                                                    bg="blackAlpha.700"
+                                                                                    _hover={{
+                                                                                        bg: "blackAlpha.700",
+                                                                                        color: "gray"
+                                                                                    }}
+                                                                                    _active={{
+                                                                                        bg: "blackAlpha.700",
+                                                                                        color: "gray"
+                                                                                    }}
+                                                                                    _focus={{
+                                                                                        bg: "blackAlpha.700",
+                                                                                        color: "gray"
+                                                                                    }}
+                                                                                    // variant="outlined"
+                                                                                    size="small"
+                                                                                    onClick={
+                                                                                        () => providers![1].disconnect()
+                                                                                    }
+                                                                                    leftIcon={<MdLinkOff />}
+                                                                                >
+                                                                                    Disconnect {activeAddress.substring(0, is0x ? 6 : 3)}...
+                                                                                    {activeAddress.substr(activeAddress.length - (is0x ? 4 : 3))}
+                                                                                </Button>
+                                                                            </Tooltip>
+                                                                            :
+                                                                            <HStack w="100%" spacing={10}>
+                                                                                {providers?.map((provider, index) => (
 
+                                                                                    <Button
+                                                                                        h="45px"
+                                                                                        fontSize={"sm"}
+                                                                                        w="fit-content"
+                                                                                        bg={index === 0 ? "black" : "#ffee55"}
+                                                                                        color={index === 0 ? "white" : "black"}
+                                                                                        px={5}
+                                                                                        leftIcon={<Box
+                                                                                            width={25}
+                                                                                            height={25}
+                                                                                            alt={`${provider.metadata.name} icon`}
+                                                                                            src={provider.metadata.icon}
+                                                                                            as="img" />}
+                                                                                        key={provider.metadata.id}
+                                                                                        type="button" onClick={provider.connect} disabled={provider.isConnected}>
+                                                                                        Connect {provider.metadata.name}
+                                                                                    </Button>
+                                                                                ))}
+
+                                                                            </HStack>
+                                                                        }
+                                                                        {!isValidating && !balanceConfirmed && (
+                                                                            <Box py={2}>
+                                                                                <Text
+                                                                                    textAlign={"center"}
+                                                                                    fontSize={"xs"} color="red.200"
+
+                                                                                >
+                                                                                    Insufficient Balance
+                                                                                    to cover payment and transaction fees
+
+                                                                                </Text>
+                                                                            </Box>
+                                                                        )}
+
+                                                                        <Box w="100%" pt={8}>
                                                                             <Button
                                                                                 h="45px"
-                                                                                fontSize={"sm"}
-                                                                                w="fit-content"
-                                                                                bg={index === 0 ? "black" : "#ffee55"}
-                                                                                color={index === 0 ? "white" : "black"}
-                                                                                px={5}
-                                                                                leftIcon={<Box
-                                                                                    width={25}
-                                                                                    height={25}
-                                                                                    alt={`${provider.metadata.name} icon`}
-                                                                                    src={provider.metadata.icon}
-                                                                                    as="img" />}
-                                                                                key={provider.metadata.id}
-                                                                                type="button" onClick={provider.connect} disabled={provider.isConnected}>
-                                                                                Connect {provider.metadata.name}
+                                                                                w="100%"
+                                                                                isLoading={isPaying}
+                                                                                isDisabled={!activeAddress || !balanceConfirmed}
+                                                                                onClick={handleConfirmClick}
+                                                                            >
+                                                                                Transfer
                                                                             </Button>
-                                                                        ))}
+                                                                            <SendConfirmationDialog
+                                                                                open={isConfirmOpen}
+                                                                                onClick={handleConfirmClick}
+                                                                                onClose={handleConfirmClose}
+                                                                            />
+                                                                        </Box>
 
-                                                                    </HStack>
-                                                                }
-                                                                {!isValidating && !balanceConfirmed && (
-                                                                    <Box py={2}>
-                                                                        <Text
-                                                                            textAlign={"center"}
-                                                                            fontSize={"xs"} color="red.200"
-
-                                                                        >
-                                                                            Insufficient Balance
-                                                                            to cover payment and transaction fees
-
-                                                                        </Text>
                                                                     </Box>
-                                                                )}
 
-                                                                <Box w="100%" pt={8}>
-                                                                    <Button
-                                                                        h="45px"
-                                                                        w="100%"
-                                                                        isLoading={isPaying}
-                                                                        isDisabled={!activeAddress || !balanceConfirmed}
-                                                                        onClick={handleConfirmClick}
-                                                                    >
-                                                                        Transfer
-                                                                    </Button>
-                                                                    <SendConfirmationDialog
-                                                                        open={isConfirmOpen}
-                                                                        onClick={handleConfirmClick}
-                                                                        onClose={handleConfirmClose}
-                                                                    />
+
+
                                                                 </Box>
 
-                                                            </Box>
-
-
-
-                                                        </Box>
+                                                            </>
+                                                        }
 
                                                     </>
-                                                }
-
+                                                )}
                                             </>
                                         )}
                                     </>
                                 )}
-                            </>
-                        )}
-                    </Box>
+                            </Box>
 
-                    {pageIndex !== 0 && pageIndex !== 1 && <BridgeSteps active={activeStep} />}
+                        </>
+                    )}
+
+                    {success && (
+                        <VStack align={"center"}>
+                            <FaCheckCircle size={48} color="green" />
+                            <Text
+                                color="#81e6d9"
+                                mt="4" fontWeight="bold">
+                                Transaction Successful
+                            </Text>
+                        </VStack>
+                    )}
+
+
+                    {!success && pageIndex !== 0 && pageIndex !== 1 && <BridgeSteps active={activeStep} />}
+
+
+
+
                     <HStack
                         opacity="0.9"
                         pt={4}
@@ -734,6 +784,9 @@ const PaymentPage: React.FC = () => {
                             src="/verifiedmorty.png"
                         />
                     </HStack>
+
+
+
                 </VStack>
             </Center>
         </Box >

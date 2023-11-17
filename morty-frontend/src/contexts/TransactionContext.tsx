@@ -606,6 +606,18 @@ export const TransactionProvider = ({ children }: any) => {
 
                         await UploadOrgOffline(metadata, user.id)
 
+                        toast({
+                            status: "success",
+                            description: "Record Created Successfully",
+                            position: "top-right",
+                            duration: 10000
+                        });
+                        setIsCreatingOrg(false)
+                        setName("")
+                        setCategory("")
+                        setOrganizations(null)
+                        setStatus(null)
+
                     })
                     .catch((error) => {
                         console.error(error.message)
@@ -616,23 +628,24 @@ export const TransactionProvider = ({ children }: any) => {
                     oid: OID,
                     name: name,
                     category: category,
-                    url: url
+                    url: " "
                 }
 
                 await UploadOrgOffline(metadata, user.id)
+                toast({
+                    status: "success",
+                    description: "Record Created Successfully",
+                    position: "top-right",
+                    duration: 10000
+                });
+                setIsCreatingOrg(false)
+                setName("")
+                setCategory("")
+                setOrganizations(null)
+                setStatus(null)
             }
 
-            toast({
-                status: "success",
-                description: "Record Created Successfully",
-                position: "top-right",
-                duration: 10000
-            });
-            setIsCreatingOrg(false)
-            setName("")
-            setCategory("")
-            setOrganizations(null)
-            setStatus(null)
+
         } catch (error) {
             console.error('Error uploading image:', error);
             setIsCreatingOrg(false)
@@ -666,6 +679,7 @@ export const TransactionProvider = ({ children }: any) => {
         setIsSubmittingInvoice(false)
         return refs
     }
+
 
     return (
         <TransactionContext.Provider value={{

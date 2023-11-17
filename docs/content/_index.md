@@ -78,7 +78,7 @@ date: 2018-11-28T15:14:39+10:00
         });
 
           boxes[1].addEventListener('click', function() {
-            window.location.href = 'https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/MortyStack_Whitepaper.pdf?alt=media&token=f6790ccc-58f7-4879-9016-7ec6b2719bfb';
+            window.location.href = 'https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/MORTYSTACK_WHITEPAPER.pdf?alt=media&token=c0959e3c-0a07-4132-8af8-357e8a67d2f4';
         });
 
         boxes.forEach(box => {

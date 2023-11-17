@@ -85,3 +85,9 @@ export function getEquivalentAmount(
   const amountInMatic = usdAmount / usdPrice;
   return parseFloat(amountInMatic.toFixed(7));
 }
+
+
+export function algosToMicroAlgos(algos: number): number {
+  const microAlgosFactor = 1000000;
+  return algos * microAlgosFactor;
+}

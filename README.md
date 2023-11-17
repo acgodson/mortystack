@@ -10,7 +10,7 @@
 
 - [Brand Bible](/Morty_Brand_Bible.pdf)
 
-- [Whitepaper](/MortyStack_Whitepaper.pdf)
+- [Whitepaper](/MORTYSTACK_WHITEPAPER.pdf)
 
 ### Links
 
