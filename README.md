@@ -4,6 +4,8 @@
 
 # MortyStack wants to help millions of unsatisfied and under-banked users meet their needs and grow their businesses
 
+![Alt text](morty-frontend/public/Direct_Approach.jpg)
+
 ### Resources
 
 - [Pitch Deck](/MortyStack_Pitchdeck.pdf)
