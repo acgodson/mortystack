@@ -1,16 +1,11 @@
-import { evmTargetAsset } from "@/Wormhole/target/targetAsset"
 import { useTransaction } from "@/contexts/TransactionContext"
 import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext"
-import { useWormholeContext } from "@/contexts/WormholeContext/WormholeStoreContext"
 import { InvoiceItem } from "@/hooks/useInvoiceDetails"
 import { calculateKeccak256 } from "@/utils/helpers"
 import { Box, VStack, Text, HStack, Stack, Button, Checkbox, Heading, Link } from "@chakra-ui/react"
-import Lottie from "lottie-react";
-// import galaxyAnimation from "../components/Animations/success.lottie";
 import { useWallet } from "@txnlab/use-wallet"
 import algosdk from "algosdk"
 import { useEffect, useState } from "react"
-import { FaCheckCircle, FaCircle } from "react-icons/fa"
 
 interface InvoiceSummaryType {
     organization: string,
@@ -49,12 +44,13 @@ export const InvoiceSummary = (
 ) => {
 
 
-    const { organizations, selectedProvider, web3AuthAccount, signMessage }: any = useWeb3AuthProvider()
+    const { organizations }: any = useWeb3AuthProvider()
     const { activeAddress } = useWallet()
     const { typedClient, setRecord, CreateInvoice, isSubmittingInvoice, setIsSubmittingInvoice, reset,
         setActiveStep
     } = useTransaction()
     const [IRef, setIRef] = useState<string | null>(null)
+    const [createdInvoice, setCreatedInvoice] = useState<string | null>(null)
 
 
 
@@ -153,28 +149,13 @@ export const InvoiceSummary = (
         if (result) {
             console.log("returned from clientside", result)
 
-            const offlineInvoices: any = localStorage.getItem("morty-ivc");
+            setCreatedInvoice(result[0])
 
-            if (offlineInvoices) {
-                localStorage.setItem("morty-ivc", JSON.stringify([...JSON.parse(offlineInvoices), ...result]))
-            } else {
-                localStorage.setItem("morty-ivc", JSON.stringify(result))
-            }
             setSuccess(true)
             setActiveStep(4)
         }
 
     }
-
-    const handleCopyLink = () => {
-
-    }
-
-    useEffect(() => {
-        console.log(success)
-    }, [success])
-
-
 
 
     return (

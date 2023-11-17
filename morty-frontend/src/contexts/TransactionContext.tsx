@@ -224,17 +224,9 @@ export const TransactionProvider = ({ children }: any) => {
 
         if (user && !status && activeAddress && selectedProvider === 1) {
             console.log("firebase", user)
-
-            // console.log(user.id)
             getUserStatus(user.id, activeAddress)
         }
     }, [user, status, selectedProvider, activeAddress])
-
-    // useEffect(() => {
-    //     console.log(status)
-    // }, [status])
-
-
 
 
     useEffect(() => {
@@ -645,23 +637,6 @@ export const TransactionProvider = ({ children }: any) => {
             console.error('Error uploading image:', error);
             setIsCreatingOrg(false)
         }
-
-
-
-
-
-
-        // console.log(`Calling createRecord`)
-        // //we just want to register an organziation offline
-        // await typedClient.createRecord(
-        //     {
-        //         account: account,
-        //         ref: ref,
-        //         asset: 123  //remember to remove this
-        //     },
-        //     { sender },
-        // );
-
 
     }
 

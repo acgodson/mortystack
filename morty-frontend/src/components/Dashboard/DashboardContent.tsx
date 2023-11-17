@@ -6,6 +6,8 @@ import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
 import { useTransaction } from '@/contexts/TransactionContext';
 import useCountdown from '@/hooks/useCountdown';
 import TransactionPanel from './TransactionPanel';
+import OrganizationList from "./OrganizationList"
+
 
 
 
@@ -38,6 +40,12 @@ const DashboardContent = () => {
             {page === 1 && (
                 <>
                     <TransactionPanel />
+                </>
+            )}
+
+            {page === 2 && (
+                <>
+                    <OrganizationList />
                 </>
             )}
 

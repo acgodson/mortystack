@@ -10,6 +10,11 @@ const PINATA_GATEWAY = "https://scarlet-warm-anaconda-739.mypinata.cloud";
 
 const db = admin.firestore();
 
+const currentTime = new Date();
+const twentyFourHoursAgo = new Date(
+  Number(currentTime) - Number(24 * 60 * 60 * 1000)
+);
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const updatedHeaders = await middleware(req);
 
@@ -26,7 +31,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { refs } = req.body;
 
-    console.log(refs)
+    console.log(refs);
+    if (!refs) {
+      return;
+    }
 
     for (let index = 0; index < refs.length; index++) {
       const ref = refs[index];
@@ -35,19 +43,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .doc(ref)
         .get()) as admin.firestore.DocumentData;
 
-      const obj = {
-        createdAt: docRef.data()["createdAt"].toDate(),
-        cid: docRef.data()["cid"],
-        id: docRef.id,
-        record: docRef.data()["record"],
-      };
-      ivs.push(obj);
+      if (docRef && docRef.exists) {
+        const obj = {
+          createdAt: docRef.data()["createdAt"].toDate(),
+          cid: docRef.data()["cid"],
+          id: docRef.id,
+          record: docRef.data()["record"],
+        };
+        ivs.push(obj);
+      } else {
+        console.error(`Document with ref ${ref} not found`);
+      }
     }
-
-    const currentTime = new Date();
-    const twentyFourHoursAgo = new Date(
-      Number(currentTime) - Number(24 * 60 * 60 * 1000)
-    );
 
     const validInvoices = ivs.filter((invoice: any) => {
       const createdAtTime = new Date(invoice.createdAt as string);
@@ -82,6 +89,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
 
+    console.log(invoices);
     res
       .status(200)
       .json({ success: true, active: invoices, expired: expiredInvoices });

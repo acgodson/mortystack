@@ -51,7 +51,7 @@ export const Web3AuthProvider = ({ children }: any) => {
     const [organizations, setOrganizations] = useState<Organization | null>(null)
     const [invoices, setInvoices] = useState<any | null>(null)
     const [loading, setLoading] = useState(false)
-    const [refs, setRefs] = useState<any[] | null>(["0VwKdYdzvIRk2nlfPjm4"])
+    const [refs, setRefs] = useState<any[] | null>(null)
 
 
 
@@ -261,12 +261,18 @@ export const Web3AuthProvider = ({ children }: any) => {
 
         let data = await response.json();
         if (data.orgs) {
+            console.log("gotten org", data.orgs)
             setOrganizations(data.orgs)
         }
     }
 
 
     async function fetchInvoices(refs: any[]) {
+
+        if (!web3AuthAccount || !organizations) {
+            console.log("no organization found")
+            return
+        }
 
         console.log(refs.length)
 
@@ -287,13 +293,12 @@ export const Web3AuthProvider = ({ children }: any) => {
                 });
 
                 let data = await response.json(); // assuming the response is in JSON format
-                // console.log(data);
+                console.log(data);
                 console.log("active invoices", data.active)
 
-                console.log(data.expired)
+                console.log(data.active)
                 const updatedInvoices = [...(invoices || []), ...data.active];
                 setInvoices(updatedInvoices);
-                localStorage.setItem("morty-invoices", JSON.stringify(updatedInvoices));
             } catch (error) {
                 console.error("Error fetching invoices:", error);
 
@@ -512,18 +517,6 @@ export const Web3AuthProvider = ({ children }: any) => {
             fetchOrganization()
         }
     }, [user, organizations])
-
-
-    useEffect(() => {
-
-        if (refs && refs.length > 0 && !invoices) {
-            // alert("yooo")
-            fetchInvoices(refs);
-        }
-
-    }, [refs, invoices])
-
-
 
 
     return (

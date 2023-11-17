@@ -20,7 +20,6 @@ function getJoinedDate(date: string) {
     return formattedDate
 }
 
-
 export default function NavigationBar() {
     const auth = getAuth()
     const joined = auth.currentUser?.metadata.creationTime || " "

@@ -1,7 +1,9 @@
 // components/HomePage.js
 
 import { Box, Center, Flex, HStack, Heading, SimpleGrid, Stack, Text } from '@chakra-ui/react';
+import CreateShopButton from './CreateShopButton';
 
+//list out users created shops
 // const shops = [
 //     { id: 1, name: 'Shop 1' },
 //     { id: 2, name: 'Shop 2' },
@@ -47,7 +49,7 @@ const HomePage = () => {
 
                             <br />
                             <Text fontSize={["sm", "sm", "sm", "md"]}>
-                                Host your website for free with Morty and start accepting tokens.</Text>
+                                Host your website for free with Morty and start accepting payments in form of Assets.</Text>
                         </Box>
                     </Box>
                 </Center>
@@ -74,13 +76,10 @@ const HomePage = () => {
                     p={8}
                     borderRadius="md"
                 >
+
+
                     <Box>
-                        <Text
-                            fontWeight={"bold"}
-                            fontSize="3xl">+</Text>
-                        <Text
-                            fontWeight={"bold"}
-                            fontSize="md">Create New Shop</Text>
+                        <CreateShopButton />
                     </Box>
 
                 </Flex>

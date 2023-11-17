@@ -12,7 +12,7 @@ import { useWallet } from "@txnlab/use-wallet";
 
 const CenterPanel = () => {
   const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
-  const { web3AuthAccount, organizations, status, invoices }: any = useWeb3AuthProvider()
+  const { web3AuthAccount, organizations, status, refs, invoices, fetchInvoices }: any = useWeb3AuthProvider()
   const { activeAddress, providers } = useWallet()
   const [data, setData] = useState<any | null>(null)
   const org = organizations ? organizations : []
@@ -26,17 +26,11 @@ const CenterPanel = () => {
   }, [status, organizations, setCurrentStep])
 
 
-  // useEffect(() => {
-  //   console.log("center page invoices", organizations)
-  //   if (organizations) {
-  //     console.log("center page invoices", organizations)
-  //     console.log(currentStep)
-  //   }
-  // }, [organizations])
+
 
   useEffect(() => {
     if (invoices) {
-      // console.log("center page invoices", invoices)
+      console.log("c page invoices", invoices)
       setData(invoices)
     }
   }, [invoices])
@@ -44,6 +38,23 @@ const CenterPanel = () => {
   useEffect(() => {
     console.log("current step", status)
   }, [status])
+
+  useEffect(() => {
+    console.log("refs from c panel", refs)
+  }, [refs])
+
+
+
+  useEffect(() => {
+    if (refs && refs.length > 0 && !invoices) {
+      // alert("yooo")
+      console.log(refs)
+      fetchInvoices(refs);
+    }
+
+  })
+
+
 
 
   return (
@@ -154,7 +165,8 @@ const CenterPanel = () => {
                           >
 
 
-                            {item.metadata.invoiceTotal}</Text>
+                            ${item.metadata.invoiceTotal}</Text>
+                          <Text>in</Text>
                           <Text
                             color="whiteAlpha.800"
                             fontSize={"lg"}

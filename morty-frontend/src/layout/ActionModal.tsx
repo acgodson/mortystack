@@ -7,11 +7,8 @@ import {
     ModalBody,
     ModalFooter,
     ModalCloseButton,
-    Select,
-    Input,
     Box,
     Center,
-    FormLabel,
     HStack
 } from '@chakra-ui/react';
 
@@ -28,18 +25,12 @@ interface AModalProps {
 
 
 
-// Create New Invoice
-
-
-// activeStep === 2 ? "100vh" : "fit-content"}
-
-
 
 const AModalLayout: React.FC<AModalProps> = ({ isOpen, onClose, title, size, body, footer }) => {
     return (
         <Modal
-        trapFocus={false}
-        isOpen={isOpen} onClose={onClose} size="full">
+            trapFocus={false}
+            isOpen={isOpen} onClose={onClose} size="full">
             <ModalOverlay />
             <ModalContent
 
