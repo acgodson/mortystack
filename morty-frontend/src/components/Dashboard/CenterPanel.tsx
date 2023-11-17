@@ -26,35 +26,20 @@ const CenterPanel = () => {
   }, [status, organizations, setCurrentStep])
 
 
-
-
   useEffect(() => {
     if (invoices) {
-      console.log("c page invoices", invoices)
       setData(invoices)
     }
   }, [invoices])
 
   useEffect(() => {
-    console.log("current step", status)
-  }, [status])
-
-  useEffect(() => {
-    console.log("refs from c panel", refs)
-  }, [refs])
-
-
-
-  useEffect(() => {
     if (refs && refs.length > 0 && !invoices) {
-      // alert("yooo")
+
       console.log(refs)
       fetchInvoices(refs);
     }
 
   })
-
-
 
 
   return (

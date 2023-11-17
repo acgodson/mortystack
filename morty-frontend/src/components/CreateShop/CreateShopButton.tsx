@@ -35,7 +35,7 @@ const CreateShopButton = () => {
                     color={"whiteAlpha.700"}
                     mb={8}
                 >
-                    <Button
+                    {/* <Button
                         isDisabled={isDisabled}
                         w="100%"
                         bg={isDisabled ? "#03000f" : "linear-gradient(to right, #243c81, #3951a2)"}
@@ -46,7 +46,7 @@ const CreateShopButton = () => {
                     >
                         New Shop
 
-                    </Button>
+                    </Button> */}
                 </Box>
             </Box >
 

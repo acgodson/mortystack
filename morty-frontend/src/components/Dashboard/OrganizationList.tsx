@@ -6,17 +6,12 @@ import { FaCopy } from 'react-icons/fa';
 
 
 const OrganizationList = () => {
-  const { web3AuthAccount, organizations, status, refs, invoices, fetchInvoices }: any = useWeb3AuthProvider()
+  const { organizations }: any = useWeb3AuthProvider()
   const [index, setIndex] = useState(0)
   const { onCopy } = useClipboard(organizations[index].oid)
-  const toast = useToast()
+  const toast = useToast();
 
 
-  useEffect(() => {
-    if (organizations) {
-      console.log(organizations)
-    }
-  }, [organizations])
 
   const handleCopy = (organization: any) => {
 

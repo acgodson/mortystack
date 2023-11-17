@@ -4,6 +4,7 @@ import {
   Button,
   Collapse,
   Flex,
+  HStack,
   IconButton,
   Text,
   useDisclosure,
@@ -17,6 +18,7 @@ import algosdk, { Algodv2 } from 'algosdk';
 import { MortyClient } from '@/tsContracts/MortyClient';
 import { ALGORAND_HOST } from '@/utils/wormhole/consts';
 import { useWeb3AuthProvider } from '@/contexts/Web3AuthContext';
+import { useWallet } from '@txnlab/use-wallet';
 
 
 const algodClient = new Algodv2(
@@ -26,24 +28,92 @@ const algodClient = new Algodv2(
 );
 
 
-interface TransactionProps {
-  title: string;
-  details: string;
-}
+const typedClient = new MortyClient(
+  {
+    sender: undefined,
+    resolveBy: "id",
+    id: 479526612,
+  },
+  algodClient
+);
 
-const Transaction: React.FC<TransactionProps> = ({ title, details }) => {
+const Transaction: React.FC<any> = ({ value, id, assetID, details, }) => {
   const { isOpen, onToggle } = useDisclosure();
-  const { web3AuthAccount, organizations, status, refs, invoices, fetchInvoices }: any = useWeb3AuthProvider();
-  const [orgs, setOrgs] = useState(null)
+  const [asset, setAsset] = useState<string | null>(null);
 
-  const typedClient = new MortyClient(
-    {
-      sender: undefined,
-      resolveBy: "id",
-      id: 479526612,
-    },
-    algodClient
+  const fetchAsset = async () => {
+    const assetInfo = await algodClient.getAssetByID(assetID).do();
+    setAsset(assetInfo.params["unit-name"])
+  }
+
+
+  useEffect(() => {
+    if (assetID && !asset) {
+      fetchAsset()
+    }
+  }, [asset, assetID])
+
+
+
+  assetID
+  return (
+    <Box p={4} borderWidth="1px" borderRadius="md" mb={4}>
+      <Flex justify="space-between" align="center">
+        <Text fontSize="lg" fontWeight="bold">
+          {value} {asset ? asset : assetID}
+        </Text>
+        <Box>
+          <Button
+            colorScheme='blue'
+          > Withdraw</Button>
+          <IconButton
+            ml={5}
+            aria-label={isOpen ? 'Hide' : 'Show'}
+            icon={isOpen ? <FaChevronUp /> : <FaChevronDown />}
+            onClick={onToggle}
+          />
+        </Box>
+      </Flex>
+      <Collapse in={isOpen}>
+        <HStack justifyContent={"left"}
+          px={0}
+        >
+
+          <Text fontSize={"xs"}>invoice ref: {details}</Text>
+
+
+        </HStack>
+      </Collapse>
+    </Box>
   );
+};
+
+const TransactionList = ({ data }: { data: any }) => {
+
+  return (
+    <Box>
+      {
+        data.map((x: any, i: number) => (
+          <Transaction
+            key={x.id}
+            value={Number(x.value)}
+            assetID={Number(x.vault)}
+            id={Number(x.id)}
+            details={x.description}
+          />
+
+        ))}
+
+    </Box>
+  );
+};
+
+const DashboardTransactions: React.FC = () => {
+
+  const { web3AuthAccount, organizations }: any = useWeb3AuthProvider();
+  const [txns, settxns] = useState<any | null>(null)
+  const { activeAddress } = useWallet()
+
 
   const getAllTransactions = async (oid: string, addr: string) => {
 
@@ -58,58 +128,76 @@ const Transaction: React.FC<TransactionProps> = ({ title, details }) => {
       (acc: number, num: number) => acc + num,
       0);
     const reference = calculateKeccak256(oid + period.toString());
+    if (reference) {
+      const recRes = await typedClient.appClient.getBoxValue(hexToUint8Array(reference));
+      const decoder2 = new algosdk.ABIArrayDynamicType(new algosdk.ABIUintType(64));
+      const result2: any = decoder2.decode(recRes)
+      const transactionIDs = result2.map((x: bigint) => Number(x));
+      console.log("txn IDs", transactionIDs)
+      settxns(true)
+      let transactions = [];
+      if (transactionIDs.length > 0) {
+        for (let index = 0; index < transactionIDs.length; index++) {
+          const id = transactionIDs[index];
+          const res = await typedClient.appClient.getBoxValue(algosdk.encodeUint64(id));
 
-    //return values for all txnIDs in record
-    const recRes = await typedClient.appClient.getBoxValue(hexToUint8Array(reference));
+          const nNecoder = new algosdk.ABITupleType([
+            new algosdk.ABIUintType(64),
+            new algosdk.ABIUintType(64),
+            new algosdk.ABIStringType(),
+            new algosdk.ABIUintType(64),
+            new algosdk.ABIUintType(64),
+            new algosdk.ABIAddressType(),
+            new algosdk.ABIAddressType(),
+            new algosdk.ABIUintType(64),
+          ]);
 
-    const decoder2 = new algosdk.ABIArrayDynamicType(new algosdk.ABIUintType(64));
+          const result = nNecoder.decode(res)
+          const metadata = {
+            vault: result[0],
+            value: result[1],
+            description: result[2],
+            status: result[3],
+            receipt: result[4],
+            to: result[5],
+            from: result[6],
+            rIdx: result[7],
+            id: Number(id)
+          };
 
-    const result2: any = decoder2.decode(recRes)
 
-    console.log(result2)
+          transactions.push(metadata)
+        }
+
+        console.log("all transs", transactions)
+        settxns(transactions)
+      }
+
+    }
 
 
   }
 
   useEffect(() => {
-    if (organizations) {
+    if (activeAddress && organizations && !txns) {
       console.log("from txnPanel:", organizations)
+      getAllTransactions(organizations[0].oid, activeAddress)
     }
-
-  }, [organizations])
-
+  });
 
 
-  return (
-    <Box p={4} borderWidth="1px" borderRadius="md" mb={4}>
-      <Flex justify="space-between" align="center">
-        <Text fontSize="lg" fontWeight="bold">
-          {title}
-        </Text>
-        <IconButton
-          aria-label={isOpen ? 'Hide' : 'Show'}
-          icon={isOpen ? <FaChevronUp /> : <FaChevronDown />}
-          onClick={onToggle}
-        />
-      </Flex>
-      <Collapse in={isOpen}>
-        <Text mt={2}>{details}</Text>
-      </Collapse>
-    </Box>
-  );
-};
+  useEffect(() => {
+    console.log("all transactions")
+  }, [txns])
 
-const TransactionList: React.FC = () => {
-  return (
-    <div>
-      <Transaction title="Transaction 1" details="Transaction details 1" />
-      <Transaction title="Transaction 2" details="Transaction details 2" />
-      {/* Add more transactions as needed */}
-    </div>
-  );
-};
 
-const DashboardTransactions: React.FC = () => {
+
+  const gertOrignalAsset = () => {
+  }
+
+
+
+
   return (
     <Box
       w="100%"
@@ -122,7 +210,9 @@ const DashboardTransactions: React.FC = () => {
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
         Transactions
       </Text>
-      {/* <TransactionList /> */}
+      {txns && txns.length > 0 && (
+        <TransactionList data={txns} />
+      )}
     </Box>
   );
 };
