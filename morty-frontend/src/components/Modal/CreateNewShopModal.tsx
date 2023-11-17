@@ -68,97 +68,11 @@ const CreateNewShopModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) 
             maxW="800px"
 
         >
-            <Text
-                w="100%"
-                maxW={"500px"}
-                textAlign={"left"}
-            >This would serve as a business profile for customers to identity  with your service</Text>
-
-            <Box
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                w="100%"
-
-                flexDirection={["column-reverse", "column-reverse", "column-reverse", "row"]}
-            >
-                <Box
-
-                    pt={8}
-                >
-                    <Text
-                        color={"#a6a6ee"}
-                        fontSize={["md", "md", "lg", "2xl"]}> Name of Organization</Text>
-                    <Input
-                        // w="100%"
-                        value={name}
-                        type='text'
-                        onChange={handleNameChange}
-                        placeholder="Enter a name"
-
-                    />
-
-                    <br />
-                    <Text
-                        color={"#a6a6ee"}
-                        fontSize={["md", "md", "lg", "2xl"]} mt={4}>Category </Text>
-                    <Select
-                        w="100%"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        placeholder="Select Category">
-                        <option value="public profile">Public Profile</option>
-                        <option value="technology">Technology</option>
-                        <option value="finance">Finance</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="hospitality">Hospitality </option>
-                        <option value="others">Others</option>
-                    </Select>
-
-                </Box >
-
-                <VStack spacing={4}
-
-                    justifyContent={"space-between"}
-                    m="auto">
-
-                    <FormLabel>
-                        <Flex
-                            color={"#a6a6ee"}
-                            alignItems={"center"} fontSize={"sm"}>
-                            Upload  Logo  <Box fontSize={"xs"} as="span">(Optional)</Box>
-                        </Flex>
-                    </FormLabel>
-
-                    {!selectedImage && (
-                        <Input
-                            w={["100%", "100%", "100%", "300px"]}
-                            h={["fit-content", "fit-content", "fit-content", "300px"]}
-                            border={"none"}
-                            py={6}
-                            bg="blackAlpha.300"
-                            type="file"
-                            accept="image/*" onChange={handleImageChange} />
-                    )}
-
-                    {selectedImage && (
-                        <HStack
-                            spacing={5}
-                            alignItems={"center"}
-                        >
-                            <Text>{selectedImage.name}</Text>
-                            <IconButton
-                                onClick={() => setSelectedImage(null)}
-                                icon={<MdRemove />} aria-label={'clear image'} />
-
-                        </HStack>
-                    )}
-
-                </VStack>
 
 
-            </Box>
 
+
+            {/*             
             <Box pt={12}>
                 <Button
                     isDisabled={name.length < 2 || category.length < 2}
@@ -171,7 +85,7 @@ const CreateNewShopModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) 
                     Submit
                 </Button>
 
-            </Box>
+            </Box> */}
 
 
 
@@ -186,7 +100,7 @@ const CreateNewShopModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) 
             <AModalLayout
                 isOpen={isOpen}
                 onClose={onClose}
-                title={' Add New Organization'}
+                title={'New Shop'}
                 size={"fit-content"}
                 body={<ModalBody />}
             />

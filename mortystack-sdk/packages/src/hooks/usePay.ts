@@ -136,7 +136,7 @@ export const usePay = () => {
       signer: appInfo.signer.addr,
     });
     //TODO: remember to replace with url addresses
-    let response = await fetch("http://localhost:3000/api/verify-record", {
+    let response = await fetch("https://mortystack.xyz/api/verify-record", {
       method: "POST",
       body: bodyContent,
       headers: headersList,
@@ -165,11 +165,12 @@ export const usePay = () => {
     };
 
     //send a second request to create new invoice and return the reference
-
     const { ref, expiry } = await generateTransactionReference(metadata);
 
     console.log("payment reference from sdk", ref);
-    setReference(ref);
+    if (ref) {
+      setReference(ref);
+    }
 
     const encodedRef = encodeURIComponent(ref);
 

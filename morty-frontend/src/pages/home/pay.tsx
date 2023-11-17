@@ -73,8 +73,6 @@ const PaymentPage: React.FC = () => {
         console.log(reference);
         console.log(organizationID);
 
-        //I think we need to get the exact reference from the smart contract
-
         const result = await typedClient.appClient.getBoxValue(algosdk.decodeAddress(sellersSigner).publicKey);
         if (result) {
             const decoder = new algosdk.ABITupleType([
@@ -193,7 +191,6 @@ const PaymentPage: React.FC = () => {
         setIsConfirmOpen(false);
     }, []);
 
-
     async function prepareToken() {
         if (!tokenAmount || !activeAddress || !token) {
             return
@@ -223,10 +220,7 @@ const PaymentPage: React.FC = () => {
                 const assetId = asset["asset-id"];
                 console.log(assetId)
                 console.log(asset_ID)
-
-
                 const amount = asset.amount;
-
                 const parsedAccount = createParsedTokenAccount(
                     activeAddress,
                     assetId.toString(),
@@ -246,9 +240,7 @@ const PaymentPage: React.FC = () => {
 
             }
         }
-        // console.log("parsedd", ParsedOriginAccounts)
         setParsedToken(ParsedOriginAccounts[0])
-        // return ParsedOriginAccounts[0]
     }
 
     async function fetchInvoice() {
@@ -279,7 +271,7 @@ const PaymentPage: React.FC = () => {
                     setTokenAmount(data.invoice.metadata.invoiceTotal)
                     setToken(data.invoice.metadata.invoiceToken)
                     setInvoice(data.invoice)
-                    
+
                 }
                 if (!data.success) {
                     console.log("expireeeeed")

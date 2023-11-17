@@ -261,6 +261,7 @@ export const Web3AuthProvider = ({ children }: any) => {
 
         let data = await response.json();
         if (data.orgs) {
+            console.log("gotten org", data.orgs)
             setOrganizations(data.orgs)
         }
     }

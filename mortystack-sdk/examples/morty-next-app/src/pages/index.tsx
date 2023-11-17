@@ -1,8 +1,8 @@
 // pages/index.js
-import React, { useEffect, useState } from 'react';
-import { Box, Grid, Button, Image, Text, GridItem, HStack, Heading, Divider, List, ListItem, VStack, Select } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Grid, Button, Image, Text, HStack, Heading, Divider, List, ListItem, VStack, Select } from '@chakra-ui/react';
 //@ts-ignore
-import { MortyStackProvider, usePay, PayButton } from 'mortystack'
+import { usePay, PayButton } from 'mortystack'
 
 
 const kittens = [
@@ -28,11 +28,6 @@ const KittenStore = () => {
   const [asset, setAsset] = useState<number>(1)
   const [amount, setAmount] = useState(0)
   const { appInfo } = usePay()
-
-
-  // useEffect(() => {
-  //   console.log(appInfo)
-  // }, [appInfo])
 
 
 
@@ -228,6 +223,8 @@ const KittenStore = () => {
                   acceptWrapped: true,
                 }}
               />
+              <br />
+              <Text fontSize={"xs"}>Please do not disable pop up in browser</Text>
 
 
             </Box>

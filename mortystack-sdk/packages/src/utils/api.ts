@@ -1,8 +1,8 @@
 // src/utils/api.ts
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000/api/";
-export const PAYMENT_PAGE_URL = "http://localhost:3000/";
+const API_BASE_URL = "https://mortystack.xyz/api/";
+export const PAYMENT_PAGE_URL = "https://mortystack.xyz/";
 
 export const generateTransactionReference = async (metadata: any) => {
   // Send request to your server via API to encrypt paymentDetails and get a reference

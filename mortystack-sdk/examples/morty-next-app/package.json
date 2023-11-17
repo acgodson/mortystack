@@ -15,7 +15,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "framer-motion": "^10.16.4",
-    "mortystack": "^0.1.0-alpha.3",
+    "mortystack": "^0.1.0-alpha.4",
     "next": "13.5.5",
     "path": "^0.12.7",
     "react": "^18.2.0",

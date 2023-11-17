@@ -94,7 +94,7 @@ export default function SidePanel() {
                         </Button>
                         <br />
                         <br />
-                      <Button
+                        <Button
 
                             colorScheme='transaprent'
                             leftIcon={<MdFlashOn />}
@@ -108,7 +108,7 @@ export default function SidePanel() {
                             </Text>
                         </Button>
 
-         <br />
+                        <br />
                         <     br /><Button
 
                             colorScheme='transaprent'
@@ -118,7 +118,7 @@ export default function SidePanel() {
                             onClick={() => setPage(2)}
                         >
                             <Text pl={3}>
-                                 Organizations
+                                Organizations
 
                             </Text>
                         </Button>
