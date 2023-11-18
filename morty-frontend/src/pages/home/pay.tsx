@@ -249,13 +249,15 @@ const PaymentPage: React.FC = () => {
                 ParsedOriginAccounts.push(parsedAccount)
 
             } else {
-                toast({
-                    status: "error",
-                    description: `You don't have asset ${token} in your current account. Please connect another wallet with asset and sufficent balance`,
-                    position: "bottom",
-                    duration: 2000000,
-                    isClosable: true
-                })
+                if (pageIndex === 1) {
+                    toast({
+                        status: "error",
+                        description: `You don't have asset ${token} in your current account. Please connect another wallet with asset and sufficent balance`,
+                        position: "bottom",
+                        duration: 2000000,
+                        isClosable: true
+                    })
+                }
             }
         }
         setParsedToken(ParsedOriginAccounts[0])
@@ -314,7 +316,7 @@ const PaymentPage: React.FC = () => {
         if (tokenAmount && activeAddress && token && !parsedToken) {
             prepareToken()
         }
-    }, [tokenAmount, activeAddress, token, parsedToken])
+    }, [tokenAmount, activeAddress, token, parsedToken, pageIndex])
 
 
 
