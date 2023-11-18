@@ -4,7 +4,7 @@ date: 2019-02-11T19:27:37+10:00
 weight: 2
 ---
 
-To use enable morty within your React app, you will need to install the [mortystack]() installed and fill in your app configuration obtained from the [dashboard]().
+To use enable morty within your React app, you will need to install the [mortystack sdk]() and configure with your organization's detials obtained from mortystack's [dashboard]().
 
 ```javascript
 npm i mortystack

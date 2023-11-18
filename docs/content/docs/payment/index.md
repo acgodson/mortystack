@@ -9,16 +9,17 @@ weight: 3
 
 ![Button](https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/badge.png?alt=media&token=0940d98c-54d1-49b5-bc2c-c889f6bf08ed)
 
-
 ```javascript
 import { PayButton } from "mortystack";
 ```
 
 The Button would trigger the payment modal after successful click
 
-- Add payload from your application states
+- Add payload from your application state storage
 
 ```javascript
+//const [payload, setPayload] = useState()
+
 <PayButton
   payload={{
     asset: asset,
