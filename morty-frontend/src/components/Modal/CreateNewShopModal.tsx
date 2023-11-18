@@ -1,112 +1,144 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
+import AModalLayout from "@/layout/ActionModal";
+import { createShop, getShopsByOid } from "@/libs/shops";
 import {
-    Button,
-    Box,
-    VStack,
-    Text,
-    Flex,
-    Stack,
-    FormControl,
-    FormLabel,
-    Input,
-    Select,
-    IconButton,
-    HStack,
-    Textarea
-} from '@chakra-ui/react';
-import AModalLayout from '@/layout/ActionModal';
-import { useTransaction } from '@/contexts/TransactionContext';
-import { MdRemove } from 'react-icons/md';
-
-interface ImageUploadFormProps {
-    organizationID: string;
-}
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  HStack,
+  Input,
+  Textarea,
+  VStack,
+  useToast,
+} from "@chakra-ui/react";
+import React, { useState } from "react";
 
 interface CreateOrgModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
+const ModalBody = ({ setShops, onClose }: { setShops: any; onClose: any }) => {
+  const { organizations }: any = useWeb3AuthProvider();
 
+  const [shopName, setShopName] = useState("");
+  const [shopDescription, setShopDescription] = useState("");
+  const toast = useToast();
 
+  // Updated regex to allow domain characters
+  const handleShopNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9.-]/g, "").toLowerCase();
+    setShopName(sanitizedValue);
+  };
 
-const CreateNewShopModal: React.FC<CreateOrgModalProps> = ({ isOpen, onClose }) => {
-
-    const { isCreatingOrg, name, category, setCategory, CreateRecord, CreateApplication, setName } = useTransaction()
-    const [selectedImage, setSelectedImage] = useState<File | null>();
-
-
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files && files.length > 0) {
-            setSelectedImage(files[0]);
-        }
-    };
-
-    const handleSubmit = async () => {
-
-        // await CreateApplication();
-
-        const img = selectedImage ? selectedImage : null;
-
-        await CreateRecord(name, category, img);
-    }
-    const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-    }, []);
-
-
-
-
-    const ModalBody = () => (
-        <Box
-            w="100%"
-            position={"relative"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            pt={12}
-            maxW="800px"
-
-        >
-
-
-
-
-            {/*             
-            <Box pt={12}>
-                <Button
-                    isDisabled={name.length < 2 || category.length < 2}
-                    isLoading={isCreatingOrg}
-                    bg="#4e4fdf"
-                    color="white"
-                    size="lg"
-                    onClick={handleSubmit}
-                >
-                    Submit
-                </Button>
-
-            </Box> */}
-
-
-
-
-        </Box >
-    )
-
-
-
-    return (
-        <>
-            <AModalLayout
-                isOpen={isOpen}
-                onClose={onClose}
-                title={'New Shop'}
-                size={"fit-content"}
-                body={<ModalBody />}
+  return (
+    <VStack
+      w="100%"
+      position={"relative"}
+      justifyContent={"center"}
+      alignItems={"center"}
+    >
+      <Box
+        mb={8}
+        display={"flex"}
+        alignItems={"center"}
+        justifyContent={"center"}
+        alignSelf={"center"}
+        w="100%"
+        maxW={"500px"}
+      >
+        <Box w="100%" pt={32}>
+          <FormControl>
+            <FormLabel fontSize={["md", "md", "lg", "2xl"]} mt={4}>
+              Shop name
+            </FormLabel>
+            <Input
+              w="100%"
+              value={shopName}
+              onChange={handleShopNameChange}
+              placeholder="Enter shop name"
             />
-        </>
-    );
+            <FormLabel fontSize={["md", "md", "lg", "2xl"]} mt={4}>
+              Shop description
+            </FormLabel>
+            <Textarea
+              w="100%"
+              value={shopDescription}
+              onChange={(e) => setShopDescription(e.target.value)}
+              placeholder="Enter shop description"
+            />
+          </FormControl>
+
+          <HStack py={12} w="100%" spacing={10} alignItems={"center"}>
+            <Button
+              colorScheme="green"
+              onClick={() => {
+                createShop(
+                  {
+                    description: shopDescription,
+                    name: shopName,
+                    oid: organizations[0].oid,
+                  },
+                  (error: string) => {
+                    if (error) {
+                      toast({
+                        status: "error",
+                        description: error,
+                      });
+                    } else {
+                      toast({
+                        status: "success",
+                        description: "Shop created",
+                      });
+
+                      // get shop by OID
+                      const myCallback = (error: string, shops?: any[]) => {
+                        if (error) {
+                          toast({
+                            status: "error",
+                            description: error,
+                          });
+                        } else {
+                          console.log(shops);
+                          setShops(shops || []);
+                        }
+                      };
+
+                      getShopsByOid(organizations[0].oid, myCallback);
+
+                      onClose();
+                    }
+                  }
+                );
+              }}
+            >
+              Create
+            </Button>
+          </HStack>
+        </Box>
+      </Box>
+    </VStack>
+  );
 };
 
+const CreateNewShopModal: React.FC<CreateOrgModalProps & { setShops: any }> = ({
+  isOpen,
+  onClose,
+  setShops,
+}) => {
+  return (
+    <>
+      <AModalLayout
+        isOpen={isOpen}
+        onClose={onClose}
+        title={"New Shop"}
+        size={"fit-content"}
+        body={<ModalBody setShops={setShops} onClose={onClose} />}
+      />
+    </>
+  );
+};
 
 export default CreateNewShopModal;
