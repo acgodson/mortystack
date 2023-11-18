@@ -126,7 +126,11 @@ const HomePage: React.FC = () => {
             <Flex
               key={i}
               as="a"
-              href={`http://${name}${host}`}
+              href={`${
+                process.env.NODE_ENV === "production"
+                  ? `https://${name}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                  : `http://${name}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+              }`}
               target="_blank"
               maxW="250px"
               h={["fit-content", "fit-content", "fit-content", "250"]}
