@@ -1,8 +1,11 @@
 import { Box, Button, Text, VStack } from "@chakra-ui/react";
+import { useWallet } from "@txnlab/use-wallet";
 import { FaChartBar } from "react-icons/fa";
 import { MdFlashOn } from "react-icons/md";
 
 export default function Cart() {
+  const { activeAddress, providers } = useWallet();
+
   return (
     <>
       <VStack color={"white"} w="100%" pt={8} pb={8}>
@@ -43,33 +46,47 @@ export default function Cart() {
             </Button>
           </Box>
 
-          <Box>
-            <Box
-              py={6}
-              bg="#182942"
-              sx={{
-                backdropFilter: " saturate(140%)",
-              }}
-              textAlign={"center"}
-              px={2}
-              display={"flex"}
-              flexDirection={"column"}
-              justifyContent={"center"}
-              alignItems={"center"}
-              borderRadius={"15px"}
-            >
-              <Text fontSize={"md"} fontWeight={"bold"}>
-                Get Started By Connecting your Wallet
-              </Text>
-              <Text fontSize={"xs"} color={"whiteAlpha.600"} py={2}>
-                Discover new limits and more features by connecting your algo
-                wallet.
-              </Text>
-              <VStack>
-                <Button colorScheme="blue">Login </Button>
-              </VStack>
-            </Box>
-          </Box>
+          <VStack
+            borderRadius={"8px"}
+            mt={5}
+            padding={2}
+            w="100%"
+            spacing={5}
+            bg="#182942"
+            sx={{
+              backdropFilter: " saturate(140%)",
+            }}
+          >
+            <Text align="center">Admin Login</Text>
+            {providers?.map((provider, index) => (
+              <Button
+                w="max-content"
+                h="50px"
+                bg={index === 0 ? "black" : "#ffee55"}
+                color={index === 0 ? "white" : "black"}
+                px={5}
+                leftIcon={
+                  <Box
+                    width={30}
+                    height={30}
+                    alt={`${provider.metadata.name} icon`}
+                    src={provider.metadata.icon}
+                    as="img"
+                  />
+                }
+                key={provider.metadata.id}
+                type="button"
+                onClick={() => {
+                  if (!activeAddress) {
+                    provider.connect();
+                  }
+                }}
+                disabled={provider.isConnected}
+              >
+                Connect {provider.metadata.name}
+              </Button>
+            ))}
+          </VStack>
         </Box>
       </VStack>
     </>

@@ -1,62 +1,62 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
+import Cart from "@/components/cart";
+import ShopLayout from "@/layout/ShopLayout";
+import { getShop } from "@/libs/shops";
 import {
   Box,
   Center,
-  Flex,
   Heading,
   SimpleGrid,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
-import ShopLayout from "@/layout/ShopLayout";
-import Cart from "@/components/cart";
+import { useState } from "react";
 
-const items = [
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  { id: 2, name: "item 2" },
-  // Add more items as needed
-];
+export const getShopPromise = (shopId: string) => {
+  return new Promise((resolve, reject) => {
+    getShop(shopId, (error, shop) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(shop);
+      }
+    });
+  });
+};
 
 export const getServerSideProps: GetServerSideProps<{
-  subdomain: String;
+  shop: any;
 }> = async ({ req }) => {
   const subdomain = req.headers.host?.split(".")[0];
 
-  const allowed = ["kelvx", "mercy", "grace"];
-
-  if (!allowed.includes(subdomain || "")) {
+  if (typeof subdomain === "string") {
+    try {
+      const shop = await getShopPromise(subdomain);
+      return {
+        props: {
+          shop,
+        },
+      };
+    } catch (error) {
+      return {
+        notFound: true,
+      };
+    }
+  } else {
     return {
       notFound: true,
     };
   }
-
-  return {
-    props: {
-      subdomain: subdomain!,
-    },
-  };
 };
 
 const HomePage = ({
-  subdomain,
+  shop,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [shopState, setShopState] = useState(shop);
+  const toast = useToast();
+
   return (
     <ShopLayout>
       <Box w="100%">
@@ -91,12 +91,12 @@ const HomePage = ({
             >
               <Box h="100%" fontSize={["md", "md", "md", "2xl"]}>
                 <Box fontWeight={"semibold"} as="h1">
-                  Welcome to {subdomain} shop
+                  Welcome to {shop.name} shop
                 </Box>
 
                 <br />
                 <Text fontSize={["sm", "sm", "sm", "md"]}>
-                  This is the description of my shop.
+                  {shopState?.description}
                 </Text>
               </Box>
             </Box>
@@ -109,9 +109,9 @@ const HomePage = ({
 
         {/* Item Grid */}
         <SimpleGrid columns={[1, 2, 3]} spacing={4} p={4}>
-          {items.map((item) => (
+          {shopState?.products?.map((item: any, i: number) => (
             <Box
-              key={item.id}
+              key={i}
               bg="black"
               p={4}
               w="100%"
@@ -122,8 +122,7 @@ const HomePage = ({
               <Heading as="h2" fontSize="xl" mb={2}>
                 {item.name}
               </Heading>
-              Add more details or links for each item as needed
-              <Text>item Description or Additional Information</Text>
+              <Text>{item.description}</Text>
             </Box>
           ))}
         </SimpleGrid>
