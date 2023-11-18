@@ -6,7 +6,7 @@ weight: 5
 
 #### Hosting Blockchain enabled catalogs on MortyStack
 
-## Custom Shops with Subdomain Domains
+## Custom Shops with unique Subdomain
 
 Morty Wallet introduces the capability for users to create custom shops with dedicated subdomain names. This feature empowers users to host their catalog items, whether they are NFTs or real-world goods, and seamlessly integrate Morty's inbuilt checkout.
 
@@ -43,6 +43,4 @@ Morty Wallet introduces the capability for users to create custom shops with ded
 
 Suppose you create a custom shop named "ArtisanTreasures." Morty Wallet will assign the subdomain domain "artisantreasures.mortsystack.xyz" for your shop.
 
-Now, visitors can explore your curated collection, whether it includes unique NFTs or handcrafted goods, and complete purchases seamlessly using Morty's integrated checkout. Morty will issue a receipt and the contract would hold the asset until you return to claim it
-
-Explore the possibilities with custom shops and subdomain domains, making it easy for users to showcase and sell their favorite items while
+Now, visitors can explore your curated collection, whether it includes unique NFTs or handcrafted goods, and complete purchases seamlessly using Morty's integrated checkout. Morty will issue a receipt and the contract would hold the asset until you return to claim it.
