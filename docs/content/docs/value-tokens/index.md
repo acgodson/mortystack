@@ -28,6 +28,8 @@ Representative assets are minted upon successful deposits, controlled by the Mor
 
 The Smart contract Assets minted per deposit can be used freely at the discretion of the owner of the record (seller). By default the seller can use the asset-id to query transaction information from morty
 
+![direct approach](https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/tldraw.png?alt=media&token=6ba1ae4a-f2e4-4f2e-b372-818cf50c080e)
+
 - Some basic representations include
   - Basic Receipt for paid goods and services
   - Voucher and coupons

@@ -51,7 +51,7 @@ date: 2018-11-28T15:14:39+10:00
     <div class="box">
         <div>
             <h2 sytle="fontWeight: bold">Documentation</h2>
-            <p>Explore our detailed documentation</p>
+            <p>Explore our documentation</p>
         </div>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 18L15 12L9 6" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -61,7 +61,27 @@ date: 2018-11-28T15:14:39+10:00
     <div class="box">
         <div>
             <h2>Whitepaper</h2>
-            <p>Have a glance</p>
+            <p>Rationale behind Morty</p>
+        </div>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18L15 12L9 6" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+      <div class="box">
+        <div>
+            <h2>Pitch Deck</h2>
+            <p>Reasons to choose Morty</p>
+        </div>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18L15 12L9 6" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+      <div class="box">
+        <div>
+            <h2>Brand Bible</h2>
+            <p>What our brand looks like</p>
         </div>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 18L15 12L9 6" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -80,6 +100,17 @@ date: 2018-11-28T15:14:39+10:00
           boxes[1].addEventListener('click', function() {
             window.location.href = 'https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/MORTYSTACK_WHITEPAPER.pdf?alt=media&token=c0959e3c-0a07-4132-8af8-357e8a67d2f4';
         });
+
+
+          boxes[2].addEventListener('click', function() {
+            window.location.href = 'https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/MortyStack_Pitchdeck.pdf?alt=media&token=b7c30e81-6645-4d1f-9104-0ad25cfe7c30';
+        });
+
+
+          boxes[3].addEventListener('click', function() {
+            window.location.href = 'https://firebasestorage.googleapis.com/v0/b/mortywalletng.appspot.com/o/Morty_Brand_Bible.pdf?alt=media&token=f5a43961-8a19-44c8-aef1-d006501838e5';
+        });
+
 
         boxes.forEach(box => {
             box.addEventListener('mouseover', () => {
