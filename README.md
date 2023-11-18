@@ -16,7 +16,6 @@
 
 ### Links
 
-
 - [Smart Contract]("/morty-tealscript)
 - [Documentation](https://docs.mortystack.xyz)
 - [Dashboard](https://mortystack.xyz)
@@ -27,17 +26,16 @@
 
 - [Invoice Sample & Checkout](https://mortystack.xyz/checkout?ref=6bH5iu8pyKmf0gF9e7a9)
 
-- [Sample Shop](https://kelvx.mortystack.xyz/)
+- [Sample Shop](https://highfeast.mortystack.xyz/)
 
 ### Videos
 
 - [ Demo Video (Pitch)](https://www.youtube.com/watch?v=sq3tRW7CJEQ)
 - [ Demo Video (Design)](https://www.loom.com/share/96ec49ee09a945a6b10e980995722a6d?sid=0651864d-8cbd-460d-b1ac-8b7139feeefc)
-- [ Demo Video (Whitepaper)]()
-- [ Demo Video (Smart Contracts)]()
-- [ Demo Video (Client)]()
+- [ Demo Video (Whitepaper)](https://youtu.be/f4Ci5-lyaKQ)
+- [ Demo Video (Stack)]()
 
-### Contributors
+### Contributor
 
 [Contributors](TEAM.md)
 
@@ -51,10 +49,14 @@ git clone https://github.com/acgodson/mortystack
 
 open the tealscript directory and run the test
 
+**Requirements**
+`AlgoKit`, `Docker`, `NPM`
+
 ```
 cd morty-tealscript
 npm install
-npm test
+algokit localnet start
+npm run test test
 ```
 
 ## Using the MortyStack SDK & Dashboard
