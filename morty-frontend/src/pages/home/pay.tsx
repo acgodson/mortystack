@@ -183,10 +183,6 @@ const PaymentPage: React.FC = () => {
     }
 
 
-
-    const handleTransferClick = useCallback(() => {
-        setIsConfirmOpen(true);
-    }, []);
     const handleConfirmClick = async () => {
 
         console.log(parsedToken.mintKey)
@@ -233,7 +229,6 @@ const PaymentPage: React.FC = () => {
             console.log(assetId)
             console.log(asset_ID)
             if (assetId.toString() === asset_ID?.toString()) {
-
                 const assetId = asset["asset-id"];
                 console.log(assetId)
                 console.log(asset_ID)
@@ -250,11 +245,17 @@ const PaymentPage: React.FC = () => {
                     undefined,
                     false
                 );
-
-
                 console.log(parsedAccount)
                 ParsedOriginAccounts.push(parsedAccount)
 
+            } else {
+                toast({
+                    status: "error",
+                    description: `You don't have asset ${token} in your current account. Please connect another wallet with asset and sufficent balance`,
+                    position: "bottom",
+                    duration: 2000000,
+                    isClosable: true
+                })
             }
         }
         setParsedToken(ParsedOriginAccounts[0])
@@ -318,6 +319,7 @@ const PaymentPage: React.FC = () => {
 
 
     async function getPrice() {
+        console.log("pay parsed token", parsedToken)
         if (!parsedToken) {
             return
         }
@@ -349,14 +351,22 @@ const PaymentPage: React.FC = () => {
     }
 
     useEffect(() => {
-        if (balanceConfirmed === null && pageIndex === 1 && parsedToken && tokenAmount && isValidating) {
+        if (balanceConfirmed === null && pageIndex === 1 && parsedToken && tokenAmount && isValidating && !amount) {
             console.log("checFh")
             const { uiAmount } = parsedToken
             if (uiAmount) {
                 getPrice()
             }
         }
-    }, [source, pageIndex, tokenAmount, balanceConfirmed, parsedToken, isValidating])
+    },)
+
+
+    useEffect(() => {
+        if (parsedToken) {
+            console.log("parsed token at pay page", parsedToken)
+        }
+    }, [parsedToken])
+
 
     const copyReference = () => {
     };
