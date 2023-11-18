@@ -166,7 +166,7 @@ const TransactionContentLayout = ({ invoice }: any) => {
                     >
                         {invoice &&
                             <a href="#" target='_blank'>
-                                https://mortystack.xyz/checkout?ref=${invoice.id}
+                                https://mortystack.xyz/checkout?ref={invoice.id}
                             </a>
                         }
                     </Box>

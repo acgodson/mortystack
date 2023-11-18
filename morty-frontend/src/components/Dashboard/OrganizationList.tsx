@@ -7,8 +7,9 @@ import { FaCopy } from 'react-icons/fa';
 
 const OrganizationList = () => {
   const { organizations }: any = useWeb3AuthProvider()
+  const [value, setValue] = useState("")
   const [index, setIndex] = useState(0)
-  const { onCopy } = useClipboard(organizations[index].oid)
+  const { onCopy } = useClipboard(value)
   const toast = useToast();
 
 
@@ -39,7 +40,7 @@ const OrganizationList = () => {
         My  Organizations
       </Text>
       <Flex w="100%" flexWrap="wrap">
-        {organizations && organizations.map((org: any) => (
+        {organizations && organizations.length > 0 && organizations.map((org: any) => (
           <HStack
             justifyContent={"space-between"}
             alignItems={"center"}

@@ -175,7 +175,7 @@ const DashboardTransactions: React.FC = () => {
   }
 
   useEffect(() => {
-    if (activeAddress && organizations && !txns) {
+    if (activeAddress && organizations && organizations.length > 0 && !txns) {
       console.log("from txnPanel:", organizations)
       getAllTransactions(organizations[0].oid, activeAddress)
     }
@@ -188,7 +188,6 @@ const DashboardTransactions: React.FC = () => {
 
   const gertOrignalAsset = () => {
   }
-
 
 
 

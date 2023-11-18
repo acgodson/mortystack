@@ -7,12 +7,14 @@ import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
 import SubscribeButton from "../Subscription/SubscribeButton";
 import AddOrgButton from "../Organization/AddOrgButton";
 import { useWallet } from "@txnlab/use-wallet";
+import AnimatedSpinner from "../Animations/AnimatedSpinner";
 
 
 
 const CenterPanel = () => {
+
   const { selectedTransaction, setSelectedTransaction }: any = useTransaction();
-  const { web3AuthAccount, organizations, status, refs, invoices, fetchInvoices }: any = useWeb3AuthProvider()
+  const { web3AuthAccount, loading, organizations, status, refs, invoices, fetchInvoices }: any = useWeb3AuthProvider()
   const { activeAddress, providers } = useWallet()
   const [data, setData] = useState<any | null>(null)
   const org = organizations ? organizations : []
@@ -56,161 +58,265 @@ const CenterPanel = () => {
     >
       <Box
         mt={20}
-
         py={1}
-
         w="100%"
         pr={[0, 0, 16]} pl={[0, 0, 8]}>
 
-        {web3AuthAccount && data && (
-          <BulletTitle title=
-            " Active Invoices"
-          />
-        )}
-
-        {web3AuthAccount && data && Array.isArray(data) && data.length > 0 && (
+        {web3AuthAccount &&
           <>
-            <Box
-              w="100%"
-              mt={[5, 5, 0, 0]}
-              pr={[0, 0, 10]}
-              pl={[0, 0, 3]}>
 
-
-              <Box
-                mt={5} px={2} w="100%" >
-                {data.map((item: any, index: number) => (
-                  <Box
-                    mb={8}
-                    bg="rgba(21, 34, 57, 0.6)"
-                    border="solid 0.9px #253350"
-                    borderRadius={"12px"}
-                    sx={{
-                      backdropFilter: "blur(15px) saturate(120%)",
-                    }}
-
-                    pb={3}
-                    display={"flex"}
-                    flexDirection={"column"}
-                    justifyContent={"center"}
-                    key={index}
-                  >
-                    <Box
-                      bg={selectedTransaction === item ? "#253350" : "#182942"}
-
-                      cursor={data ? "pointer" : "default"}
-                      // onClick={() => { }}
-                      onClick={() => setSelectedTransaction(index + 1)}
-                      px={4}
-                      py={4}
-                      borderRadius={"12px"}
-                      w="100%"
-                      color={selectedTransaction === item ? "white" : "whiteAlpha.500"}
-
-                    >
-                      <HStack w="100%"
-
-                        justifyContent={"space-between"}>
-                        <VStack
-                          w="60%"
-                          pr={3}
-                          textAlign={"left"}
-                          justifyContent={"flex-start"}
-                          alignItems={"flex-start"}
-                        >
-                          <Text
-                            textAlign={"left"}
-                            color="whiteAlpha.700"
-                            fontWeight={"semibold"}
-                          >
-                            {item.metadata.invoiceTitle?.toUpperCase() || ""}</Text>
-                          <Box
-                            color="whiteAlpha.800"
-                            fontSize={"xs"}
-
-                          >
-                            <Box as="span" color="#6c7686" pr={2}>
-                              Billed to:
-                            </Box>
-                            {item.metadata.customerName} ({item.metadata.customerEmail})</Box>
-                          <Box
-
-                            fontSize={"xs"}
-
-                          >org:   ({item.metadata.organization})</Box>
-
-
-
-                        </VStack>
-                        <VStack w="40%">
-                          <Text
-                            color="whiteAlpha.800"
-                            fontSize={["md", "md", "xl", "xl"]}
-                            fontWeight={"bold"}
-                          >
-
-
-                            ${item.metadata.invoiceTotal}</Text>
-                          <Text>in</Text>
-                          <Text
-                            color="whiteAlpha.800"
-                            fontSize={"lg"}
-                            fontWeight={"bold"}
-                          >
-                            {item.metadata.invoiceToken.split("(")[0].trim()}
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </Box>
-
-                    <Flex
-                      px={3}
-                      justifyContent={"space-between"}
-                    >
-                      <Box
-                        px={3}
-                        pt={3}
-                        fontSize={"xs"}
-                        color="#a6a6ee"
-                        opacity={0.6}
-                      >
-                        created:  {
-                          item.createdAt}
-
-                      </Box>
-                      <Box
-                        px={3}
-                        pt={3}
-
-                        fontSize={"xs"}
-                        color="whiteAlpha.800"
-                        opacity={0.6}
-
-                      >
-                        Next Action:
-                        <Box as="span"
-                          color="yellow"
-                          textDecoration={"underline"}
-                          pl={2}
-                          cursor={"pointer"}
-                        >
-                          {
-                            item.metadata.customerName}
-                        </Box>
-
-
-
-                      </Box>
-                    </Flex>
-
-                  </Box>
-
-                ))}
+            {loading ?
+              <Box w="100%">
+                <Center
+                  ml={[0, 0, 0, "252px"]}
+                  mx={0}
+                  position={"fixed"}
+                  pt={32}>
+                  <AnimatedSpinner />
+                </Center>
               </Box>
-            </Box>
-          </>
-        )}
 
+              :
+              <>
+
+                {data && (
+                  <BulletTitle title=
+                    " Active Invoices"
+                  />
+                )}
+
+                {data && Array.isArray(data) && data.length > 0 && (
+                  <>
+                    <Box
+                      w="100%"
+                      mt={[5, 5, 0, 0]}
+                      pr={[0, 0, 10]}
+                      pl={[0, 0, 3]}>
+
+
+                      <Box
+                        mt={5} px={2} w="100%" >
+                        {data.map((item: any, index: number) => (
+                          <Box
+                            mb={8}
+                            bg="rgba(21, 34, 57, 0.6)"
+                            border="solid 0.9px #253350"
+                            borderRadius={"12px"}
+                            sx={{
+                              backdropFilter: "blur(15px) saturate(120%)",
+                            }}
+
+                            pb={3}
+                            display={"flex"}
+                            flexDirection={"column"}
+                            justifyContent={"center"}
+                            key={index}
+                          >
+                            <Box
+                              bg={selectedTransaction === item ? "#253350" : "#182942"}
+
+                              cursor={data ? "pointer" : "default"}
+                              // onClick={() => { }}
+                              onClick={() => setSelectedTransaction(index + 1)}
+                              px={4}
+                              py={4}
+                              borderRadius={"12px"}
+                              w="100%"
+                              color={selectedTransaction === item ? "white" : "whiteAlpha.500"}
+
+                            >
+                              <HStack w="100%"
+
+                                justifyContent={"space-between"}>
+                                <VStack
+                                  w="60%"
+                                  pr={3}
+                                  textAlign={"left"}
+                                  justifyContent={"flex-start"}
+                                  alignItems={"flex-start"}
+                                >
+                                  <Text
+                                    textAlign={"left"}
+                                    color="whiteAlpha.700"
+                                    fontWeight={"semibold"}
+                                  >
+                                    {item.metadata.invoiceTitle?.toUpperCase() || ""}</Text>
+                                  <Box
+                                    color="whiteAlpha.800"
+                                    fontSize={"xs"}
+
+                                  >
+                                    <Box as="span" color="#6c7686" pr={2}>
+                                      Billed to:
+                                    </Box>
+                                    {item.metadata.customerName} ({item.metadata.customerEmail})</Box>
+                                  <Box
+
+                                    fontSize={"xs"}
+
+                                  >org:   ({item.metadata.organization})</Box>
+
+
+
+                                </VStack>
+                                <VStack w="40%">
+                                  <Text
+                                    color="whiteAlpha.800"
+                                    fontSize={["md", "md", "xl", "xl"]}
+                                    fontWeight={"bold"}
+                                  >
+
+
+                                    ${item.metadata.invoiceTotal}</Text>
+                                  <Text>in</Text>
+                                  <Text
+                                    color="whiteAlpha.800"
+                                    fontSize={"lg"}
+                                    fontWeight={"bold"}
+                                  >
+                                    {item.metadata.invoiceToken.split("(")[0].trim()}
+                                  </Text>
+                                </VStack>
+                              </HStack>
+                            </Box>
+
+                            <Flex
+                              px={3}
+                              justifyContent={"space-between"}
+                            >
+                              <Box
+                                px={3}
+                                pt={3}
+                                fontSize={"xs"}
+                                color="#a6a6ee"
+                                opacity={0.6}
+                              >
+                                created:  {
+                                  item.createdAt}
+
+                              </Box>
+                              <Box
+                                px={3}
+                                pt={3}
+
+                                fontSize={"xs"}
+                                color="whiteAlpha.800"
+                                opacity={0.6}
+
+                              >
+                                Next Action:
+                                <Box as="span"
+                                  color="yellow"
+                                  textDecoration={"underline"}
+                                  pl={2}
+                                  cursor={"pointer"}
+                                >
+                                  {
+                                    item.metadata.customerName}
+                                </Box>
+
+
+
+                              </Box>
+                            </Flex>
+
+                          </Box>
+
+                        ))}
+                      </Box>
+                    </Box>
+                  </>
+                )}
+
+                {!data && activeAddress && (
+
+                  <Center>
+                    {status !== 3 && (
+                      <Stepper index={currentStep} orientation="vertical">
+                        <Step >
+
+                          <StepIndicator>
+                            <StepStatus
+                              complete={<StepIcon />}
+                              incomplete={<StepNumber />}
+                              active={<StepNumber />}
+                            />
+                          </StepIndicator>
+
+                          <Box w="100%" flexShrink='0'
+                            color={currentStep < 1 ? "white" : "#90cdf4"}
+                          >
+                            Get started for free
+                            {status && status < 1 && (
+                              <SubscribeButton
+                                isCurrent={status === "0" ? true : false}
+                              />
+                            )}
+
+                          </Box>
+                          <StepSeparator />
+                        </Step>
+
+
+                        <Step>
+                          <StepIndicator>
+                            <StepStatus
+                              complete={<StepIcon />}
+                              incomplete={<StepNumber />}
+                              active={<StepNumber />}
+                            />
+                          </StepIndicator>
+
+                          <Box w="100%"
+                            color={currentStep > 1 ? "#90cdf4" : "white"}
+                          >
+                            Ready for Business
+                            {org < 1 && (
+                              <AddOrgButton
+                                isCurrent={currentStep === 1 ? true : false}
+
+                              />
+                            )}
+
+
+                          </Box>
+                          <StepSeparator />
+                        </Step>
+
+
+                        <Step>
+                          <StepIndicator>
+                            <StepStatus
+                              complete={<StepIcon />}
+                              incomplete={<StepNumber />}
+                              active={<StepNumber />}
+                            />
+                          </StepIndicator>
+
+                          <Box w="100%"
+                          >
+
+
+                            Your first Invoice
+                            <CreateButton
+                              isCurrent={org.length > 0 && currentStep === 2 ? true : false}
+                            />
+
+                          </Box>
+                          <StepSeparator />
+                        </Step>
+
+                      </Stepper>
+                    )}
+
+                  </Center>
+                )}
+
+              </>
+            }
+
+          </>
+        }
 
         {web3AuthAccount && organizations && !activeAddress && (
           <>
@@ -254,92 +360,6 @@ const CenterPanel = () => {
           </>
 
         )}
-
-
-        {web3AuthAccount && !data && activeAddress && (
-
-          <Center>
-            {status !== 3 && (
-              <Stepper index={currentStep} orientation="vertical">
-                <Step >
-
-                  <StepIndicator>
-                    <StepStatus
-                      complete={<StepIcon />}
-                      incomplete={<StepNumber />}
-                      active={<StepNumber />}
-                    />
-                  </StepIndicator>
-
-                  <Box w="100%" flexShrink='0'
-                    color={currentStep < 1 ? "white" : "#90cdf4"}
-                  >
-                    Get started for free
-                    {status && status < 1 && (
-                      <SubscribeButton
-                        isCurrent={status === "0" ? true : false}
-                      />
-                    )}
-
-                  </Box>
-                  <StepSeparator />
-                </Step>
-
-
-                <Step>
-                  <StepIndicator>
-                    <StepStatus
-                      complete={<StepIcon />}
-                      incomplete={<StepNumber />}
-                      active={<StepNumber />}
-                    />
-                  </StepIndicator>
-
-                  <Box w="100%"
-                    color={currentStep > 1 ? "#90cdf4" : "white"}
-                  >
-                    Ready for Business
-                    {org < 1 && (
-                      <AddOrgButton
-                        isCurrent={currentStep === 1 ? true : false}
-
-                      />
-                    )}
-
-
-                  </Box>
-                  <StepSeparator />
-                </Step>
-
-
-                <Step>
-                  <StepIndicator>
-                    <StepStatus
-                      complete={<StepIcon />}
-                      incomplete={<StepNumber />}
-                      active={<StepNumber />}
-                    />
-                  </StepIndicator>
-
-                  <Box w="100%"
-                  >
-
-
-                    Your first Invoice
-                    <CreateButton
-                      isCurrent={org.length > 0 && currentStep === 2 ? true : false}
-                    />
-
-                  </Box>
-                  <StepSeparator />
-                </Step>
-
-              </Stepper>
-            )}
-
-          </Center>
-        )}
-
 
       </Box>
     </Box >

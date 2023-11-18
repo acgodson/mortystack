@@ -14,6 +14,7 @@ import {
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import RPC from "@/Web3Auth/AlgorandRPC";
 import { CommonPrivateKeyProvider } from "@web3auth/base-provider";
+import { uiConsole } from "@/utils/helpers";
 
 
 export interface AuthContext {
@@ -38,9 +39,9 @@ type Organization = {
 
 
 export const Web3AuthProvider = ({ children }: any) => {
-    const auth = getAuth(); //firebase auth
-    const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null); //web3auth provider
-    const [user, setUser] = useState<any | null>(null); //firebase user
+    const auth = getAuth();
+    const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+    const [user, setUser] = useState<any | null>(null);
     const [web3AuthProfile, setWeb3AuthProfile] = useState<any | null>(null);
     const [web3AuthAccount, setWeb3AuthAccount] = useState<Algoccount | null>(null);
     const [web3AuthBalance, setWeb3AuthBalance] = useState<any | null>(null);
@@ -48,21 +49,12 @@ export const Web3AuthProvider = ({ children }: any) => {
     const [isGoogleSignIn, setIsGoogleSignIn] = useState(false)
     const [status, setStatus] = useState<number | string | null>(null);
     const [selectedProvider, setSelectedProvider] = useState<number>(1); //use external provider for now
-    const [organizations, setOrganizations] = useState<Organization | null>(null)
+    const [organizations, setOrganizations] = useState<Organization[] | null>(null)
     const [invoices, setInvoices] = useState<any | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [refs, setRefs] = useState<any[] | null>(null)
-
-
-
-
-
-    function uiConsole(...args: any[]): void {
-        const el = document.querySelector("#console>p");
-        if (el) {
-            el.innerHTML = JSON.stringify(args || {}, null, 2);
-        }
-    }
+    // const [isLoadingInvoices, setIsLoadingInvoices] = useState(true);
+    // const [isLoadingRefs, setIsLoadingRefs] = useState(true);
 
 
     const getUserFromCookie = () => {
@@ -72,12 +64,12 @@ export const Web3AuthProvider = ({ children }: any) => {
         }
         return cookie;
     };
+
     const setUserCookie = (user: { id: any; email: any; token: any }) => {
         cookies.set("auth", JSON.stringify(user), {
             expires: 1 / 24,
         });
     };
-
 
     const removeUserCookie = () => cookies.remove("auth");
 
@@ -95,16 +87,12 @@ export const Web3AuthProvider = ({ children }: any) => {
         };
     };
 
-    //login user with crentials from firebase log in
     const loginWeb3 = async (idToken: string) => {
-
         if (!web3Auth) {
             console.log("web3auth not initialized yet");
             return;
         }
-        // console.log("logiing into web3", idToken)
         try {
-
             const _web3authProvider = await web3Auth.connectTo(
                 WALLET_ADAPTERS.OPENLOGIN,
                 {
@@ -115,12 +103,10 @@ export const Web3AuthProvider = ({ children }: any) => {
                     },
                 }
             );
-
             if (_web3authProvider) {
                 localStorage.removeItem('isGoogleSignedIn')
                 setIsGoogleSignIn(false)
                 //     setProvider(_web3authProvider as SafeEventEmitterProvider);
-
             }
         } catch (e) {
             console.log(e)
@@ -203,6 +189,7 @@ export const Web3AuthProvider = ({ children }: any) => {
         }
     };
 
+    //signing message with default web3auth Account
     const signMessage = async (message: {}) => {
         if (!provider) {
             uiConsole("provider not initialized yet");
@@ -228,7 +215,6 @@ export const Web3AuthProvider = ({ children }: any) => {
         return result;
     };
 
-
     const findWeb3AuthAccountsAsset = async (address: string) => {
         if (!provider) {
             uiConsole("provider not initialized yet");
@@ -244,54 +230,54 @@ export const Web3AuthProvider = ({ children }: any) => {
         if (!user) {
             return;
         }
-        //it's time to fetch some org
-        let headersList = {
-            "Content-Type": "application/json"
-        }
+        setLoading(true)
+        try {
+            let headersList = {
+                "Content-Type": "application/json"
+            }
 
-        let bodyContent = JSON.stringify({
-            "uid": user.id
-        });
+            let bodyContent = JSON.stringify({
+                "uid": user.id
+            });
 
-        let response = await fetch("/api/fetch-org", {
-            method: "POST",
-            body: bodyContent,
-            headers: headersList
-        });
+            let response = await fetch("/api/fetch-org", {
+                method: "POST",
+                body: bodyContent,
+                headers: headersList
+            });
 
-        let data = await response.json();
-        if (data.orgs) {
-            console.log("gotten org", data.orgs)
-            setOrganizations(data.orgs)
+            let data = await response.json();
+            if (data.orgs) {
+                console.log("gotten org", data.orgs)
+                setOrganizations(data.orgs)
+                setLoading(false)
+            }
+        } catch (e) {
+            console.error(e)
+            setLoading(false)
         }
     }
 
-
     async function fetchInvoices(refs: any[]) {
-
         if (!web3AuthAccount || !organizations) {
             console.log("no organization found")
             return
         }
-
+        setLoading(true)
         console.log(refs.length)
-
         if (refs.length > 0) {
             try {
                 let headersList = {
                     "Content-Type": "application/json",
                 };
-
                 let bodyContent = JSON.stringify({
                     refs: refs,
                 });
-
                 let response = await fetch("/api/fetch-invoices", {
                     method: "POST",
                     body: bodyContent,
                     headers: headersList,
                 });
-
                 let data = await response.json(); // assuming the response is in JSON format
                 console.log(data);
                 console.log("active invoices", data.active)
@@ -299,39 +285,44 @@ export const Web3AuthProvider = ({ children }: any) => {
                 console.log(data.active)
                 const updatedInvoices = [...(invoices || []), ...data.active];
                 setInvoices(updatedInvoices);
+                setLoading(false)
             } catch (error) {
                 console.error("Error fetching invoices:", error);
-
+                setLoading(false)
             }
         }
+        setLoading(false)
     }
 
     async function fetchRefs(addr: string) {
+        setLoading(true)
+        try {
+            let headersList = {
+                "Content-Type": "application/json"
+            }
 
-        let headersList = {
-            "Content-Type": "application/json"
+            let bodyContent = JSON.stringify({
+                "addr": addr
+            });
+
+            let response = await fetch("/api/fetch-refs", {
+                method: "POST",
+                body: bodyContent,
+                headers: headersList
+            });
+
+            let data: any = await response.json();
+
+            console.log(data);
+            setRefs(data.refs);
+            setLoading(false)
+        } catch (e) {
+            console.log(e)
+            setLoading(false)
         }
 
-        let bodyContent = JSON.stringify({
-            "addr": addr
-        });
-
-        let response = await fetch("/api/fetch-refs", {
-            method: "POST",
-            body: bodyContent,
-            headers: headersList
-        });
-
-        let data: any = await response.json();
-
-        console.log(data);
-        setRefs(data.refs);
 
     }
-
-
-
-
 
 
     //Initialize web3Auth
@@ -413,8 +404,6 @@ export const Web3AuthProvider = ({ children }: any) => {
     }, []);
 
 
-
-
     //Listen to UnAuthStateChange
     useEffect(() => {
         if (!provider) {
@@ -455,8 +444,6 @@ export const Web3AuthProvider = ({ children }: any) => {
         }
     },);
 
-
-
     useEffect(() => {
         if (user && !isGoogleSignIn && web3AuthAccount && !web3AuthProfile) {
             getWeb3Profile();
@@ -480,6 +467,7 @@ export const Web3AuthProvider = ({ children }: any) => {
 
 
     async function getUserStatus(id: string, address: string) {
+        setLoading(true)
         try {
             let response = await fetch(`/api/fetch-user/?userId=${id}&address=${address}`, {
                 method: "GET",
@@ -492,13 +480,13 @@ export const Web3AuthProvider = ({ children }: any) => {
             }
             console.log(value)
             setStatus(value)
+            setLoading(false)
 
         } catch (e) {
             console.log("error fetching user status", e)
+            setLoading(false)
         }
-
     }
-
 
     // useEffect(() => {
     //     if (user && !status && web3AuthAccount) {
@@ -531,6 +519,7 @@ export const Web3AuthProvider = ({ children }: any) => {
                 organizations,
                 invoices,
                 refs,
+                loading,
                 mapUserData,
                 logout,
                 setUserCookie,

@@ -48,8 +48,10 @@ const HomePage = () => {
 
 
                             <br />
-                            <Text fontSize={["sm", "sm", "sm", "md"]}>
-                                Host your website for free with Morty and start accepting payments in form of Assets.</Text>
+                            <Text
+                                maxW="600px"
+                                fontSize={["sm", "sm", "sm", "md"]}>
+                                Host a web page for free with Morty and start accepting payments in form of Assets for your products.</Text>
                         </Box>
                     </Box>
                 </Center>
