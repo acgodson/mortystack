@@ -75,6 +75,7 @@ export const getTokenEquivalent = async (
   provider: any
 ) => {
   const payerChain = sourceChain as ChainId;
+
   if (!isEVMChain(payerChain)) {
     console.log(
       "This payment option is evm compatible only. Please connect an evm wallet"
@@ -98,6 +99,9 @@ export const getTokenEquivalent = async (
       ALGORAND_TOKEN_BRIDGE_ID,
       BigInt(method)
     );
+
+    console.log("wrapped info", wrappedInfo);
+    return;
 
     const { chainId, assetAddress } = wrappedInfo;
     console.log(wrappedInfo);
@@ -133,7 +137,7 @@ export const getTokenEquivalent = async (
       address: asset,
     });
 
-    console.log(result);
+    console.log("thankss s syou", result);
     return result;
   } catch (e) {
     console.log(

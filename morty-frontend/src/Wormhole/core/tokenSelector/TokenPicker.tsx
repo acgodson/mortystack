@@ -272,57 +272,54 @@ export default function TokenPicker({
 
   //This is the effect which allows pasting an address in directly
   useEffect(() => {
-
-    if (!isValidAddress || !getAddress) {
-      return;
-    }
-
-    if (useTokenId && !tokenIdHolderString) {
-      return;
-    }
-    setLoadingError("");
     let cancelled = false;
-    if (isValidAddress(holderString, chainId)) {
-      console.log(holderString)
-      const option = localFind(holderString, tokenIdHolderString);
-      if (option) {
-        init(option);
-        return () => {
-          cancelled = true;
-        };
-      }
-      setLocalLoading(true);
-      setLoadingError("");
-      getAddress(
-        holderString,
-        useTokenId ? tokenIdHolderString : undefined
-      ).then(
-        (result) => {
-          if (!cancelled) {
-            setLocalLoading(false);
-            if (result) {
-              init(result);
-            }
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setLocalLoading(false);
-            setLoadingError("Could not find the specified address.");
+  
+    if (!isValidAddress || !getAddress) {
+      return () => {
+        cancelled = true;
+      };
+    }
+  
+    if (useTokenId && !tokenIdHolderString) {
+      return () => {
+        cancelled = true;
+      };
+    }
+  
+    setLoadingError("");
+    setLocalLoading(true);
+  
+    const fetchAddress = async () => {
+      try {
+        const result = await getAddress(
+          holderString,
+          useTokenId ? tokenIdHolderString : undefined
+        );
+  
+        if (!cancelled) {
+          setLocalLoading(false);
+  
+          if (result) {
+            init(result);
           }
         }
-      );
+      } catch (error) {
+        if (!cancelled) {
+          setLocalLoading(false);
+          setLoadingError("Could not find the specified address.");
+        }
+      }
+    };
+  
+    if (isValidAddress(holderString, chainId)) {
+      fetchAddress();
     }
-    return () => (cancelled = true);
-  }, [
-    holderString,
-    isValidAddress,
-    getAddress,
-    localFind,
-    tokenIdHolderString,
-    useTokenId,
-    chainId,
-  ]);
+  
+    return () => {
+      cancelled = true;
+    };
+  }, [holderString, isValidAddress, getAddress, localFind, tokenIdHolderString, useTokenId, chainId]);
+  
 
 
   const localLoader = (
@@ -353,7 +350,7 @@ export default function TokenPicker({
           <Text variant="h5">Select a token</Text>
           <Box />
           {/* <Tooltip title="Reload tokens"> */}
-            {/* <IconButton aria-label="refresh" icon={<MdRefresh />} onClick={resetAccountsWrapper} /> */}
+          {/* <IconButton aria-label="refresh" icon={<MdRefresh />} onClick={resetAccountsWrapper} /> */}
           {/* </Tooltip> */}
         </Box>
       </ModalHeader>

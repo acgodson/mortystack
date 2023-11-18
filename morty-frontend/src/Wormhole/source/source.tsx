@@ -16,10 +16,17 @@ import { MdError } from "react-icons/md";
 
 
 function Source(
-    { tokenAmount, name }: { tokenAmount: string, name: string | null }
+    { tokenAmount, name, paymentMethod, verifying, paymentToken }: { tokenAmount: string, name: string | null, paymentMethod: string, verifying: boolean | null, paymentToken: string | null }
 ) {
-    const { amount, activeStep, setAmount, setActiveStep, balanceConfirmed, setSourceChain, sourceChain, targetChain, sourceParsedTokenAccount 
-    
+    const { amount, activeStep, setAmount,
+        setActiveStep,
+        balanceConfirmed,
+        setSourceChain,
+        sourceChain,
+        targetChain,
+        sourceParsedTokenAccount,
+        setOriginAsset
+
     }: any = useWormholeContext()
 
     const targetChainOptions = useMemo(
@@ -42,38 +49,13 @@ function Source(
     const [uiAmountString, setUiAmountString] = useState("")
     const { isReady, statusMessage } = useIsWalletReady(sourceChain);
     const { provider } = useEthereumProvider()
-    const [verifying, setVerifying] = useState<boolean | null>(null)
-    const [paymentToken, setPaymentToken] = useState<string | null>(null)
-
-
-    const paymentMethod = "212942045"
-
-
-    async function handlePermit() {
-        setVerifying(true)
-        const result = await getTokenEquivalent(sourceChain, paymentMethod, provider)
-        try {
-            if (result) {
-
-                if (result.data?.doesExist) {
-                    setPaymentToken(result.data.address)
-                    setVerifying(true)
-                } else {
-                    setVerifying(false)
-                }
-            }
-        } catch (e) {
-            setVerifying(false)
-        }
-
-    }
-
 
 
     const handleSourceChange = useCallback(
         (event: any) => {
             if (event)
                 setSourceChain(event)
+            // setOriginAsset(null)
             // setSourceChain(event.targe);
         },
         []
@@ -92,11 +74,6 @@ function Source(
         setActiveStep(1)
     }
 
-    useEffect(() => {
-        if (activeStep) {
-            console.log(activeStep)
-        }
-    },)
 
 
     //this is where we set the amount
@@ -108,17 +85,10 @@ function Source(
 
     }, [isReady, hasParsedTokenAccount])
 
-    useEffect(() => {
-        if (sourceChain && verifying === null) {
-            handlePermit()
-        }
-    }, [sourceChain, verifying])
 
     useEffect(() => {
         console.log(verifying)
     }, [verifying])
-
-
 
 
     return (
@@ -173,8 +143,6 @@ function Source(
 
 
             {verifying === true ?
-
-
                 <Box>
                     <TokenSelector
                         disabled={true}

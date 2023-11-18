@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { CHAIN_ID_ALGORAND, CHAIN_ID_ETH, CHAIN_ID_POLYGON, ChainId, getForeignAssetAlgorand } from "@certusone/wormhole-sdk";
-import { Container, Box, VStack, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, StepSeparator, Center } from "@chakra-ui/react";
+import { CHAIN_ID_ALGORAND, CHAIN_ID_ETH, CHAIN_ID_POLYGON, ChainId, getForeignAssetAlgorand, getForeignAssetEth, getOriginalAssetAlgorand, tryHexToNativeAssetString, tryUint8ArrayToNative } from "@certusone/wormhole-sdk";
+import { Container, Box, VStack, Center } from "@chakra-ui/react";
 import algosdk, { Algodv2 } from "algosdk";
 import { formatUnits } from "@ethersproject/units";
 import { useWormholeContext } from "@/contexts/WormholeContext/WormholeStoreContext";
-import { useEthereumProvider } from "@/contexts/WormholeContext/EthereumWalletContext";
-import { ALGORAND_HOST, ALGORAND_TOKEN_BRIDGE_ID, CHAINS_BY_ID } from "@/utils/wormhole/consts"
-import { errorDataWrapper } from "@/utils/wormhole/helpers";
+import { Provider, useEthereumProvider } from "@/contexts/WormholeContext/EthereumWalletContext";
+import { ALGORAND_HOST, ALGORAND_TOKEN_BRIDGE_ID, CHAINS_BY_ID, WETH_DECIMALS, getTokenBridgeAddressForChain } from "@/utils/wormhole/consts"
+import { errorDataWrapper, receiveDataWrapper } from "@/utils/wormhole/helpers";
 import { algorandOriginAsset, evmOriginAsset } from "@/Wormhole/core/";
 import { fetchSingleMetadata } from "@/hooks/wormhole/useAlgoMetadata";
-import { createParsedTokenAccount } from "@/utils/wormhole/parsedTokenAccount";
-
+import { ParsedTokenAccount, createParsedTokenAccount } from "@/utils/wormhole/parsedTokenAccount";
 import Source from "./source/source";
 import SourcePreview from "./source/SourcePreview";
 import Target from "./target/Target";
@@ -21,7 +20,8 @@ import { useRelayContext } from "@/contexts/WormholeContext/RelayWalletContext";
 import { Invoice } from "@/utils/types";
 import AnimatedSpinner from "@/components/Animations/AnimatedSpinner";
 import { extractToken, getEquivalentAmount } from "@/utils/helpers";
-import { useAlgorandContext } from "@/contexts/WormholeContext/AlgorandWalletContext";
+import { getTokenEquivalent } from "@/utils/wormhole/algorand";
+import { ethers, providers, utils } from "ethers";
 
 
 const algodClient = new Algodv2(
@@ -43,13 +43,15 @@ function TransferBridge(
 
   const { provider, signerAddress } = useEthereumProvider()
   const { isRedeeming,
-    balanceConfirmed, setBalanceConfirmed,
+    balanceConfrimed,
+    setBalanceConfirmed,
+    balance,
     setIsValidating, isValidating, sourceChain,
     targetAsset, setTargetAsset, sourceParsedTokenAccount,
     isSendComplete, isSending, setSourceChain,
     setTargetChain, activeStep, isRedeemComplete,
     originAsset, setOriginAsset,
-    setTargetParsedTokenAccount }: any = useWormholeContext()
+    setTargetParsedTokenAccount, setSourceParsedTokenAccount }: any = useWormholeContext()
 
   const pathSourceChain = CHAIN_ID_POLYGON
   const pathTargetChain = CHAIN_ID_ALGORAND;
@@ -59,6 +61,20 @@ function TransferBridge(
   const preventNavigation = (isSending || isSendComplete || isRedeeming) && !isRedeemComplete;
   const [parsedToken, setParsedToken] = useState<any | null>(null)
   const [name, setName] = useState<string | null>(null)
+
+
+
+
+  useEffect(() => {
+    console.log("taaaags", parsedToken)
+    if (parsedToken && !originAsset) {
+      const x = getOriginAsset()
+      console.log(x)
+    }
+  }, [
+    originAsset,
+    parsedToken
+  ])
 
 
 
@@ -90,8 +106,6 @@ function TransferBridge(
     return ParsedToken
   }
 
-
-
   async function getPrice() {
     if (!parsedToken) {
       return
@@ -111,12 +125,7 @@ function TransferBridge(
     let data = await response.json();
     if (data.usdPrice) {
       const equiv = getEquivalentAmount(data.usdPrice, parseInt(tokenAmount), 2)
-      const sufficient = parsedToken.uiAmount >= equiv;
-
       setAmount(equiv.toString())
-      console.log(equiv.toString())
-      console.log(sufficient)
-      setBalanceConfirmed(sufficient)
       setIsValidating(false)
     }
   }
@@ -143,7 +152,7 @@ function TransferBridge(
 
     let data: any = await response.json();
     if (data.success) {
-      
+
       setName(data.info.name.toUpperCase())
     }
   }
@@ -154,6 +163,21 @@ function TransferBridge(
     }
   }, [name])
 
+  // useEffect(() => {
+  //   if (amount) {
+  //     alert(amount)
+  //   }
+  // }, [amount])
+
+
+
+  useEffect(() => {
+    if (sourceParsedTokenAccount && amount) {
+      const sufficient = sourceParsedTokenAccount.uiAmount > parseInt(amount);
+      console.log("mr suffificent", sufficient, sourceParsedTokenAccount.uiAmount, amount)
+      setBalanceConfirmed(sufficient)
+    }
+  }, [sourceParsedTokenAccount, amount])
 
 
 
@@ -164,14 +188,13 @@ function TransferBridge(
   }, [tokenAmount, signerAddress, invoice, parsedToken])
 
   useEffect(() => {
-    if (tokenAmount && parsedToken && isValidating) {
-      const { uiAmount } = parsedToken
-      console.log(uiAmount)
-      if (uiAmount) {
-        getPrice()
-      }
+    if (tokenAmount && parsedToken && isValidating && !amount) {
+      getPrice()
+
     }
   }, [tokenAmount, isValidating, parsedToken])
+
+
 
 
 
@@ -222,179 +245,231 @@ function TransferBridge(
   const [fetchingTarget, setFetchingTarget] = useState(false)
   const [targetInfo, setTargetInfo] = useState<any | undefined>()
   const { account } = useRelayContext()
+  const [verifying, setVerifying] = useState<boolean | null>(null)
+
+  const [paymentToken, setPaymentToken] = useState<string | null>(null)
+
+
+  async function createParsedTokenAccountDynamic(
+    publicKey: string,
+    mintKey: string,
+    amount: string,
+    decimals: number,
+    isWrapped: boolean,
+    provider: any
+  ): Promise<ParsedTokenAccount> {
+    const balance = await getBalance(provider, mintKey);
+    const symbol = await getSymbol(provider, mintKey);
+
+    return {
+      publicKey: publicKey,
+      mintKey: mintKey,
+      amount,
+      decimals,
+      uiAmount: parseInt(balance),
+      uiAmountString: balance,
+      symbol: isWrapped ? symbol : '', // Include symbol only for wrapped tokens
+      name: isWrapped ? undefined : symbol, // Include name only for native tokens
+      logo: undefined, // Include logo if available
+      isNativeAsset: !isWrapped,
+    };
+  }
+
+  async function getBalance(provider: providers.Provider, address: string): Promise<string> {
+    const balanceBN = await provider.getBalance(address);
+    return utils.formatUnits(balanceBN, 18); // Assuming 18 decimal places for ETH, adjust accordingly
+  }
+
+  async function getSymbol(provider: providers.Provider, address: string): Promise<string> {
+    const contract = new ethers.Contract(address, ['function symbol() view returns (string)'], provider);
+    return contract.symbol();
+  }
+
 
   async function getOriginAsset() {
-    const x: any = await evmOriginAsset(
-      sourceParsedTokenAccount.mintKey,
-      sourceChain,
-      provider)
-    setOriginAsset(x)
-    setTargetAsset(null)
-    return x
+
+    if (!signerAddress) {
+      return
+    }
+    setVerifying(true)
+    const wrappedInfo = await getOriginalAssetAlgorand(
+      //@ts-ignore
+      algodClient,
+      ALGORAND_TOKEN_BRIDGE_ID,
+      parsedToken.mintKey
+    );
+
+    const { assetAddress, chainId, isWrapped } = wrappedInfo
+    console.log("readable address in payers chain", tryUint8ArrayToNative(assetAddress, chainId))
+
+    const addr = tryUint8ArrayToNative(assetAddress, chainId);
+
+    if (chainId === sourceChain) {
+
+      const result = receiveDataWrapper({
+        doesExist:
+          addr &&
+            addr !== ethers.constants.AddressZero
+            ? true
+            : false,
+        address: addr,
+      });
+      console.log("formatted result", result)
+
+      const parsedAccount = await createParsedTokenAccountDynamic(
+        signerAddress,
+        result.data?.address!,
+        tokenAmount,
+        WETH_DECIMALS,
+        isWrapped,
+        provider
+      );
+
+      setSourceParsedTokenAccount(parsedAccount);
+      setPaymentToken(result.data?.address!);
+
+      if (result.data) {
+        if (result.data.doesExist) {
+          setVerifying(true);
+        } else {
+          setVerifying(false)
+        }
+      }
+      return result;
+    }
+
+    const asset = await getForeignAssetEth(
+      getTokenBridgeAddressForChain(sourceChain),
+      provider!,
+      chainId,
+      assetAddress
+    );
+
+    const result = receiveDataWrapper({
+      doesExist: asset && asset !== ethers.constants.AddressZero ? true : false,
+      address: asset,
+    });
+
+
+    const parsedAccount = await createParsedTokenAccountDynamic(
+      signerAddress,
+      result.data?.address!,
+      tokenAmount,
+      WETH_DECIMALS,
+      isWrapped,
+      provider
+    );
+
+    console.log("parsed external account", parsedAccount)
+    setSourceParsedTokenAccount(parsedAccount);
+    setPaymentToken(result.data?.address!);
+
+    if (result.data) {
+      if (result.data.doesExist) {
+        setVerifying(true);
+      } else {
+        setVerifying(false)
+      }
+    }
+    return result
   }
+
   async function getTargetInfo() {
-    const x: any = await algorandOriginAsset(targetAsset)
+    const x: any = await algorandOriginAsset(parsedToken.mintKey)
+
+    console.log(x)
+    const wrappedInfo = await getOriginalAssetAlgorand(
+      //@ts-ignore
+      algodClient,
+      ALGORAND_TOKEN_BRIDGE_ID,
+      parsedToken.mintKey
+    );
+
+    console.log("xxxxx", wrappedInfo)
     setTargetInfo(x)
     return x
   }
 
-  async function fetchAlgorandTargetAsset(
-    originChain: ChainId,
-    originAsset: string,
-    isSourceAssetWormholeWrapped: boolean,
-    targetChain: ChainId
-
-  ) {
-
-    const argsMatchLastSuccess = !!lastSuccessfulArgs &&
-      lastSuccessfulArgs.isSourceAssetWormholeWrapped ===
-      isSourceAssetWormholeWrapped &&
-      lastSuccessfulArgs.originChain === originChain &&
-      lastSuccessfulArgs.originAsset === originAsset &&
-      lastSuccessfulArgs.targetChain === targetChain;
-
-    if (argsMatchLastSuccess) {
-      setFetchingTarget(false)
-      return;
-    }
-    const setArgs = () => {
-      setLastSuccessfulArgs({
-        isSourceAssetWormholeWrapped,
-        originChain,
-        originAsset,
-        targetChain,
-      });
-    }
-
-    try {
-      const algodClient = new algosdk.Algodv2(
-        ALGORAND_HOST.algodToken,
-        ALGORAND_HOST.algodServer,
-        ALGORAND_HOST.algodPort
-      );
-
-      const asset = await getForeignAssetAlgorand(
-        //@ts-ignore
-        algodClient,
-        ALGORAND_TOKEN_BRIDGE_ID,
-        originChain,
-        originAsset
-      );
-      console.log("checkkkkk", asset)
-      setTargetAsset(asset === null ? asset : asset.toString(),
-      );
-      setArgs();
-
-      setFetchingTarget(false)
-    } catch (e) {
-      console.error(e);
-      setTargetAsset(
-        errorDataWrapper(
-          "Unable to determine existence of wrapped asset"
-        )
-      );
-
-      setFetchingTarget(false)
-    }
-  }
-
   useEffect(() => {
-    console.log("taaaags", sourceParsedTokenAccount)
-    if (sourceParsedTokenAccount && !originAsset) {
+    console.log("taaaags", parsedToken)
+    if (parsedToken && !originAsset) {
       const x = getOriginAsset()
+      console.log(x)
     }
   }, [
     originAsset,
-    sourceParsedTokenAccount
+    parsedToken
   ])
 
-  useEffect(() => {
-    if (pathTargetChain === CHAIN_ID_ALGORAND && originAsset && !targetAsset) {
-      fetchAlgorandTargetAsset(
-        pathSourceChain,
-        originAsset.originAsset,
-        originAsset.isSourceAssetWormholeWrapped,
-        pathTargetChain
-      )
-    }
-  }, [originAsset, targetAsset, pathTargetChain, setTargetAsset])
+
+
+  // useEffect(() => {
+  //   if (pathTargetChain === CHAIN_ID_ALGORAND && originAsset && !targetAsset) {
+  //     fetchAlgorandTargetAsset(
+  //       pathSourceChain,
+  //       originAsset.originAsset,
+  //       originAsset.isSourceAssetWormholeWrapped,
+  //       pathTargetChain
+  //     )
+  //   }
+  // }, [originAsset, targetAsset, pathTargetChain, setTargetAsset])
 
   useEffect(() => {
-    if (targetAsset && originAsset) {
+    if (originAsset) {
       console.log("origin Asset", originAsset)
       console.log("target Asset", targetAsset)
-
       getTargetInfo()
-
     }
-  }, [targetAsset, originAsset])
-
-  useEffect(() => {
-
-    console.log("approved amount", amount)
-  }, [amount])
+  }, [originAsset])
 
 
+  // const lookupAlgoAddress = () => {
+  //   const algodClient = new Algodv2(
+  //     ALGORAND_HOST.algodToken,
+  //     ALGORAND_HOST.algodServer,
+  //     ALGORAND_HOST.algodPort
+  //   );
+  //   if (!account) {
+  //     return
+  //   }
 
+  //   console.log(targetAsset);
 
-  const lookupAlgoAddress = () => {
-    const algodClient = new Algodv2(
-      ALGORAND_HOST.algodToken,
-      ALGORAND_HOST.algodServer,
-      ALGORAND_HOST.algodPort
-    );
-    if (!account) {
-      return
-    }
+  //   return fetchSingleMetadata(targetAsset, algodClient)
+  //     .then(async (metadata) => {
 
-    console.log(targetAsset);
+  //       const accountInfo = await algodClient
+  //         .accountInformation(invoice.metadata.signer)
+  //         .do();
 
-    return fetchSingleMetadata(targetAsset, algodClient)
-      .then(async (metadata) => {
+  //       let ParsedTargetAccounts = [];
 
-        const accountInfo = await algodClient
-          .accountInformation(invoice.metadata.signer)
-          .do();
+  //       for (const asset of accountInfo.assets) {
+  //         const assetId = asset["asset-id"];
+  //         if (assetId.toString() === targetAsset) {
 
-        let ParsedTargetAccounts = [];
+  //           const amount = asset.amount;
+  //           const parsedAccount = createParsedTokenAccount(
+  //             account!.addr,
+  //             assetId.toString(),
+  //             amount,
+  //             metadata.decimals,
+  //             parseFloat(formatUnits(amount, metadata.decimals)),
+  //             formatUnits(amount, metadata.decimals).toString(),
+  //             metadata.symbol,
+  //             metadata.tokenName,
+  //             undefined,
+  //             false
+  //           );
+  //           ParsedTargetAccounts.push(parsedAccount)
 
-        for (const asset of accountInfo.assets) {
-          const assetId = asset["asset-id"];
-          if (assetId.toString() === targetAsset) {
-
-            
-            const amount = asset.amount;
-            const parsedAccount = createParsedTokenAccount(
-              account!.addr,
-              assetId.toString(),
-              amount,
-              metadata.decimals,
-              parseFloat(formatUnits(amount, metadata.decimals)),
-              formatUnits(amount, metadata.decimals).toString(),
-              metadata.symbol,
-              metadata.tokenName,
-              undefined,
-              false
-            );
-            ParsedTargetAccounts.push(parsedAccount)
-
-          }
-        }
-        console.log("parsedd", ParsedTargetAccounts)
-        setTargetParsedTokenAccount(ParsedTargetAccounts[0])
-      })
-      .catch(() => Promise.reject());
-  }
-
-  async function checker() {
-    const algoAsset = await lookupAlgoAddress();
-    console.log("Algorand Asset", algoAsset)
-
-  }
-
-
-
-
+  //         }
+  //       }
+  //       console.log("parsedd", ParsedTargetAccounts)
+  //       setSourceParsedTokenAccount(ParsedTargetAccounts[0])
+  //     })
+  //     .catch(() => Promise.reject());
+  // }
 
   return (
 
@@ -413,6 +488,9 @@ function TransferBridge(
                 <Source
                   name={name}
                   tokenAmount={amount}
+                  paymentMethod={invoice.metadata.invoiceToken.toString()}
+                  verifying={verifying}
+                  paymentToken={paymentToken}
                 /> : <SourcePreview />}
             </Box>
 

@@ -43,6 +43,7 @@ export async function algorandOriginAsset(mintAddress: string) {
       originAsset: uint8ArrayToHex(assetAddress),
     };
 
+    // console.log("yeeeee", assetInfo);
     return assetInfo;
   } catch (e) {}
 }

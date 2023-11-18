@@ -15,12 +15,12 @@ export default function SelectedTokenMessage({
             <Textarea
                 h="fit-content"
                 fontSize={"xs"}
-                color={!isValidating && !balanceConfirmed ? "red" : "#a8a9ee"}
+                color={!isValidating && !balanceConfirmed ? "white" : "#a8a9ee"}
                 bg="blackAlpha.400"
                 type="number"
 
                 value={
-                    !isValidating && !balanceConfirmed ? ` Insufficient Balance to cover transaction fees and transfer of ${amount}${token}` :
+                    !isValidating && !balanceConfirmed ? ` Insufficient Balance to cover transaction fees and transfer of ${amount} ${token}` :
 
 
                         `You're about to pay the total sum of ${amount}${token} from your connected wallet. Click on next to proceed`}

@@ -6,7 +6,7 @@ import {
     isEVMChain,
 } from "@certusone/wormhole-sdk";
 import { useWormholeContext } from "@/contexts/WormholeContext/WormholeStoreContext";
-import useGetSourceParsedTokens from "@/hooks/wormhole/useGetSourceParsedTokenAccounts";
+// import useGetSourceParsedTokens from "@/hooks/wormhole/useGetSourceParsedTokenAccounts";
 import useIsWalletReady from "@/hooks/wormhole/useIsWalletReady";
 import AlgoTokenPicker from "./AlgoTokenPicker";
 import EvmTokenPicker from "./EVMTokenPicker";
@@ -55,22 +55,21 @@ export const TokenSelector = (props: TokenSelectorProps) => {
 
 
 
-    const maps = useGetSourceParsedTokens(nft);
-    const resetAccountWrapper = maps?.resetAccounts || (() => { }); //This should never happen.
+    // const maps = useGetSourceParsedTokens(nft);
+    // const resetAccountWrapper = maps?.resetAccounts || (() => { }); //This should never happen.
 
 
 
 
     //This is only for errors so bad that we shouldn't even mount the component
     const fatalError =
-        !isEVMChain(lookupChain) &&
-        maps?.tokenAccounts?.error; // EVM chains can proceed because they have advanced mode
+        !isEVMChain(lookupChain); // EVM chains can proceed because they have advanced mode
 
 
 
 
     const content = fatalError ? (
-        <RefreshButtonWrapper callback={resetAccountWrapper}>
+        <RefreshButtonWrapper callback={() => {}}>
             <Text>Error</Text>
         </RefreshButtonWrapper>
     )
@@ -79,8 +78,8 @@ export const TokenSelector = (props: TokenSelectorProps) => {
                 value={sourceParsedTokenAccount || null}
                 disabled={disabled}
                 onChange={handleOnChange}
-                tokenAccounts={maps?.tokenAccounts}
-                resetAccounts={maps?.resetAccounts}
+                tokenAccounts={undefined}
+                resetAccounts={undefined}
                 chainId={lookupChain as ChainId}
                 nft={nft}
                 mintkey={props.token}
@@ -91,8 +90,8 @@ export const TokenSelector = (props: TokenSelectorProps) => {
                     value={sourceParsedTokenAccount || null}
                     disabled={disabled}
                     onChange={handleOnChange}
-                    resetAccounts={maps?.resetAccounts}
-                    tokenAccounts={maps?.tokenAccounts}
+                    tokenAccounts={undefined}
+                    resetAccounts={undefined}
                 />
             )
 

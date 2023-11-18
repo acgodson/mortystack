@@ -151,7 +151,6 @@ const DashboardTransactions: React.FC = () => {
             new algosdk.ABIAddressType(),
             new algosdk.ABIUintType(64),
           ]);
-
           const result = nNecoder.decode(res)
           const metadata = {
             vault: result[0],
@@ -172,10 +171,7 @@ const DashboardTransactions: React.FC = () => {
         console.log("all transs", transactions)
         settxns(transactions)
       }
-
     }
-
-
   }
 
   useEffect(() => {
@@ -189,8 +185,6 @@ const DashboardTransactions: React.FC = () => {
   useEffect(() => {
     console.log("all transactions")
   }, [txns])
-
-
 
   const gertOrignalAsset = () => {
   }
