@@ -25,7 +25,11 @@ export const getShop = async (
   callback: (error: any, shop?: any) => void
 ) => {
   try {
-    const response = await fetch(`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/api/get-shop/${name}`, {
+    const url =
+      process.env.NODE_ENV === "production"
+        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/api/get-shop/${name}`
+        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/api/get-shop/${name}`;
+    const response = await fetch(url, {
       method: "GET",
       headers,
     });
