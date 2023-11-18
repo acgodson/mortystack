@@ -53,7 +53,7 @@ function TransferBridge(
     originAsset, setOriginAsset,
     setTargetParsedTokenAccount, setSourceParsedTokenAccount }: any = useWormholeContext()
 
-  const pathSourceChain = CHAIN_ID_POLYGON
+  const pathSourceChain = CHAIN_ID_ETH
   const pathTargetChain = CHAIN_ID_ALGORAND;
 
   const [amount, setAmount] = useState<string | null>(null)

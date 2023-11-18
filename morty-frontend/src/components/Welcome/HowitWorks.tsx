@@ -1,19 +1,17 @@
 import React, { useRef } from 'react';
 import {
     Box,
-    Flex,
     Heading,
     Select,
-    SimpleGrid,
-    Text,
     HStack,
+    Text
 } from '@chakra-ui/react';
 
 
 const HowItWorks = () => {
     const containerRef: any = useRef(null);
 
-    const options = ['Pay Button', 'Invoice Links', 'Instant Shop',];
+    const options = ['Morty Button', 'Morty Invoice', 'Morty-fy (Shops)'];
 
     const handleOptionChange = (index: number) => {
         const scrollWidth = containerRef.current.scrollWidth;
@@ -27,6 +25,10 @@ const HowItWorks = () => {
             containerRef.current.scrollTo({ left: optionOffset, behavior: 'smooth' });
         }
     };
+
+    const images = [
+        "/card.svg", "/bro.svg", "/oShop.svg"
+    ]
 
     return (
         <Box py={10} w="100%">
@@ -78,21 +80,33 @@ const HowItWorks = () => {
                     spacing={8}>
                     {options.map((option, index) => (
                         <Box
+                            border="1px solid #4f4fde"
+                            background="#132036"
                             key={option}
-                            // className="grid-item"
-                            bg="#152037"
+                            // as="img"
+                            bg={`url(${images[index]})`}
+                            bgRepeat={"no-repeat"}
+                            bgPosition={"center"}
+                            bgSize={"cover"}
                             h={["250px", "250px", "500px"]}
                             w={["100%", "100%", "500px"]}
                             borderRadius="md"
                             p={6}
                         >
+                            <Text
+                                fontWeight={"bold"}
+                                fontSize={"xl"}
+                                textAlign={"center"}
+                            >{option}</Text>
+
                             <Box
+
                                 w="250px" />
                             {/* ... */}
                         </Box>
                     ))}
                 </HStack>
-            </Box>
+            </Box >
         </Box >
     );
 };

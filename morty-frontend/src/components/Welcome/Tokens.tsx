@@ -57,7 +57,7 @@ const Tokens = ({ logos }: any) => {
                 <span style={{
                     color: "#659df6"
                 }}>
-                    MortyStack
+                    Algorand, with MortyStack
                 </span>
             </Heading>
 

@@ -21,9 +21,8 @@ const featuresData = [
     },
     // Add more features as needed
 ];
-
 export const logos = [
-    "chainlink.svg", "usdc.svg", "bnb.svg", "bitcoin.svg", "eth.svg", "filecoin.svg", "matic.svg"
+    "usdc.svg", "bnb.svg", "bitcoin.svg", "eth.svg", "usdc.svg", "matic.svg"
 ];
 
 
