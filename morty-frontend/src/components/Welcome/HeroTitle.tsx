@@ -50,6 +50,8 @@ export default function HeroTitle({ title, subtitle }: any) {
                     > {subtitle} </Text>
                     <Button
                         h={["45px", "45px", "50px"]}
+                        as="a"
+                        href="https://docs.mortystack.xyz/"
                         rightIcon={<FaExternalLinkAlt />}
                     >Documentation</Button>
 

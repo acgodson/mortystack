@@ -175,7 +175,7 @@ export default function NavigationBar() {
                             as="a"
                             rightIcon={<FaExternalLinkAlt />}
                             target="_blank"
-                            href="https://docs.mortystack.xyz/docs"
+                            href="https://docs.mortystack.xyz/"
                             fontSize={"16px"}>Docs</Button>
 
                     </Flex>
