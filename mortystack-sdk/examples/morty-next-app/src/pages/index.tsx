@@ -24,7 +24,6 @@ const moustaches = [
 const KittenStore = () => {
   const [currentKittenIndex, setCurrentKittenIndex] = useState(0);
   const [currentMoustacheIndex, setCurrentMoustacheIndex] = useState("0");
-  const [payload, setPayLoad] = useState<any>()
   const [asset, setAsset] = useState<number>(1)
   const [amount, setAmount] = useState(0)
   const { appInfo } = usePay()
@@ -122,8 +121,6 @@ const KittenStore = () => {
           pt={24}
           templateColumns="repeat(2, 1fr)" gap={2}>
           <Box>
-
-
 
             <HStack
               spacing={10}
@@ -225,8 +222,6 @@ const KittenStore = () => {
               />
               <br />
               <Text fontSize={"xs"}>Please do not disable pop up in browser</Text>
-
-
             </Box>
           </Box>
         </Grid>
