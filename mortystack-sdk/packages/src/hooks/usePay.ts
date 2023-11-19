@@ -49,7 +49,7 @@ export const usePay = () => {
   };
 
   const verify = async () => {
-    console.log("is verifying mate");
+    console.log("verifying payment manually mate");
     return;
     try {
       const headersList = {
@@ -139,11 +139,14 @@ export const usePay = () => {
       signer: appInfo.signer.addr,
     });
     //TODO: remember to replace with url addresses
-    let response = await fetch("http://algo.localhost:3000/api/verify-record", {
-      method: "POST",
-      body: bodyContent,
-      headers: headersList,
-    });
+    let response = await fetch(
+      "https://algo.mortystack.xyz/api/verify-record",
+      {
+        method: "POST",
+        body: bodyContent,
+        headers: headersList,
+      }
+    );
 
     let data = await response.json();
     console.log(data);
@@ -181,7 +184,6 @@ export const usePay = () => {
     if (paymentWindow) {
       paymentWindow.addEventListener("message", (event) => {
         console.log(event);
-
         const { type, reference, txnID, returnValue } = event.data;
         console.log("Payment was successful for reference:", reference);
         console.log("Transaction ID:", txnID);
