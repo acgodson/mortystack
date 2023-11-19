@@ -24,11 +24,19 @@ export function PayModal({ onClose, open }: PayModalProps) {
         }
 
         if (verifierStatus) {
-            alert("yes")
+            // alert("yes")
         } else {
             setIsProcessing(false);
         }
     }, [countdown, verifierStatus, txn]);
+
+    // useEffect(() => {
+    //     if (reference) {
+    //         alert(reference)
+    //         return
+    //     }
+    // }, [reference])
+
 
 
 
@@ -82,12 +90,16 @@ export function PayModal({ onClose, open }: PayModalProps) {
                         <Box css={mortyFontStyles}
                             textAlign={"center"}
                         >
+                            {reference && "ref: " && reference}
                             <Heading
                                 color="red"
                             >{timer}</Heading>
-                            <Text>Waiting for Payment Confirmation...</Text>
-                            {isProcessing && <Text>Payment is still processing...</Text>}
-                            {reference && !isProcessing && <Text>Payment is successful, waiting for recipient's confirmation...</Text>}
+                            {!reference && <Text>Verifying Box reference...</Text>}
+                            {reference && countdown > 170 && <Text>Verified, waiting for Payment Page...</Text>}
+                            {reference && countdown < 240 && <Text>Payment is still processing...</Text>}
+
+                            {/* {reference && !isProcessing && <Text>Payment is successful, waiting for recipient's confirmation...</Text>} */}
+
                         </Box>
 
                     </Box>

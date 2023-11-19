@@ -10,8 +10,20 @@ export const AppContext = createContext<{
   url?: string;
   setAppInfo?(info: any): void
   signer?: SignerType | undefined
-
-}>({});
+  reference: string | null,
+  txnID: string | null,
+  receipt: bigint | number | null,
+  setReference(ref: any): void,
+  setTxnID(r: string): void,
+  setReceipt(): void
+}>({
+  reference: null,
+  txnID: null,
+  receipt: null,
+  setReference: (r) => { },
+  setTxnID: () => { },
+  setReceipt: () => { }
+});
 
 
 
@@ -20,10 +32,18 @@ export const defaultAppInfo = {
   appName: undefined,
   assets: undefined,
   url: "",
-  signer: undefined
+  signer: undefined,
+  reference: null,
+  assetID: "",
+  txnID: "",
+  setReference: () => { },
+  setTxnID: () => { },
+
 };
 export const AppProvider = ({ children, appInfo }: any) => {
-  const { countdown, status, txn } = usePay()
+  const [reference, setReference] = useState<string | null>(""); //reference from txn
+  const [receipt, setReceipt] = useState("") //claimable receipt
+  const [txnID, setTxnID] = useState("")
 
 
   useEffect(() => {
@@ -36,7 +56,19 @@ export const AppProvider = ({ children, appInfo }: any) => {
   }, []);
 
   return (
-    <AppContext.Provider value={appInfo}>
+    <AppContext.Provider
+      value={
+        {
+          ...appInfo,
+          reference,
+          setReference,
+          receipt,
+          setReceipt,
+          txnID,
+          setTxnID
+        }
+      }
+    >
       {children}
     </AppContext.Provider>
   );

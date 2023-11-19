@@ -26,7 +26,7 @@
 
 - [Invoice Sample & Checkout](https://mortystack.xyz/checkout?ref=6bH5iu8pyKmf0gF9e7a9)
 
-- [Sample Shop](https://highfeast.mortystack.xyz/)
+- [Sample Shop](https://ada-ada.mortystack.xyz/)
 
 ### Videos
 

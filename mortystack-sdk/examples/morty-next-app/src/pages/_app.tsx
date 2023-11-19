@@ -19,11 +19,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
 
   const config = {
-    id: "HIG-1700166882994-KB0H0K", //Morty Org ID from Dashboard
+    id: "HIG-1700166882994-KB0H0K",
     assets: selectedAssets,
     signer: {
-      addr: "HI2XIZK5RGT6AUVECTRQ35X6GJJO4ZAWLX4Y5A6I5WTMA6GQFJNCP7TN2I", //address that created Org/record creator,
-      secret: process.env.Secret // dispenser hash secret. Currently disabled
+      addr: "HI2XIZK5RGT6AUVECTRQ35X6GJJO4ZAWLX4Y5A6I5WTMA6GQFJNCP7TN2I",
+      secret: process.env.Secret // dispenser hash secret. Currently disabled but N/B This is not the secret associated with signer addr
     }
   }
 
@@ -37,3 +37,5 @@ export default function App({ Component, pageProps }: AppProps) {
   )
 
 }
+
+// "mortystack": "^0.1.0-alpha.5",

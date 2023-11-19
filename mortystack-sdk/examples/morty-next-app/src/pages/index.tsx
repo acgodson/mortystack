@@ -12,9 +12,9 @@ const kittens = [
 ];
 
 const moustaches = [
-  { id: '1', value: 3, image: '/moustache/1.svg' },
-  { id: '2', value: 3, image: '/moustache/2.svg' },
-  { id: '3', value: 2, image: '/moustache/3.png' },
+  { id: '1', value: 1, image: '/moustache/1.svg' },
+  { id: '2', value: 1, image: '/moustache/2.svg' },
+  { id: '3', value: 1, image: '/moustache/3.png' },
   { id: '4', value: 2, image: '/moustache/4.png' },
   { id: '5', value: 4, image: '/moustache/5.svg' },
   { id: '6', value: 5, image: '/moustache/6.svg' },
