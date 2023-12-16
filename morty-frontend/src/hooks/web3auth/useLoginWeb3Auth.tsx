@@ -9,14 +9,18 @@ const useLoginWeb3Auth = () => {
     const auth = getAuth();
 
     async function signIn(email: string, password: string, loginWeb3: any, setUserCookie: any, mapUserData: any, setSigningIn: any) {
+        // setSigningIn(true)
+        //currently disable and allow only waitlistded users to test
+        // setTimeout(() => {
+        //     toast({
+        //         status: "error",
+        //         title: "Disabled",
+        //         description: "Email and Password do not match"
+        //     })
+        //     return;
+        // }, 3000)
 
-        // toast({
-        //     status: "error",
-        //     title: "Disabled",
-        //     description: "Please try again later"
-        // })
 
-        // return
 
         try {
             setSigningIn(true)
@@ -37,11 +41,21 @@ const useLoginWeb3Auth = () => {
                 .catch((error) => {
                     const errorCode = error.code;
                     console.log(error.message, errorCode)
+                    setSigningIn(false);
+                    toast({
+                        status: "error",
+                        description: error.message,
+                    });
                 });
 
             return userID;
         } catch (e: any) {
             console.log(e);
+            setSigningIn(false);
+            toast({
+                status: "error",
+                description: e.message,
+            });
         }
     }
 

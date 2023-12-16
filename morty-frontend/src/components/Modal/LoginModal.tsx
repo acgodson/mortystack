@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 
 import { MdEmail, MdOutlineVisibility, MdPassword } from "react-icons/md";
-import { FaGoogle } from "react-icons/fa";
+// import { FaGoogle } from "react-icons/fa";
 import useLoginWeb3Auth from "@/hooks/web3auth/useLoginWeb3Auth";
 import { useWeb3AuthProvider } from "@/contexts/Web3AuthContext";
 
@@ -187,7 +187,7 @@ const LoginModal = ({ isOpen, onClose, page = 0 }: any) => {
                   Login to MortyStack
                 </Button>
 
-                <Button
+                {/* <Button
                   h="50px"
                   mt={4}
                   bg="gray.600"
@@ -197,7 +197,7 @@ const LoginModal = ({ isOpen, onClose, page = 0 }: any) => {
                   isLoading={isGoogleSignIn}
                 >
                   Google
-                </Button>
+                </Button> */}
 
                 {/* <HStack mt={8} fontSize={"sm"} justifyContent="center">
                                     <Text>           Don't have an account?</Text>
